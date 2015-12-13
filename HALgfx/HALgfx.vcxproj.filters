@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Format.h" />
+    <ClInclude Include="IDevice.h" />
+    <ClInclude Include="IBlendState.h" />
+    <ClInclude Include="IDepthStencilState.h" />
+    <ClInclude Include="IDeviceContext.h" />
+    <ClInclude Include="IResource.h" />
+    <ClInclude Include="ISamplerState.h" />
+    <ClInclude Include="ITexture2d.h" />
+    <ClInclude Include="IView.h" />
+    <ClInclude Include="IBuffer.h" />
+    <ClInclude Include="ShaderType.h" />
+    <ClInclude Include="ComparisonFunc.h" />
+    <ClInclude Include="IRasterizerState.h" />
+    <ClInclude Include="ScissorRect.h" />
+    <ClInclude Include="Viewport.h" />
+    <ClInclude Include="IInputLayout.h" />
+    <ClInclude Include="IShaderResourceView.h" />
+    <ClInclude Include="Buffer_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="Format_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="SamplerState_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2d_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="Device_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="FeatureLevel.h" />
+    <ClInclude Include="BlendState_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderTargetView.h" />
+    <ClInclude Include="RenderTargetView_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderResourceView_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilView_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="IDepthStencilView.h" />
+    <ClInclude Include="DepthStencilState_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="RasterizerState_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="ComparisonFunc_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayout_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="IShader.h" />
+    <ClInclude Include="DeviceContext_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceContext_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="d3d11">
+      <UniqueIdentifier>{52c1f2c5-c969-4b88-a42f-fc04e01b9cd1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Buffer_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Format_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2d_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceContext_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetView_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceView_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilView_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="BlendState_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthStencilState_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerState_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerState_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="ComparisonFunc_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="InputLayout_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
