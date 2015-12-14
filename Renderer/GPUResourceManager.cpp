@@ -3,6 +3,7 @@
 #include "HALgfx\IDevice.h"
 #include "HALgfx\IBuffer.h"
 #include "HALgfx\ITexture2d.h"
+#include "HALgfx\IInputLayout.h"
 #include "HALgfx\IResource.h"
 #include "HALgfx\IShaderResourceView.h"
 #include "HALgfx\ISamplerState.h"
@@ -65,10 +66,30 @@ void GPUResourceManager::CreateMeshResource(const Scene::Mesh* pMesh, HALgfx::ID
 	if (it == m_MeshMap.end())
 	{
 		MeshResource meshResource;
-		
-		// input layout
-		//meshResource.m_pInputLayout = pDevice->CreateInputLayout(m_iNumElements, m_aInputElementsDesc, iShaderSize, pVertexShaderCode);
 
+		// input elements
+		int iSize = 0;
+		Scene::VertexDecl decls[Scene::MAX_DESC_COUNT];
+		pMesh->GetVetexDecls(iSize, decls);
+		for (int i = 0; i < iSize; ++i)
+		{
+			switch (decls[i])
+			{
+			case Scene::POSITION:
+				meshResource.AddElement(HALgfx::INPUT_SEMANTIC_POSITION, 3);
+				break;
+			case Scene::NORMAL:
+				meshResource.AddElement(HALgfx::INPUT_SEMANTIC_NORMAL, 3);
+				break;
+			case Scene::TEXCOORD:
+				meshResource.AddElement(HALgfx::INPUT_SEMANTIC_TEXCOORD, 2);
+				break;
+			default:
+				assert(0);
+				break;
+			}
+		}
+		
 		// vertex buffer
 		HALgfx::BufferDesc desc;
 		desc.bindFlags = HALgfx::BIND_VERTEX_BUFFER;

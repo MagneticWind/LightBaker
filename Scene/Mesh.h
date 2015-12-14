@@ -51,6 +51,8 @@ public:
 
 	void AddVertexDecl(VertexDecl eDecl);
 
+	void GetVetexDecls(int& iSize, VertexDecl* pDecls) const;
+
 	float* CreateVertexDataBuffer(int iNumVertices, int iVertexByteSize);
 	unsigned int* CreateIndexDataBuffer(int iNumFaces);
 
@@ -74,6 +76,13 @@ protected:
 inline void Mesh::AddVertexDecl(VertexDecl eDecl)
 {
 	m_eaVertexDecls[m_iNumDecls++] = eDecl;
+}
+
+inline void Mesh::GetVetexDecls(int& iSize, VertexDecl* pDecls) const
+{
+	iSize = m_iNumDecls;
+	for (int i = 0; i < iSize; ++i)
+		pDecls[i] = m_eaVertexDecls[i];
 }
 
 inline const void* Mesh::GetVertexBufferPtr() const

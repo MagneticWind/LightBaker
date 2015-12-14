@@ -161,6 +161,12 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 								desc.byteSize = sizeof(CBufferLights);
 								pShaderNode->AddConstantBuffer(desc, pDevice, HALgfx::PIXEL_SHADER);
 
+								// input layout, it requires v shader byte code, and input elements from mesh
+								const char* meshName = pSurface->GetGeometry()->GetName();
+								GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
+								MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
+								pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+
 								m_lShaderNodes.push_back(pShaderNode);
 							}
 							

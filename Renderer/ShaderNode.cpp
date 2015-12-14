@@ -217,6 +217,12 @@ void ShaderNode::SetSamplerStates(HALgfx::ISamplerState* pSamplerStates[], int i
 }
 
 //------------------------------------------------------------------
+void ShaderNode::CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice)
+{
+	m_pInputLayout = pDevice->CreateInputLayout(iNumElements, inputElements, m_iFileSize[HALgfx::VERTEX_SHADER], m_ppFileData[HALgfx::VERTEX_SHADER]);
+}
+
+//------------------------------------------------------------------
 void ShaderNode::AddConstantBuffer(const HALgfx::BufferDesc& desc, HALgfx::IDevice* pDevice, HALgfx::ShaderType eType)
 {
 	HALgfx::SubResourceData data;
@@ -276,7 +282,7 @@ void* ShaderNode::CreateBuffer(int iSize, HALgfx::ShaderType eType)
 //------------------------------------------------------------------
 void ShaderNode::LoadShader()
 {
-	static const char SHADER_PATH[256] = "C:\\Projects\\GitHub\\Test\\LightBaker\\data\\shader\\";
+	static const char SHADER_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\shader\\";
 	char filePath[256];
 	strcpy(filePath, SHADER_PATH);
 	strcat(filePath, m_caShaderName);
@@ -335,12 +341,6 @@ void ShaderNode::LoadShader()
 	fclose(pPSFile);
 
 	m_bIsLoaded = true;
-}
-
-//------------------------------------------------------------------
-void ShaderNode::SetInputLayout(HALgfx::IInputLayout* pInputLayout)
-{
-	m_pInputLayout = pInputLayout;
 }
 
 } // namespace Renderer

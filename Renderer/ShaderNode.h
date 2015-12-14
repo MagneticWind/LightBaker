@@ -45,7 +45,7 @@ public:
 	void SetSamplerStates(HALgfx::ISamplerState* pSamplerStates [], int iNumSamplerStates);
 
 	const char* GetName() const;
-	void SetInputLayout(HALgfx::IInputLayout* pInputLayout);
+	void CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
 
 	// load compiled shades, create cbuffer, input layout and such
 	void LoadShader();

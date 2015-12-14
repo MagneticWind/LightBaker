@@ -16,8 +16,8 @@ namespace Scene
 
 namespace ResourceManagerPrivate
 {
-	char MESH_PATH[256] = "C:\\Projects\\GitHub\\Test\\LightBaker\\data\\";
-	char TEXTURE_PATH[256] = "C:\\Projects\\GitHub\\Test\\LightBaker\\data\\texture\\";
+	char MESH_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\";
+	char TEXTURE_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\texture\\";
 }
 
 ResourceManager* ResourceManager::ms_pInstance = 0;
