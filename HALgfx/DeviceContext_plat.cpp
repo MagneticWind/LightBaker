@@ -1,3 +1,4 @@
+#include <d3d9.h>
 
 #include "Buffer_plat.h"
 #include "DeviceContext_plat.h"
@@ -357,6 +358,21 @@ void DeviceContext::SetPrimitiveTopology(PrimitiveTopology eType)
 		break;
 	}
 	m_pDeviceContext->IASetPrimitiveTopology(ePrimitive);
+}
+
+void DeviceContext::BeginEvent(const char* debugInfo)
+{
+	size_t newsize = strlen(debugInfo) + 1;
+	wchar_t * wcstring = new wchar_t[newsize];
+	size_t convertedChars = 0;
+	mbstowcs_s(&convertedChars, wcstring, newsize, debugInfo, _TRUNCATE);
+
+	D3DPERF_BeginEvent(D3DCOLOR_XRGB(128, 128, 128), wcstring);
+}
+
+void DeviceContext::EndEvent()
+{
+	D3DPERF_EndEvent();
 }
 
 } // namespace HALgfx

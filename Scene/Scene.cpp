@@ -46,6 +46,7 @@ void Scene::Update(float fTimeLapse)
 	m_lCameras.clear();
 	m_lLights.clear();
 	m_lEntities.clear();
+	m_lRenderObjects.clear();
 	Math::Matrix4f mIdentity; // default constructor creates identity matrix
 	TraverseSceneGraph(m_pSceneRoot, mIdentity);
 

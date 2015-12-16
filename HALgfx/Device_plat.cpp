@@ -13,7 +13,6 @@
 #include "PixelShader_plat.h"
 #include "VertexShader_plat.h"
 
-
 namespace Magnet
 {
 namespace HALgfx

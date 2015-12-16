@@ -55,6 +55,8 @@ namespace Renderer
 		HALgfx::RenderSystem::Initialize();
 		HALgfx::RenderSystem::GetInstance().InitializeSystem(iWidth, iHeight, pWindowHandle);
 
+		GPUResourceManager::Initialize();
+
 		assert(ms_pInstance == 0);
 
 		ms_pInstance = new RenderManager();
@@ -83,6 +85,7 @@ namespace Renderer
 		delete ms_pInstance;
 		ms_pInstance = 0;
 
+		GPUResourceManager::Terminate();
 		HALgfx::RenderSystem::Terminate();
 	}
 
@@ -224,7 +227,7 @@ namespace Renderer
 		pShadowPass->ClearDrawNodes();*/
 
 		IRenderPass* pOpaquePass = m_pRenderPasses[PASS_OPAQUE];
-		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
+		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateEnabled);
 		pOpaquePass->Render(pDevice, pDeviceContext);
 		pOpaquePass->ClearDrawNodes();
 

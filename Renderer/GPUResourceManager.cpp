@@ -26,7 +26,54 @@ GPUResourceManager::GPUResourceManager()
 //------------------------------------------------------------------
 GPUResourceManager::~GPUResourceManager()
 {
-		
+	std::map<std::string, MeshResource>::iterator itMesh = m_MeshMap.begin();
+	std::map<std::string, MeshResource>::iterator itMeshEnd = m_MeshMap.end();
+
+	while (itMesh != itMeshEnd)
+	{
+		MeshResource& meshResource = itMesh->second;
+		if (meshResource.m_pVertexBuffer)
+		{
+			delete meshResource.m_pVertexBuffer;
+			meshResource.m_pVertexBuffer = NULL;
+		}
+		if (meshResource.m_pIndexBuffer)
+		{
+			delete meshResource.m_pIndexBuffer;
+			meshResource.m_pIndexBuffer = NULL;
+		}
+	}
+
+	std::map<std::string, TextureResource>::iterator itTexture = m_TextureMap.begin();
+	std::map<std::string, TextureResource>::iterator itTextureEnd = m_TextureMap.end();
+
+	while (itTexture != itTextureEnd)
+	{
+		TextureResource& textureResource = itTexture->second;
+		if (textureResource.m_pShaderResourceView)
+		{
+			delete textureResource.m_pShaderResourceView;
+			textureResource.m_pShaderResourceView = NULL;
+		}
+		if (textureResource.m_pTexture2D)
+		{
+			delete textureResource.m_pTexture2D;
+			textureResource.m_pTexture2D = NULL;
+		}
+	}
+
+	std::map<int, HALgfx::ISamplerState*>::iterator itSampler = m_SamplerMap.begin();
+	std::map<int, HALgfx::ISamplerState*>::iterator itSamplerEnd = m_SamplerMap.end();
+
+	while (itSampler != itSamplerEnd)
+	{
+		HALgfx::ISamplerState* pSampler = itSampler->second;
+		if (pSampler)
+		{
+			delete pSampler;
+			pSampler = NULL;
+		}
+	}
 }
 
 //------------------------------------------------------------------
@@ -93,7 +140,7 @@ void GPUResourceManager::CreateMeshResource(const Scene::Mesh* pMesh, HALgfx::ID
 		// vertex buffer
 		HALgfx::BufferDesc desc;
 		desc.bindFlags = HALgfx::BIND_VERTEX_BUFFER;
-		desc.byteStride = pMesh->GetStride();
+		desc.byteStride = meshResource.m_iStride;
 		desc.byteSize = desc.byteStride * pMesh->GetNumVerts();
 		//desc.cpuAccessFlags = HALgfx::CPU_ACCESS_READ;
 		desc.usage = HALgfx::USAGE_DEFAULT;

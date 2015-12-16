@@ -52,6 +52,9 @@ public:
 
 	ID3D11DeviceContext* GetD3DPtr();
 
+	virtual void BeginEvent(const char* debugInfo);
+	virtual void EndEvent();
+
 private:
 	ID3D11DeviceContext* m_pDeviceContext;
 

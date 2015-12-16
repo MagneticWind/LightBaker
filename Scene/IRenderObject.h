@@ -24,6 +24,10 @@ enum RenderObjectType
 class IRenderObject
 {
 public:
+	IRenderObject()
+	{
+		m_v3Scale = Math::Vector3f(1.f, 1.f, 1.f);
+	}
 	virtual ~IRenderObject(){}
 
 	virtual void Initialize() = 0;

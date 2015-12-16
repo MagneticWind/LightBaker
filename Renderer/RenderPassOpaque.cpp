@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "CBufferDefs.h"
 #include "GPUResourceManager.h"
 
@@ -12,6 +14,7 @@
 #include "Scene\Scene.h"
 #include "Scene\Surface.h"
 #include "Scene\Material.h"
+#include "Scene\Light.h"
 
 #include "Math\Frustum.h"
 #include "Memory.h"
@@ -61,6 +64,7 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 //------------------------------------------------------------------
 void RenderPassOpaque::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext)
 {
+	pDeviceContext->BeginEvent("RenderPassOpaque");
 	std::list<ShaderNode*>::iterator it = m_lShaderNodes.begin();
 	std::list<ShaderNode*>::iterator itEnd = m_lShaderNodes.end();
 	while (it != itEnd)
@@ -68,6 +72,7 @@ void RenderPassOpaque::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* 
 		(*it)->Draw(pDeviceContext);
 		it++;
 	}
+	pDeviceContext->EndEvent();
 }
 
 //------------------------------------------------------------------
@@ -95,10 +100,15 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 	Scene::Scene* pScene = Scene::SceneManager::GetInstance().GetScene();
 	std::list<Scene::IRenderObject*>&renderObjectList = pScene->GetRenderObjectList();
 
+	// camera
 	const Scene::Camera* pCamera = pScene->GetCurrentCamera();
-
 	const Math::Matrix4f& mView = pCamera->GetViewMatrix();
 	const Math::Matrix4f& mProjection = pCamera->GetProjectionMatrix();
+
+	// lights
+	std::list<Scene::Light*>& lightList = pScene->GetLightList();
+	Scene::Light* pMainLight = *lightList.begin();
+	assert(pMainLight->GetType() == Scene::LIGHT_DIRECTIONAL);
 
 	std::list<Scene::IRenderObject*>::iterator itEnd = renderObjectList.end();
 	for (std::list<Scene::IRenderObject*>::iterator it = renderObjectList.begin(); it != itEnd; ++it)
@@ -177,6 +187,8 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 
 								const char* meshName = pSurface->GetGeometry()->GetName();
 
+								strcpy(drawNode.m_caName, meshName);
+
 								GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 								MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
 
@@ -199,13 +211,11 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 								pMaterialNormal->GetSpecular(pMaterialBuffer->v4Ks);
 								pMaterialNormal->GetExponent(pMaterialBuffer->v4Ks.w);
 
-								/*CBufferOpaque* pCBufferOpaque = static_cast<CBufferOpaque*>(drawNode.CreateCBufferData(sizeof(CBufferOpaque), HALgfx::PIXEL_SHADER));
-								pCBufferOpaque->v4EyePosition = Math::Vector4f(v3EyePosition.x, v3EyePosition.y, v3EyePosition.z, 1.f);
-								Math::Vector3f v3LightDirection, v3LightColor;
-								RenderManager::GetInstance().GetMajorLightData(v3LightDirection, v3LightColor);
-								pCBufferOpaque->v4SunDirection = Math::Vector4f(v3LightDirection.x, v3LightDirection.y, v3LightDirection.z, 1.f);
-								pCBufferOpaque->v4SunColor = Math::Vector4f(v3LightColor.x, v3LightColor.y, v3LightColor.z, 1.f);
-								RenderManager::GetInstance().GetSHCubemap(pCBufferOpaque->v4SHCoeffs, 7);*/
+								CBufferLights* pCBufferLights = static_cast<CBufferLights*>(drawNode.CreateCBufferData(sizeof(CBufferLights), HALgfx::PIXEL_SHADER));
+								Math::Vector3f v3LightDirection = pMainLight->GetDirection();
+								Math::Vector3f v3LightColor = pMainLight->GetColor();
+								pCBufferLights->v4LightDirection = Math::Vector4f(v3LightDirection.x, v3LightDirection.y, v3LightDirection.z, 1.f);
+								pCBufferLights->v4LightColor = Math::Vector4f(v3LightColor.x, v3LightColor.y, v3LightColor.z, 1.f);
 
 								// textures
 								int iNumTextures = pSurface->GetNumTextures();

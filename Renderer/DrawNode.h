@@ -45,6 +45,8 @@ struct DrawNode
 	// textures
 	HALgfx::IShaderResourceView* m_ppSRVs[MAX_NUMBER_SRVS];
 
+	char m_caName[256];
+
 	int m_iNumberOfSamplers;
 	int m_iNumberOfSRVs;
 	int m_iNumberOfPrimitives;

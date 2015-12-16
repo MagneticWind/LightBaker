@@ -72,7 +72,11 @@ ShaderNode::~ShaderNode()
 		}
 	}
 
-	m_pInputLayout = 0;
+	if (m_pInputLayout)
+	{
+		delete m_pInputLayout;
+		m_pInputLayout = 0;
+	}
 
 	for (int i = 0; i < MAX_NUMBER_BUFFERS; ++i)
 	{
@@ -151,6 +155,8 @@ void ShaderNode::UnbindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, 
 //------------------------------------------------------------------
 void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 {
+	pDeviceContext->BeginEvent(m_caShaderName);
+
 	pDeviceContext->SetInputlayout(m_pInputLayout);
 
 	pDeviceContext->SetSamplerStates(HALgfx::PIXEL_SHADER, 0, m_iNumSamplerState, m_ppSamplers);
@@ -163,14 +169,22 @@ void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 	while(it != itEnd)
 	{
 		DrawNode& drawNode = *it;
+
+		pDeviceContext->BeginEvent(drawNode.m_caName);
+
 		BindDrawNodeResource(pDeviceContext, drawNode);
 		pDeviceContext->DrawIndexed(drawNode.m_iNumberOfPrimitives * 3, 0, 0);
 		UnbindDrawNodeResource(pDeviceContext, drawNode);
+
+		pDeviceContext->EndEvent();
+
 		it++;
 	}
 
 	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
 		pDeviceContext->SetShader(static_cast<HALgfx::ShaderType>(i), 0);
+
+	pDeviceContext->EndEvent();
 }
 
 

@@ -252,7 +252,7 @@ void SceneLoader::ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface
 		int techValue;
 		sscanf(tech, "%d", &techValue);
 
-		if (strcmp(type, "normal"))
+		if (strcmp(type, "normal") == 0)
 		{
 			Material* pMaterial = new Material(static_cast<unsigned char>(techValue));
 			ParseMaterial(pMaterialElement, pMaterial);

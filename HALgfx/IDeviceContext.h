@@ -84,6 +84,9 @@ public:
 	virtual void Map(IResource* pResource, unsigned int uSubResourceIndex, MapType eType, unsigned int uMapFlag, SubResourceData& data) = 0;
 	virtual void Unmap(IResource* pResource, unsigned int uSubResourceIndex) = 0;
 
+	virtual void BeginEvent(const char* debugInfo) = 0;
+	virtual void EndEvent() = 0;
+
 };
 
 } // namespace HALgfx

@@ -17,6 +17,17 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# vs studio files
+*.sdf
+*.suo
+*.user
+*.opensdf
+
+# other folders
+build/
+data/
+External/
+
 # =========================
 # Operating System Files
 # =========================
