@@ -289,8 +289,8 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	rDesc.scissorEnable = false;
 	rDesc.depthBiasClamp = 0.f;
 	rDesc.fillMode = FILL_SOLID;
-	rDesc.antialiasedLineEnable = false;
-	rDesc.multisampleEnable = false;
+	rDesc.antialiasedLineEnable = true;
+	rDesc.multisampleEnable = true;
 	m_pRasterizerState = pDevice->CreateRasterizerState(rDesc);
 
 	// initialize perf\debug event wrapper

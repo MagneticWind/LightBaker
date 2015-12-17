@@ -142,6 +142,17 @@ void SceneLoader::ParseLight(tinyxml2::XMLElement* pElement, Light* pLight)
 		pLight->SetDirection(v3Direction);
 		pLight->SetColor(v3Color);
 	}
+	else if (strcmp(type, "point") == 0)
+	{
+		Math::Vector3f v3Position, v3Color;
+		const char* direction = pElement->FirstChildElement("position")->GetText();
+		const char* color = pElement->FirstChildElement("color")->GetText();
+		sscanf(direction, "%f %f %f", &v3Position.x, &v3Position.y, &v3Position.z);
+		sscanf(color, "%f %f %f", &v3Color.x, &v3Color.y, &v3Color.z);
+		pLight->SetType(LIGHT_POINT);
+		pLight->SetPosition(v3Position);
+		pLight->SetColor(v3Color);
+	}
 }
 
 //------------------------------------------------------------------

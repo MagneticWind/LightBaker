@@ -26,7 +26,7 @@ struct CBufferMaterialNormal
 
 struct CBufferLights
 {
-	Math::Vector4f v4LightDirection;
+	Math::Vector4f v4LightPosition;
 	Math::Vector4f v4LightColor;
 };
 

@@ -54,8 +54,8 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 	pDeviceContext->SetRasterizerState(pRState);
 	pDeviceContext->SetDepthStencilState(pDSState);
 
-	//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
-	//	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
+	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -212,9 +212,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 								pMaterialNormal->GetExponent(pMaterialBuffer->v4Ks.w);
 
 								CBufferLights* pCBufferLights = static_cast<CBufferLights*>(drawNode.CreateCBufferData(sizeof(CBufferLights), HALgfx::PIXEL_SHADER));
-								Math::Vector3f v3LightDirection = pMainLight->GetDirection();
+								Math::Vector3f v3LightPosition = pMainLight->GetPosition();
 								Math::Vector3f v3LightColor = pMainLight->GetColor();
-								pCBufferLights->v4LightDirection = Math::Vector4f(v3LightDirection.x, v3LightDirection.y, v3LightDirection.z, 1.f);
+								pCBufferLights->v4LightPosition = Math::Vector4f(v3LightPosition.x, v3LightPosition.y, v3LightPosition.z, 1.f);
 								pCBufferLights->v4LightColor = Math::Vector4f(v3LightColor.x, v3LightColor.y, v3LightColor.z, 1.f);
 
 								// textures
