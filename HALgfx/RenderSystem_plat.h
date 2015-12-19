@@ -59,8 +59,6 @@ public:
 
 	void GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float faSHBlue[9]) const;
 
-//	void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV);
-
 	void Present();
 
 private:

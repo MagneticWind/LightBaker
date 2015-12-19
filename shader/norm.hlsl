@@ -84,7 +84,7 @@ float4 PointLight(in float4 f4Normal, in float4 f4View, in float4 f4Position)
 	float NDotH = saturate(dot(f3HalfVec, f4Normal.xyz));
 	f4Color += f4Ks * f4LightColor * pow(NDotH, f4Ks.w);
 
-	float fadeFactor = 1.f / (fDistance) * 400.f;
+	float fadeFactor = 1.f / (fDistance);
 
 	return f4Color * fadeFactor;
 }

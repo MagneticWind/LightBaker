@@ -122,7 +122,8 @@
       <Path>$(OutDir)\$(ProjectName)\log.txt</Path>
     </BuildLog>
     <Lib>
-      <AdditionalDependencies>D3D11.lib; d3d9.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

@@ -32,6 +32,7 @@ public:
 	virtual IDepthStencilView* CreateDepthStencilView(IResource*, const DepthStencilViewDesc&);
 	virtual IShaderResourceView* CreateShaderResourceView(IResource*, const ShaderResourceViewDesc&);
 	//virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*);
+	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV);
 
 	ID3D11Device* GetD3DPtr();
 

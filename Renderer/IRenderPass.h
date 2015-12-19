@@ -29,7 +29,9 @@ class ShaderNode;
 
 enum PassType
 {
+	PASS_SKY,
 	PASS_OPAQUE,
+	PASS_POSTPROCESS,
 	PASS_NUMBER
 };
 

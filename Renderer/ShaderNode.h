@@ -53,6 +53,8 @@ public:
 	void* CreateBuffer(int iSize, HALgfx::ShaderType eType);
 	bool IsLoaded() const;
 
+	DrawNode& GetDrawNode(const char* name);
+
 private:
 	char m_caShaderName[256];
 	void* m_ppFileData[HALgfx::MAX_SHADER_NUM];

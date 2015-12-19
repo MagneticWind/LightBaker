@@ -13,7 +13,7 @@ namespace Magnet
 {
 class IRenderObject;
 class Surface;
-class Material;
+class IMaterial;
 class Texture;
 
 namespace Scene
@@ -47,7 +47,7 @@ private:
 	IRenderObject* ParseRenderObject(tinyxml2::XMLElement* pElement);
 	void ParseTransformation(tinyxml2::XMLElement* pElement, IRenderObject* pObject);
 	void ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface);
-	void ParseMaterial(tinyxml2::XMLElement* pElement, Material* pMaterial);
+	void ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pMaterial);
 
 private:
 	char m_caSceneName[256];

@@ -5,6 +5,7 @@
 #include "External\tinyxml2\tinyxml2.h"
 #include "Light.h"
 #include "Material.h"
+#include "MaterialSky.h"
 #include "Memory.h"
 #include "Mesh.h"
 #include "RenderObject.h"
@@ -269,9 +270,15 @@ void SceneLoader::ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface
 			ParseMaterial(pMaterialElement, pMaterial);
 			pSurface->SetMaterial(pMaterial);
 		}
+		else if (strcmp(type, "sky") == 0)
+		{
+			MaterialSky* pMaterial = new MaterialSky(static_cast<unsigned char>(techValue));
+			ParseMaterial(pMaterialElement, pMaterial);
+			pSurface->SetMaterial(pMaterial);
+		}
 		else
 		{
-			printf("only normal material is supported.");
+			printf("material is not supported.");
 			assert(0);
 		}
 	}
@@ -297,42 +304,75 @@ void SceneLoader::ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface
 	tinyxml2::XMLElement* pShaderElement = pElement->FirstChildElement("shader");
 }
 
-void SceneLoader::ParseMaterial(tinyxml2::XMLElement* pElement, Material* pMaterial)
+void SceneLoader::ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pIMaterial)
 {
-	tinyxml2::XMLElement* pMaterialElement = pElement->FirstChildElement();
-	while (pMaterialElement)
+	if (pIMaterial->GetType() == MATERIAL_NORMAL)
 	{
-		const char* pProperty = pMaterialElement->Name();
-		if (strcmp(pProperty, "ambient") == 0)
+		Material* pMaterial = static_cast<Material*>(pIMaterial);
+		tinyxml2::XMLElement* pMaterialElement = pElement->FirstChildElement();
+		while (pMaterialElement)
 		{
-			const char* pAmbient = pMaterialElement->GetText();
-			Math::Vector4f v4Ambient;
-			sscanf(pAmbient, "%f %f %f %f", &v4Ambient.x, &v4Ambient.y, &v4Ambient.z, &v4Ambient.w);
-			pMaterial->SetAmbient(v4Ambient);
+			const char* pProperty = pMaterialElement->Name();
+			if (strcmp(pProperty, "ambient") == 0)
+			{
+				const char* pAmbient = pMaterialElement->GetText();
+				Math::Vector4f v4Ambient;
+				sscanf(pAmbient, "%f %f %f %f", &v4Ambient.x, &v4Ambient.y, &v4Ambient.z, &v4Ambient.w);
+				pMaterial->SetAmbient(v4Ambient);
 
+			}
+			else if (strcmp(pProperty, "diffuse") == 0)
+			{
+				const char* pDiffuse = pMaterialElement->GetText();
+				Math::Vector4f v4Diffuse;
+				sscanf(pDiffuse, "%f %f %f %f", &v4Diffuse.x, &v4Diffuse.y, &v4Diffuse.z, &v4Diffuse.w);
+				pMaterial->SetDiffuse(v4Diffuse);
+			}
+			else if (strcmp(pProperty, "specular") == 0)
+			{
+				const char* pSpecular = pMaterialElement->GetText();
+				Math::Vector4f v4Specular;
+				sscanf(pSpecular, "%f %f %f %f", &v4Specular.x, &v4Specular.y, &v4Specular.z, &v4Specular.w);
+				pMaterial->SetSpecular(v4Specular);
+			}
+			else if (strcmp(pProperty, "exponent") == 0)
+			{
+				float fExponent;
+				pMaterialElement->QueryFloatText(&fExponent);
+				pMaterial->SetExponent(fExponent);
+			}
+			pMaterialElement = pMaterialElement->NextSiblingElement();
 		}
-		else if (strcmp(pProperty, "diffuse") == 0)
-		{
-			const char* pDiffuse = pMaterialElement->GetText();
-			Math::Vector4f v4Diffuse;
-			sscanf(pDiffuse, "%f %f %f %f", &v4Diffuse.x, &v4Diffuse.y, &v4Diffuse.z, &v4Diffuse.w);
-			pMaterial->SetDiffuse(v4Diffuse);
-		}
-		else if (strcmp(pProperty, "specular") == 0)
-		{
-			const char* pSpecular = pMaterialElement->GetText();
-			Math::Vector4f v4Specular;
-			sscanf(pSpecular, "%f %f %f %f", &v4Specular.x, &v4Specular.y, &v4Specular.z, &v4Specular.w);
-			pMaterial->SetSpecular(v4Specular);
-		}
-		else if (strcmp(pProperty, "exponent") == 0)
-		{
-			float fExponent;
-			pMaterialElement->QueryFloatText(&fExponent);
-			pMaterial->SetExponent(fExponent);
-		}
-		pMaterialElement = pMaterialElement->NextSiblingElement();
 	}
+	else if (pIMaterial->GetType() == MATERIAL_SKY)
+	{
+		MaterialSky* pMaterial = static_cast<MaterialSky*>(pIMaterial);
+		tinyxml2::XMLElement* pMaterialElement = pElement->FirstChildElement();
+		while (pMaterialElement)
+		{
+			const char* pProperty = pMaterialElement->Name();
+			if (strcmp(pProperty, "type") == 0)
+			{
+				const char* pType = pMaterialElement->GetText();
+
+				if (strcmp(pType, "cubemap") == 0)
+				{
+					pMaterial->SetSkyType(SKY_CUBE);
+				}
+				else if (strcmp(pType, "parabloid") == 0)
+				{
+					pMaterial->SetSkyType(SKY_PARABLOID);
+				}
+			}
+			else if (strcmp(pProperty, "map") == 0)
+			{
+				const char* pName = pMaterialElement->GetText();
+				pMaterial->SetTextureName(pName);
+			}
+			pMaterialElement = pMaterialElement->NextSiblingElement();
+		}
+	}
+	
 }
 
 } // namespace Scene

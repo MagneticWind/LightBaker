@@ -59,6 +59,8 @@ private:
 	int m_iLastMousePositionY;
 	bool m_bMouseLButtonDown;
 
+	int m_iIntensityControl;
+
 	bool m_bCallbacksSet;
 };
 

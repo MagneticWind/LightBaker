@@ -108,6 +108,7 @@ inline void Light::SetColor(const Math::Vector3f& v3Color)
 inline void Light::SetIntensity(float fIntensity)
 {
 	m_fIntensity = fIntensity;
+	m_v3Color = m_v3Color * fIntensity;
 }
 
 //------------------------------------------------------------------

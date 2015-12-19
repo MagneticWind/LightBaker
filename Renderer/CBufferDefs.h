@@ -30,6 +30,11 @@ struct CBufferLights
 	Math::Vector4f v4LightColor;
 };
 
+struct CBufferToneMapping
+{
+	Math::Vector4f v4Param; // (width, height, avg_luminance)
+};
+
 } // namespace Renderer
 } // namespace Magnet
 

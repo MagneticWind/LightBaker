@@ -41,6 +41,7 @@ public:
 public:
 	void CreateMeshResource(const Scene::Mesh* pMesh, HALgfx::IDevice* pDevice);// void* pVertexShaderCode, int iShaderSize);
 	void CreateTextureResource(const Scene::Texture* pTexture, HALgfx::IDevice* pDevice);
+	void CreateCubeTextureResource(const char* pTextureName, HALgfx::IDevice* pDevice);
 	void CreateSamplerState(const Scene::SamplerMode mode, HALgfx::IDevice* pDevice);
 
 	MeshResource& GetMeshResource(const std::string name);

@@ -52,8 +52,6 @@ void Scene::Update(float fTimeLapse)
 
 	m_pCurrentCamera = *m_lCameras.begin();
 
-	Light* majorLight = *m_lLights.begin();
-
 	// update entities
 	std::list<IEntity*>::iterator it = m_lEntities.begin();
 	while (it != m_lEntities.end())

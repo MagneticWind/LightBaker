@@ -7,6 +7,8 @@
 
 #include "RenderManager.h"
 #include "RenderPassOpaque.h"
+#include "RenderPassPostprocess.h"
+#include "RenderPassSky.h"
 
 #include "Scene\IRenderObject.h"
 #include "Scene\RenderObject.h"
@@ -15,6 +17,7 @@
 #include "Scene\Surface.h"
 #include "Scene\Mesh.h"
 #include "Scene\Texture.h"
+#include "Scene\MaterialSky.h"
 
 namespace Magnet
 {
@@ -70,7 +73,9 @@ namespace Renderer
 	//------------------------------------------------------------------
 	void RenderManager::SetupRenderPasses()
 	{
+		m_pRenderPasses[PASS_SKY] = new RenderPassSky();
 		m_pRenderPasses[PASS_OPAQUE] = new RenderPassOpaque();
+		m_pRenderPasses[PASS_POSTPROCESS] = new RenderPassPostprocess();
 	}
 
 	//------------------------------------------------------------------
@@ -164,6 +169,18 @@ namespace Renderer
 	}
 
 	//------------------------------------------------------------------
+	void RenderManager::SetIntensityLevel(float fIntensityLevel)
+	{
+		m_fIntensityLevel = fIntensityLevel;
+	}
+
+	//------------------------------------------------------------------
+	void RenderManager::SetLightIntensityLevel(float fLightIntensityLevel)
+	{
+		m_fLightIntensityLevel = fLightIntensityLevel;
+	}
+
+	//------------------------------------------------------------------
 	void RenderManager::RenderOneFrame()
 	{
 		// create gpu resources for meshes, textures
@@ -176,37 +193,6 @@ namespace Renderer
 		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
 		HALgfx::IDeviceContext* pDeviceContext = renderSystem.GetDeviceContext();
 
-	/*	if (m_bShadowResourcesCreated == false)
-		{
-			m_pShadowShader = new Shader("shadow");
-			m_callBackLoadShader(m_pShadowShader);
-			m_pShadowShader->Create(pDevice);
-
-			m_bShadowResourcesCreated = true;
-		}*/
-
-		//if (m_bPostProcessResourcesCreated == false)
-		//{
-		//	m_pQuadMesh = new Scene::Mesh("quad.ply");
-		//	m_callBackLoadMesh(m_pQuadMesh);
-
-		//	m_pTonemapShader = new Shader("tonemap");
-		//	m_callBackLoadShader(m_pTonemapShader);
-		//	m_pTonemapShader->Create(pDevice);
-
-		//	const void* pShaderCode = m_pTonemapShader->GetBufferPtr(HALgfx::VERTEX_SHADER);
-		//	int iSize = m_pTonemapShader->GetBufferSize(HALgfx::VERTEX_SHADER);
-		//	m_pQuadMesh->CreateHALResources(pShaderCode, iSize, pDevice);
-
-		//	RenderPassTonemap* pTonemapPass = static_cast<RenderPassTonemap*>(m_pRenderPasses[PASS_TONEMAP]);
-		//	pTonemapPass->SetMesh(m_pQuadMesh);
-		//	pTonemapPass->SetShader(m_pTonemapShader);
-		//	pTonemapPass->SetFrameBufferDimension(m_iWidth, m_iHeight);
-		//	pTonemapPass->SetFrameBufferSRVHDR(HALgfx::RenderSystem::GetInstance().GetFrameBufferSRVHDR());
-
-		//	m_bPostProcessResourcesCreated = true;
-		//}
-
 		HALgfx::ViewPort viewPort = renderSystem.GetViewPort();
 		HALgfx::IRenderTargetView* pRTV = renderSystem.GetFrameBufferRTV();
 		HALgfx::IRenderTargetView* pHDRRTV = renderSystem.GetFrameBufferRTVHDR();
@@ -215,26 +201,26 @@ namespace Renderer
 		HALgfx::IDepthStencilState* pDSVStateDisabled = renderSystem.GetDepthStencilStateDisabled();
 		HALgfx::IRasterizerState* pRState = renderSystem.GetRasterizerState();
 
-		/*IRenderPass* pSkyboxPass = m_pRenderPasses[PASS_SKYBOX];
-		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateDisabled);
+		IRenderPass* pSkyboxPass = m_pRenderPasses[PASS_SKY];
+		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
 		pSkyboxPass->Render(pDevice, pDeviceContext);
 		pSkyboxPass->ClearDrawNodes();
 
-		IRenderPass* pShadowPass = m_pRenderPasses[PASS_SHADOW];
-		pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateDisabled);
-		pShadowPass->Setup(pDevice);
-		pShadowPass->Render(pDevice, pDeviceContext);
-		pShadowPass->ClearDrawNodes();*/
+		//IRenderPass* pShadowPass = m_pRenderPasses[PASS_SHADOW];
+		//pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateDisabled);
+		//pShadowPass->Setup(pDevice);
+		//pShadowPass->Render(pDevice, pDeviceContext);
+		//pShadowPass->ClearDrawNodes();
 
 		IRenderPass* pOpaquePass = m_pRenderPasses[PASS_OPAQUE];
-		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateEnabled);
+		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
 		pOpaquePass->Render(pDevice, pDeviceContext);
 		pOpaquePass->ClearDrawNodes();
 
-		/*IRenderPass* pTonemapPass = m_pRenderPasses[PASS_TONEMAP];
-		pTonemapPass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateDisabled);
-		pTonemapPass->Setup(pDevice);
-		pTonemapPass->Render(pDevice, pDeviceContext);*/
+		IRenderPass* pPostprocessPass = m_pRenderPasses[PASS_POSTPROCESS];
+		pPostprocessPass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateDisabled);
+		pPostprocessPass->Setup(pDevice);
+		pPostprocessPass->Render(pDevice, pDeviceContext);
 
 		renderSystem.Present();
 	}
@@ -281,6 +267,13 @@ namespace Renderer
 							GPUResourceManager::GetInstance().CreateTextureResource(pTexture, pDevice);
 						}
 
+						const Scene::IMaterial* pMaterial = pSurface->GetMaterial();
+						if (pMaterial->GetType() == Scene::MATERIAL_SKY)
+						{
+							const Scene::MaterialSky* pMaterialSky = static_cast<const Scene::MaterialSky*>(pMaterial);
+							GPUResourceManager::GetInstance().CreateCubeTextureResource(pMaterialSky->GetMapName(), pDevice);
+						}
+
 					}
 				}
 			}
@@ -294,6 +287,17 @@ namespace Renderer
 		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
 		for (int i = 0; i < PASS_NUMBER; ++i)
 		{
+			if (i == PASS_POSTPROCESS)
+			{
+				RenderPassPostprocess* pPass = static_cast<RenderPassPostprocess*>(m_pRenderPasses[i]);
+				pPass->SetParams(m_iWidth, m_iHeight, m_fIntensityLevel);
+				pPass->SetHDRSRV(GetFrameBufferSRVHDR());
+			}
+			else if (i == PASS_OPAQUE)
+			{
+				RenderPassOpaque* pPass = static_cast<RenderPassOpaque*>(m_pRenderPasses[i]);
+				pPass->SetLightIntensityLevel(m_fLightIntensityLevel);
+			}
 			m_pRenderPasses[i]->Setup(pDevice);
 		}
 	}

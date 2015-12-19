@@ -73,6 +73,8 @@ public:
 	IRenderPass* GetPass(PassType eType);
 	void SetFrameBufferDimension(int iWidth, int iHeight);
 	void GetFrameBufferDimension(int& iWidth, int& iHeight) const;
+	void SetIntensityLevel(float fIntensityLevel);
+	void SetLightIntensityLevel(float fLightIntensityLevel);
 
 	void SetMajorLightData(const Math::Vector3f& v3Direction, const Math::Vector3f& v3Color);
 	void GetMajorLightData(Math::Vector3f& v3Direction, Math::Vector3f& v3Color) const;
@@ -104,6 +106,8 @@ private:
 	// 
 	int m_iWidth;
 	int m_iHeight;
+	float m_fIntensityLevel;
+	float m_fLightIntensityLevel;
 
 	//@TODO: design some structure for lights if support multiple lights
 	Math::Vector3f m_v3MajorLightDirection;

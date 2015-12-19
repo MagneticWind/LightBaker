@@ -1,3 +1,5 @@
+#include <D3DX11tex.h>
+
 #include "Device_plat.h"
 #include "BlendState_plat.h"
 #include "DepthStencilState_plat.h"
@@ -142,6 +144,21 @@ IShaderResourceView* Device::CreateShaderResourceView(IResource* pResource, cons
 	ShaderResourceView* pShaderResourceView = new ShaderResourceView();
 	pShaderResourceView->Create(desc, pResource, m_pDevice);
 	return pShaderResourceView;
+}
+
+//------------------------------------------------------------------
+void Device::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV)
+{
+	D3DX11_IMAGE_LOAD_INFO LoadInfo;
+	LoadInfo.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	ID3D11Texture2D* pCubeTexture = NULL;
+	ID3D11ShaderResourceView* pCubeRV = NULL;
+	D3DX11CreateShaderResourceViewFromFile(m_pDevice, pPath, &LoadInfo, NULL, &pCubeRV, NULL);
+
+	pCubeRV->GetResource((ID3D11Resource**)&pCubeTexture);
+
+	*ppTexture = new Texture2d(pCubeTexture);
+	*ppSRV = new ShaderResourceView(pCubeRV);
 }
 
 //------------------------------------------------------------------

@@ -1,5 +1,5 @@
-#ifndef RENDER_PASS_OPAQUE
-#define RENDER_PASS_OPAQUE
+#ifndef RENDER_PASS_SKY
+#define RENDER_PASS_SKY
 
 #include <list>
 #include <map>
@@ -22,11 +22,11 @@ namespace Renderer
 
 class ShaderNode;
 
-class RenderPassOpaque : public IRenderPass
+class RenderPassSky : public IRenderPass
 {
 public:
-	RenderPassOpaque();
-	virtual ~RenderPassOpaque();
+	RenderPassSky();
+	virtual ~RenderPassSky();
 
 public:
 	virtual void SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const HALgfx::ViewPort& viewPort,
@@ -37,20 +37,9 @@ public:
 	virtual void Setup(HALgfx::IDevice* pDevice);
 	virtual std::list<ShaderNode*>& GetShaderNodeList();
 
-	void SetLightIntensityLevel(float fLightIntensityLevel);
-
 private:
 	std::list<ShaderNode*> m_lShaderNodes;
-
-	float m_fLightIntensityLevel;
-
 };
-
-inline void RenderPassOpaque::SetLightIntensityLevel(float fLightIntensityLevel)
-{
-	m_fLightIntensityLevel = fLightIntensityLevel;
-}
-
 
 } // namespace Renderer
 } // namespace Magnet

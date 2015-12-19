@@ -17,7 +17,6 @@
 #include "Scene\Light.h"
 
 #include "Math\Frustum.h"
-#include "Memory.h"
 #include "RenderPassOpaque.h"
 #include "ShaderNode.h"
 
@@ -26,7 +25,7 @@ namespace Magnet
 namespace Renderer
 {
 //------------------------------------------------------------------
-RenderPassOpaque::RenderPassOpaque()
+RenderPassOpaque::RenderPassOpaque() : m_fLightIntensityLevel(1.f)
 {
 }
 
@@ -54,8 +53,8 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 	pDeviceContext->SetRasterizerState(pRState);
 	pDeviceContext->SetDepthStencilState(pDSState);
 
-	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
-	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
+//	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -213,7 +212,7 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 
 								CBufferLights* pCBufferLights = static_cast<CBufferLights*>(drawNode.CreateCBufferData(sizeof(CBufferLights), HALgfx::PIXEL_SHADER));
 								Math::Vector3f v3LightPosition = pMainLight->GetPosition();
-								Math::Vector3f v3LightColor = pMainLight->GetColor();
+								Math::Vector3f v3LightColor = pMainLight->GetColor() * m_fLightIntensityLevel;
 								pCBufferLights->v4LightPosition = Math::Vector4f(v3LightPosition.x, v3LightPosition.y, v3LightPosition.z, 1.f);
 								pCBufferLights->v4LightColor = Math::Vector4f(v3LightColor.x, v3LightColor.y, v3LightColor.z, 1.f);
 

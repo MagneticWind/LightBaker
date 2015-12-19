@@ -39,6 +39,12 @@
     <ClInclude Include="GPUResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPassSky.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPassPostprocess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RenderManager.cpp">
@@ -54,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GPUResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPassSky.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPassPostprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

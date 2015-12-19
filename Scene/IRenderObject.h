@@ -17,8 +17,7 @@ class Surface;
 enum RenderObjectType
 {
 	RENDEROBJECT_NORMAL,
-	RENDEROBJECT_SUN,
-	RENDEROBJECT_OPAQUE
+	RENDEROBJECT_LIGHT
 };
 
 class IRenderObject

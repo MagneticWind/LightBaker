@@ -10,6 +10,7 @@ namespace Scene
 enum MaterialType
 {
 	MATERIAL_NORMAL,
+	MATERIAL_SKY,
 	MATERIAL_TRANSPARENT,
 	MAX_TYPE_COUNT
 };

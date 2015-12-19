@@ -221,6 +221,19 @@ void ShaderNode::AddDrawNode(DrawNode& drawNode)
 }
 
 //------------------------------------------------------------------
+DrawNode& ShaderNode::GetDrawNode(const char* name)
+{
+	std::list<DrawNode> drawNodeList;
+	for (std::list<DrawNode>::iterator it = m_lDrawNodes.begin(); it != m_lDrawNodes.end(); it++)
+	{
+		if (strcmp((*it).m_caName, name) == 0)
+		{
+			return *it;
+		}
+	}
+}
+
+//------------------------------------------------------------------
 void ShaderNode::SetSamplerStates(HALgfx::ISamplerState* pSamplerStates[], int iNumSamplerStates)
 {
 	m_iNumSamplerState = iNumSamplerStates;

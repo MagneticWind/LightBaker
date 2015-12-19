@@ -9,6 +9,13 @@
 
 Application* Application::ms_pInstance = 0;
 
+namespace ApplicationPrivate
+{
+	const int g_iMaxIntensityLevel = 10;
+	const float g_faLightIntensityLevels[g_iMaxIntensityLevel] = { 1.0f, 10.f, 30.f, 50.f, 100.f, 500.f, 1000.f, 5000.f, 10000.f, 20000.f};
+	const float g_faIntensityLevels[g_iMaxIntensityLevel] =      { 5.0, 50.f, 150.f, 0.8f, 1.f, 5.f, 10.f, 50.f, 100.f, 200.f};
+}
+
 //------------------------------------------------------------------
 Application::Application()
 {
@@ -19,6 +26,8 @@ Application::Application()
 
 	m_iMoveForward = 0;
 	m_iMoveLeft = 0;
+
+	m_iIntensityControl = 0;
 }
 
 //------------------------------------------------------------------
@@ -117,6 +126,8 @@ void Application::Update()
 	}
 
 	// render
+	Magnet::Renderer::RenderManager::GetInstance().SetIntensityLevel(ApplicationPrivate::g_faIntensityLevels[m_iIntensityControl]);
+	Magnet::Renderer::RenderManager::GetInstance().SetLightIntensityLevel(ApplicationPrivate::g_faLightIntensityLevels[m_iIntensityControl]);
 	Magnet::Renderer::RenderManager::GetInstance().RenderOneFrame();
 
 	m_fLastFrameTimeLapse = m_timer.GetElapsedSeconds();
@@ -169,6 +180,18 @@ void Application::OnKeyDown(WPARAM wParam)
 	case 'd':
 		m_iMoveLeft = -1;
 		break;
+	case VK_UP:
+		{
+			m_iIntensityControl++;
+			m_iIntensityControl = min(m_iIntensityControl, ApplicationPrivate::g_iMaxIntensityLevel - 1);
+			break;
+		}
+	case VK_DOWN:
+		{
+			m_iIntensityControl--;
+			m_iIntensityControl = max(m_iIntensityControl, 0);
+			break;
+		}
 	}
 
 	Magnet::Scene::SceneManager::GetInstance().UpdateCurrentCameraTranslationParams(true, m_iMoveForward, m_iMoveLeft);

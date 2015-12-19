@@ -1,6 +1,5 @@
 //#include <d3d11_1.h>
 #include <assert.h>
-//#include <D3DX11tex.h>
 #include <stdio.h>
 
 #include "BlendState_plat.h"
@@ -310,25 +309,6 @@ void RenderSystem::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float 
 		faSHBlue[i] = m_faSHBlue[i];
 	}
 }
-
-//------------------------------------------------------------------
-//void RenderSystem::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV)
-//{
-//	D3DX11_IMAGE_LOAD_INFO LoadInfo;
-//	LoadInfo.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-//	ID3D11Texture2D* pCubeTexture = NULL;
-//	ID3D11ShaderResourceView* pCubeRV = NULL;
-//	Device* pDevice = static_cast<Device*>(m_pDevice);
-//	D3DX11CreateShaderResourceViewFromFile( pDevice->GetD3DPtr(), pPath, &LoadInfo, NULL, &pCubeRV, NULL );
-//
-//	pCubeRV->GetResource( ( ID3D11Resource** )&pCubeTexture );
-//
-//	*ppTexture = new Texture2d(pCubeTexture);
-//	*ppSRV = new ShaderResourceView(pCubeRV);
-//
-//	DeviceContext* pDeviceContext = static_cast<DeviceContext*>(m_pImmediateDeviceContext);
-//	D3DX11SHProjectCubeMap(pDeviceContext->GetD3DPtr(), 3, pCubeTexture, m_faSHRed, m_faSHGreen, m_faSHBlue);
-//}
 
 //------------------------------------------------------------------
 void RenderSystem::Present()

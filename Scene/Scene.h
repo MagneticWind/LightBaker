@@ -92,6 +92,12 @@ inline Camera* Scene::GetCurrentCamera()
 }
 
 //------------------------------------------------------------------
+inline void SetGlobalIntensityScale(float fGlobalIntensityScale)
+{
+	fGlobalIntensityScale = fGlobalIntensityScale;
+}
+
+//------------------------------------------------------------------
 inline void Scene::AddLight(Light* pLight)
 {
 	m_lLights.push_back(pLight);

@@ -208,6 +208,31 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 }
 
 //------------------------------------------------------------------
+void GPUResourceManager::CreateCubeTextureResource(const char* pTextureName, HALgfx::IDevice* pDevice)
+{
+	static const char TEXTURE_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\texture\\";
+	char pPath[256];
+	strcpy(pPath, TEXTURE_PATH);
+	strcat(pPath, pTextureName);
+	
+	std::string name(pTextureName);
+	std::map<std::string, TextureResource>::iterator it = m_TextureMap.find(name);
+	if (it == m_TextureMap.end())
+	{
+		TextureResource skyTexture;
+
+		HALgfx::ITexture2d* pTexture2d = 0;
+		HALgfx::IShaderResourceView* pSRV = 0;
+		pDevice->LoadCubeTextureResource(pPath, &pTexture2d, &pSRV);
+		
+		skyTexture.m_pTexture2D = pTexture2d;
+		skyTexture.m_pShaderResourceView = pSRV;
+
+		m_TextureMap[name] = skyTexture;
+	}
+}
+
+//------------------------------------------------------------------
 void GPUResourceManager::CreateSamplerState(const Scene::SamplerMode mode, HALgfx::IDevice* pDevice)
 {
 	std::map<int, HALgfx::ISamplerState*>::iterator it = m_SamplerMap.find(mode);

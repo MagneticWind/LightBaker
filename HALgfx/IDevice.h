@@ -65,6 +65,7 @@ public:
 	virtual IDepthStencilView* CreateDepthStencilView(IResource*, const DepthStencilViewDesc&) = 0;
 	virtual IShaderResourceView* CreateShaderResourceView(IResource*, const ShaderResourceViewDesc&) = 0;
 	//virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*);
+	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV) = 0;
 
 
 

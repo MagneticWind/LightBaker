@@ -18,6 +18,8 @@
     <ClInclude Include="IRenderPass.h" />
     <ClInclude Include="RenderPassOpaque.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderPassPostprocess.h" />
+    <ClInclude Include="RenderPassSky.h" />
     <ClInclude Include="ShaderNode.h" />
   </ItemGroup>
   <ItemGroup>
@@ -25,6 +27,8 @@
     <ClCompile Include="GPUResourceManager.cpp" />
     <ClCompile Include="RenderPassOpaque.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="RenderPassPostprocess.cpp" />
+    <ClCompile Include="RenderPassSky.cpp" />
     <ClCompile Include="ShaderNode.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -9,6 +9,8 @@ Light::Light(const char* pName)
 {
 	strcpy(m_name, pName);
 
+	m_fIntensity = 1.f;
+
 	m_bActive = true;
 	m_bVisible = false;
 	m_bDrawable = false;
