@@ -147,7 +147,8 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 							if (pShaderNode == NULL)
 							{
 								pShaderNode = new ShaderNode(shaderName);
-								pShaderNode->LoadShader();
+								pShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
+								pShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
 								pShaderNode->Create(pDevice);
 
 								// create const buffers
@@ -245,10 +246,5 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice)
 	}
 }
 
-//------------------------------------------------------------------
-std::list<ShaderNode*>& RenderPassOpaque::GetShaderNodeList()
-{
-	return m_lShaderNodes;
-}
 } // namespace Renderer
 } // namespace Magnet

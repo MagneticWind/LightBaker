@@ -48,7 +48,7 @@ public:
 	void CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
 
 	// load compiled shades, create cbuffer, input layout and such
-	void LoadShader();
+	void LoadShader(HALgfx::ShaderType eType);
 	void Create(HALgfx::IDevice* pDevice);
 	void* CreateBuffer(int iSize, HALgfx::ShaderType eType);
 	bool IsLoaded() const;

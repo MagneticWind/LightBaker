@@ -209,10 +209,14 @@ void Camera::UpdateInput(float fTimeLapse)
 		m_v3Up.Normalize();
 		Math::Vector3f v3Left = Math::Cross3f(m_v3Up, v3LookDirection);
 		v3Left.Normalize();
-		m_v3Position += v3LookDirection * m_fForward * fTimeLapse * m_fVelocity;
 
-		m_v3Position += v3Left * (-m_fLeft) * fTimeLapse * m_fVelocity;
-		m_v3Lookat += v3Left * (-m_fLeft) * fTimeLapse * m_fVelocity;
+		const Math::Vector3f v3ForwardMove = v3LookDirection * m_fForward * fTimeLapse * m_fVelocity;
+		m_v3Position += v3ForwardMove;
+		m_v3Lookat += v3ForwardMove;
+
+		const Math::Vector3f v3LeftMove = v3Left * (-m_fLeft) * fTimeLapse * m_fVelocity;
+		m_v3Position += v3LeftMove;
+		m_v3Lookat += v3LeftMove;
 	}
 }
 //------------------------------------------------------------------old camera code

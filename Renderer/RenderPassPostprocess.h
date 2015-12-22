@@ -1,6 +1,6 @@
 #ifndef RENDER_PASS_POSTPROCESS_H
 #define RENDER_PASS_POSTPROCESS_H
-
+#include "CBufferDefs.h"
 #include "IRenderPass.h"
 
 namespace Magnet
@@ -32,16 +32,20 @@ public:
 	virtual PassType GetType();
 	virtual void ClearDrawNodes();
 	virtual void Setup(HALgfx::IDevice* pDevice);
-	virtual std::list<ShaderNode*>& GetShaderNodeList();
 
 	void SetParams(int iDimensionX, int iDimensionY, float fIntensityLevel);
 	void SetHDRSRV(HALgfx::IShaderResourceView* pHDRSRV);
+	void SetDepthSRV(HALgfx::IShaderResourceView* pDepthSRV);
+
+	void GenerateSSAOSamples();
 
 private:
 	void Initialize(HALgfx::IDevice* pDevice);
 
 private:
-	std::list<ShaderNode*> m_lShaderNodes;
+	ShaderNode* m_pSSAOShaderNode;
+	ShaderNode* m_pTonemappingShaderNode;
+
 	bool m_bInitialized;
 
 	int m_iDimensionX;
@@ -53,6 +57,17 @@ private:
 	HALgfx::IInputLayout* m_pInputLayout;
 
 	HALgfx::IShaderResourceView* m_pSRVHDR;
+	HALgfx::IShaderResourceView* m_pSRVDepth;
+
+	HALgfx::ITexture2d* m_pSSAOTexture;
+	HALgfx::IShaderResourceView* m_pSSAOTextureSRV;
+	HALgfx::IRenderTargetView* m_pSSAORTV;
+	CBufferSSAO m_ssaoParams;
+
+	HALgfx::IRenderTargetView* m_pFinalRTV;
+	HALgfx::IDepthStencilView* m_pDSV;
+
+
 };
 
 inline void RenderPassPostprocess::SetParams(int iDimensionX, int iDimensionY, float fIntensityLevel)
@@ -65,6 +80,11 @@ inline void RenderPassPostprocess::SetParams(int iDimensionX, int iDimensionY, f
 inline void RenderPassPostprocess::SetHDRSRV(HALgfx::IShaderResourceView* pHDRSRV)
 {
 	m_pSRVHDR = pHDRSRV;
+}
+
+inline void RenderPassPostprocess::SetDepthSRV(HALgfx::IShaderResourceView* pDepthSRV)
+{
+	m_pSRVDepth = pDepthSRV;
 }
 
 } // namespace Renderer

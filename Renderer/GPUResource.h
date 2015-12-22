@@ -49,6 +49,10 @@ namespace Renderer
 		void AddElement(HALgfx::InputSemantic semantic, int iNumFloats)
 		{
 			GetSemanticString(semantic, m_aInputElementsDesc[m_iNumElements].semantic);
+
+			m_caInputLayoutString[m_iNumElements] = m_aInputElementsDesc[m_iNumElements].semantic[0];
+			m_caInputLayoutString[m_iNumElements + 1] = '\0';
+
 			if (iNumFloats == 3)
 				m_aInputElementsDesc[m_iNumElements].format = HALgfx::FORMAT_R32G32B32_FLOAT;
 			else if (iNumFloats == 2)
@@ -69,6 +73,8 @@ namespace Renderer
 		int m_iNumElements;
 		int m_iPrimitivesCount;
 		int m_iStride;
+
+		char m_caInputLayoutString[64];
 
 		HALgfx::IBuffer* m_pVertexBuffer;
 		HALgfx::IBuffer* m_pIndexBuffer;

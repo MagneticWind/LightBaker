@@ -58,6 +58,7 @@ public:
 	HALgfx::IRenderTargetView* GetFrameBufferRTV();
 	HALgfx::IRenderTargetView* GetFrameBufferRTVHDR();
 	HALgfx::IShaderResourceView* GetFrameBufferSRVHDR();
+	HALgfx::IShaderResourceView* GetDepthSRV();
 	HALgfx::IDepthStencilView* GetFrameBufferDSV();
 	HALgfx::IRasterizerState* GetRasterizerState();
 	HALgfx::ViewPort GetViewPort();

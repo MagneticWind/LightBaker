@@ -33,6 +33,8 @@ RenderSystem::RenderSystem()
 	m_pFrameBufferRTVHDR = 0;
 	m_pFrameBufferDSV = 0;
 
+	m_pTexture2dDepthSRV = 0;
+
 	m_pDepthStencilEnabled = 0;
 	m_pDepthStencilDisabled = 0;
 	m_pRasterizerState = 0;
@@ -63,6 +65,12 @@ RenderSystem::~RenderSystem()
 	{
 		delete m_pTexture2dDepthStencil;
 		m_pTexture2dDepthStencil = 0;
+	}
+
+	if (m_pTexture2dDepthSRV)
+	{
+		delete m_pTexture2dDepthSRV;
+		m_pTexture2dDepthSRV = 0;
 	}
 
 	if (m_pFrameBufferRTVHDR)
@@ -246,32 +254,37 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	Texture2dDesc texture2dDSTDesc;
 	texture2dDSTDesc.width = uWidth;
 	texture2dDSTDesc.height = uHeight;
-	texture2dDSTDesc.format = FORMAT_R24G8_TYPELESS;
+	texture2dDSTDesc.format = FORMAT_R32_TYPELESS;
 	texture2dDSTDesc.usage = USAGE_DEFAULT;
 	texture2dDSTDesc.bindFlags = BIND_SHADER_RESOURCE | BIND_DEPTH_STENCIL;
 	m_pTexture2dDepthStencil = pDevice->CreateTexture2d(texture2dDSTDesc, subResourceData);
 
 	// depth stencil target
 	DepthStencilViewDesc dstDesc;
-	dstDesc.format = FORMAT_D24_UNORM_S8_UINT;
+	dstDesc.format = FORMAT_D32_FLOAT;
 	dstDesc.viewDimension = DSV_DIMENSION_TEXTURE2D;
 	dstDesc.texture2d.mipSlice = 0;
 	m_pFrameBufferDSV = pDevice->CreateDepthStencilView(m_pTexture2dDepthStencil, dstDesc);
+
+	// depth SRV
+	ShaderResourceViewDesc srvDescDepth;
+	srvDescDepth.format = FORMAT_R32_FLOAT;
+	srvDescDepth.viewDimension = SRV_DIMENSION_TEXTURE2D;
+	srvDescDepth.texSRV.mipLevels = 1;
+	srvDescDepth.texSRV.mostDetailedMip = 0;
+	m_pTexture2dDepthSRV = pDevice->CreateShaderResourceView(m_pTexture2dDepthStencil, srvDescDepth);
 
 	// depth stencil state
 	DepthStencilDesc sdDesc;
 	sdDesc.depthEnable = true;
 	sdDesc.depthFunc = COMPARISON_LESS_EQUAL;
-	sdDesc.depthWriteMask = DEPTH_WRITE_MASK_ZERO;
-	sdDesc.stencilEnable = true;
+	sdDesc.depthWriteMask = DEPTH_WRITE_MASK_ALL;
+	sdDesc.stencilEnable = false;
 	sdDesc.frontFace.stencilFunc = COMPARISON_ALWAYS;
 	sdDesc.frontFace.stencilPassOp = STENCIL_OP_KEEP;
-	sdDesc.frontFace.stencilDepthFailOp = STENCIL_OP_INCR;
+	sdDesc.frontFace.stencilDepthFailOp = STENCIL_OP_KEEP;
 	sdDesc.frontFace.stencilFailOp = STENCIL_OP_KEEP;
-	sdDesc.backFace.stencilFunc = COMPARISON_ALWAYS;
-	sdDesc.backFace.stencilPassOp = STENCIL_OP_KEEP;
-	sdDesc.backFace.stencilDepthFailOp = STENCIL_OP_INCR;
-	sdDesc.backFace.stencilFailOp = STENCIL_OP_KEEP;
+	sdDesc.backFace = sdDesc.frontFace;
 	m_pDepthStencilEnabled = pDevice->CreateDepthStencilState(sdDesc);
 
 	sdDesc.depthEnable = false;
@@ -282,9 +295,10 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 
 	// rasterizer state
 	RasterizerDesc rDesc;
-	rDesc.cullMode = CULL_FRONT;
+	rDesc.cullMode = CULL_BACK;
+	rDesc.frontCounterClockwise = false;
 	rDesc.depthBias = 0;
-	rDesc.depthClipEnable = true;
+	rDesc.depthClipEnable = false;
 	rDesc.scissorEnable = false;
 	rDesc.depthBiasClamp = 0.f;
 	rDesc.fillMode = FILL_SOLID;

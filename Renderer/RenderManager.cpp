@@ -6,6 +6,7 @@
 #include "IRenderPass.h"
 
 #include "RenderManager.h"
+#include "RenderPassDepth.h"
 #include "RenderPassOpaque.h"
 #include "RenderPassPostprocess.h"
 #include "RenderPassSky.h"
@@ -73,6 +74,7 @@ namespace Renderer
 	//------------------------------------------------------------------
 	void RenderManager::SetupRenderPasses()
 	{
+		m_pRenderPasses[PASS_DEPTH] = new RenderPassDepth();
 		m_pRenderPasses[PASS_SKY] = new RenderPassSky();
 		m_pRenderPasses[PASS_OPAQUE] = new RenderPassOpaque();
 		m_pRenderPasses[PASS_POSTPROCESS] = new RenderPassPostprocess();
@@ -122,6 +124,12 @@ namespace Renderer
 	HALgfx::IShaderResourceView* RenderManager::GetFrameBufferSRVHDR()
 	{
 		return HALgfx::RenderSystem::GetInstance().GetFrameBufferSRVHDR();
+	}
+
+	//------------------------------------------------------------------
+	HALgfx::IShaderResourceView* RenderManager::GetDepthSRV()
+	{
+		return HALgfx::RenderSystem::GetInstance().GetDepthSRV();
 	}
 
 	//------------------------------------------------------------------
@@ -200,6 +208,11 @@ namespace Renderer
 		HALgfx::IDepthStencilState* pDSVStateEnabled = renderSystem.GetDepthStencilState();
 		HALgfx::IDepthStencilState* pDSVStateDisabled = renderSystem.GetDepthStencilStateDisabled();
 		HALgfx::IRasterizerState* pRState = renderSystem.GetRasterizerState();
+
+		IRenderPass* pDepthPass = m_pRenderPasses[PASS_DEPTH];
+		pDepthPass->SetRenderState(pDeviceContext, viewPort, NULL, pDSV, pRState, pDSVStateEnabled);
+		pDepthPass->Render(pDevice, pDeviceContext);
+		pDepthPass->ClearDrawNodes();
 
 		IRenderPass* pSkyboxPass = m_pRenderPasses[PASS_SKY];
 		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
@@ -292,6 +305,7 @@ namespace Renderer
 				RenderPassPostprocess* pPass = static_cast<RenderPassPostprocess*>(m_pRenderPasses[i]);
 				pPass->SetParams(m_iWidth, m_iHeight, m_fIntensityLevel);
 				pPass->SetHDRSRV(GetFrameBufferSRVHDR());
+				pPass->SetDepthSRV(GetDepthSRV());
 			}
 			else if (i == PASS_OPAQUE)
 			{

@@ -79,10 +79,10 @@ float4 PointLight(in float4 f4Normal, in float4 f4View, in float4 f4Position)
 	f4Color += f4Kd * f4LightColor * NDotL;
 
 	// glossy part
-	float3 f3ViewDir = normalize(f4View.xyz);// view direction
-		float3 f3HalfVec = normalize(f3ViewDir + f3LightDir);        // half vector
-	float NDotH = saturate(dot(f3HalfVec, f4Normal.xyz));
-	f4Color += f4Ks * f4LightColor * pow(NDotH, f4Ks.w);
+	//float3 f3ViewDir = normalize(f4View.xyz);// view direction
+	//	float3 f3HalfVec = normalize(f3ViewDir + f3LightDir);        // half vector
+	//float NDotH = saturate(dot(f3HalfVec, f4Normal.xyz));
+	//f4Color += f4Ks * f4LightColor * pow(NDotH, f4Ks.w);
 
 	float fadeFactor = 1.f / (fDistance);
 

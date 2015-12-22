@@ -1,3 +1,4 @@
+
 #include <assert.h>
 
 #include "CBufferDefs.h"
@@ -16,7 +17,7 @@
 #include "Scene\MaterialSky.h"
 
 #include "Math\Frustum.h"
-#include "RenderPassSky.h"
+#include "RenderPassDepth.h"
 #include "ShaderNode.h"
 
 namespace Magnet
@@ -24,12 +25,12 @@ namespace Magnet
 namespace Renderer
 {
 //------------------------------------------------------------------
-RenderPassSky::RenderPassSky()
+RenderPassDepth::RenderPassDepth()
 {
 }
 
 //------------------------------------------------------------------
-RenderPassSky::~RenderPassSky()
+RenderPassDepth::~RenderPassDepth()
 {
 	std::list<ShaderNode*>::iterator it = m_lShaderNodes.begin();
 	std::list<ShaderNode*>::iterator itEnd = m_lShaderNodes.end();
@@ -44,15 +45,22 @@ RenderPassSky::~RenderPassSky()
 }
 
 //------------------------------------------------------------------
-void RenderPassSky::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const HALgfx::ViewPort& viewPort,
+void RenderPassDepth::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const HALgfx::ViewPort& viewPort,
 	HALgfx::IRenderTargetView* pRTV, HALgfx::IDepthStencilView* pDSV, HALgfx::IRasterizerState* pRState, HALgfx::IDepthStencilState* pDSState)
 {
 	pDeviceContext->SetViewPort(viewPort);
-	pDeviceContext->SetRenderTargetViews(1, &pRTV, pDSV);
+	if (pRTV == NULL)
+	{
+		HALgfx::IRenderTargetView* paRTVs[1] = { NULL };
+		pDeviceContext->SetRenderTargetViews(1, paRTVs, pDSV);
+	}
+	else
+	{
+		pDeviceContext->SetRenderTargetViews(1, &pRTV, pDSV);
+	}
 	pDeviceContext->SetRasterizerState(pRState);
 	pDeviceContext->SetDepthStencilState(pDSState);
 
-	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
 	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -60,9 +68,9 @@ void RenderPassSky::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const
 }
 
 //------------------------------------------------------------------
-void RenderPassSky::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext)
+void RenderPassDepth::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext)
 {
-	pDeviceContext->BeginEvent("RenderPassSky");
+	pDeviceContext->BeginEvent("RenderPassDepth");
 	std::list<ShaderNode*>::iterator it = m_lShaderNodes.begin();
 	std::list<ShaderNode*>::iterator itEnd = m_lShaderNodes.end();
 	while (it != itEnd)
@@ -74,13 +82,13 @@ void RenderPassSky::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDe
 }
 
 //------------------------------------------------------------------
-PassType RenderPassSky::GetType()
+PassType RenderPassDepth::GetType()
 {
-	return PASS_SKY;
+	return PASS_DEPTH;
 }
 
 //------------------------------------------------------------------
-void RenderPassSky::ClearDrawNodes()
+void RenderPassDepth::ClearDrawNodes()
 {
 	std::list<ShaderNode*>::iterator it = m_lShaderNodes.begin();
 	std::list<ShaderNode*>::iterator itEnd = m_lShaderNodes.end();
@@ -93,7 +101,7 @@ void RenderPassSky::ClearDrawNodes()
 }
 
 //------------------------------------------------------------------
-void RenderPassSky::Setup(HALgfx::IDevice* pDevice)
+void RenderPassDepth::Setup(HALgfx::IDevice* pDevice)
 {
 	Scene::Scene* pScene = Scene::SceneManager::GetInstance().GetScene();
 	std::list<Scene::IRenderObject*>&renderObjectList = pScene->GetRenderObjectList();
@@ -124,10 +132,16 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice)
 					const Scene::IMaterial* pMaterial = pSurface->GetMaterial();
 					switch (pMaterial->GetType())
 					{
-					case Scene::MATERIAL_SKY:
+					case Scene::MATERIAL_NORMAL:
 					{
 						char shaderName[256];
-						strcpy(shaderName, "sky");
+						strcpy(shaderName, "depth_");
+
+						const char* meshName = pSurface->GetGeometry()->GetName();
+						GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
+						MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
+
+						strcat(shaderName, meshResource.m_caInputLayoutString);
 
 						ShaderNode* pShaderNode = NULL;
 						ShaderNodeExists(shaderName, m_lShaderNodes, &pShaderNode);
@@ -137,7 +151,6 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice)
 						{
 							pShaderNode = new ShaderNode(shaderName);
 							pShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
-							pShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
 							pShaderNode->Create(pDevice);
 
 							// create const buffers
@@ -183,22 +196,11 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice)
 							pTransform->mView = mView;
 							pTransform->mProjection = mProjection;
 
-							// cubemap
-							const Scene::MaterialSky* pSkyMaterial = static_cast<const Scene::MaterialSky*>(pMaterial);
-							std::string texName(pSkyMaterial->GetMapName());
-							TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
-							drawNode.AddSRV(texResource.m_pShaderResourceView);
-
-							// assume all textures use the first texture sampler now
-							gpuResourceManager.CreateSamplerState(Scene::NOMIP_LINEAR_WRAP, pDevice);
-							HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);
-							pShaderNode->SetSamplerStates(&pSampler, 1);
-
 							pShaderNode->AddDrawNode(drawNode);
 						}
 
 						break;
-						}
+					}
 					}
 				}
 			}

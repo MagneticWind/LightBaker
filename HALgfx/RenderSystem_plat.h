@@ -48,6 +48,7 @@ public:
 	IDeviceContext* GetDeviceContext();
 
 	IShaderResourceView* GetFrameBufferSRVHDR();
+	IShaderResourceView* GetDepthSRV();
 	IRenderTargetView* GetFrameBufferRTV();
 	IRenderTargetView* GetFrameBufferRTVHDR();
 	IDepthStencilView* GetFrameBufferDSV();
@@ -66,6 +67,7 @@ private:
 	
 	ITexture2d* m_pTexture2dHDR;
 	ITexture2d* m_pTexture2dDepthStencil;
+	IShaderResourceView* m_pTexture2dDepthSRV;
 
 	IRenderTargetView* m_pFrameBufferRTVHDR;
 	IDepthStencilView* m_pFrameBufferDSV;
@@ -73,6 +75,8 @@ private:
 
 	IDepthStencilState* m_pDepthStencilEnabled;
 	IDepthStencilState* m_pDepthStencilDisabled;
+
+
 	IRasterizerState* m_pRasterizerState;
 	IBlendState* m_pColorWriteEnabled;
 	IBlendState* m_pColorWriteDisabled;
@@ -113,6 +117,11 @@ inline IRenderTargetView* RenderSystem::GetFrameBufferRTVHDR()
 inline IShaderResourceView* RenderSystem::GetFrameBufferSRVHDR()
 {
 	return m_pFrameBufferSRVHDR;
+}
+
+inline IShaderResourceView* RenderSystem::GetDepthSRV()
+{
+	return m_pTexture2dDepthSRV;
 }
 
 inline IDepthStencilView* RenderSystem::GetFrameBufferDSV()

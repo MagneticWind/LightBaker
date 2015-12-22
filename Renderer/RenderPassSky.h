@@ -2,7 +2,6 @@
 #define RENDER_PASS_SKY
 
 #include <list>
-#include <map>
 #include <string>
 
 #include "IRenderPass.h"
@@ -35,7 +34,6 @@ public:
 	virtual PassType GetType();
 	virtual void ClearDrawNodes();
 	virtual void Setup(HALgfx::IDevice* pDevice);
-	virtual std::list<ShaderNode*>& GetShaderNodeList();
 
 private:
 	std::list<ShaderNode*> m_lShaderNodes;

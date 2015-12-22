@@ -29,6 +29,7 @@ class ShaderNode;
 
 enum PassType
 {
+	PASS_DEPTH,
 	PASS_SKY,
 	PASS_OPAQUE,
 	PASS_POSTPROCESS,
@@ -47,7 +48,6 @@ public:
 	virtual PassType GetType() = 0;
 	virtual void ClearDrawNodes() = 0;
 	virtual void Setup(HALgfx::IDevice* pDevice) = 0;
-	virtual std::list<ShaderNode*>& GetShaderNodeList() = 0;
 };
 } // namespace Renderer
 } // namespace Magnet

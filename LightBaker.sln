@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scene", "Scene\Scene.vcxpro
 		{556B630B-3883-4865-9784-94E0784B40E4} = {556B630B-3883-4865-9784-94E0784B40E4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HALgfx", "HALGfx\HALgfx.vcxproj", "{03392F36-CA3A-4302-8E12-EF867F3A3D24}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HALgfx", "HALgfx\HALgfx.vcxproj", "{03392F36-CA3A-4302-8E12-EF867F3A3D24}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Viewer", "Viewer\Viewer.vcxproj", "{464188E1-9D5B-4FF8-BF6C-FF7771D9E0CB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -31,6 +31,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Render
 		{556B630B-3883-4865-9784-94E0784B40E4} = {556B630B-3883-4865-9784-94E0784B40E4}
 		{03392F36-CA3A-4302-8E12-EF867F3A3D24} = {03392F36-CA3A-4302-8E12-EF867F3A3D24}
 		{7D445FD6-64B7-497F-99F1-E5CE8480E93B} = {7D445FD6-64B7-497F-99F1-E5CE8480E93B}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shader", "shader", "{A420EC2E-496A-4744-8677-87CB0848A22C}"
+	ProjectSection(SolutionItems) = preProject
+		shader\depth_pn.hlsl = shader\depth_pn.hlsl
+		shader\norm.hlsl = shader\norm.hlsl
+		shader\ShaderCompiler.bat = shader\ShaderCompiler.bat
+		shader\sky.hlsl = shader\sky.hlsl
+		shader\ssao.hlsl = shader\ssao.hlsl
+		shader\tonemapping.hlsl = shader\tonemapping.hlsl
 	EndProjectSection
 EndProject
 Global

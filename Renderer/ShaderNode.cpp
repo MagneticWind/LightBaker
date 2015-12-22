@@ -307,65 +307,74 @@ void* ShaderNode::CreateBuffer(int iSize, HALgfx::ShaderType eType)
 }
 
 //------------------------------------------------------------------
-void ShaderNode::LoadShader()
+void ShaderNode::LoadShader(HALgfx::ShaderType eType)
 {
 	static const char SHADER_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\shader\\";
 	char filePath[256];
 	strcpy(filePath, SHADER_PATH);
 	strcat(filePath, m_caShaderName);
 
-	// load vertex shader
-	char vShaderPath[256];
-	strcpy(vShaderPath, filePath);
-	strcat(vShaderPath, ".v");
-
-	FILE* pVSFile = fopen(vShaderPath, "r+b");
-	if (pVSFile == 0)
+	switch (eType)
 	{
-		printf("can't find the shader %s", vShaderPath);
-		assert(0);
+	case HALgfx::VERTEX_SHADER:
+		{
+			// load vertex shader
+			char vShaderPath[256];
+			strcpy(vShaderPath, filePath);
+			strcat(vShaderPath, ".v");
+
+			FILE* pVSFile = fopen(vShaderPath, "r+b");
+			if (pVSFile == 0)
+			{
+				printf("can't find the shader %s", vShaderPath);
+				assert(0);
+			}
+
+			fseek(pVSFile, 0, SEEK_END);
+			int iVSFileSize = ftell(pVSFile);
+			rewind(pVSFile);
+
+			void* pVSFileData = CreateBuffer(iVSFileSize, HALgfx::VERTEX_SHADER);
+			int iResult = fread(pVSFileData, 1, iVSFileSize, pVSFile);
+			if (iResult != iVSFileSize)
+			{
+				printf("Error reading shader file %s", pVSFileData);
+				assert(0);
+			}
+
+			fclose(pVSFile);
+		}
+		break;
+	case HALgfx::PIXEL_SHADER:
+		{
+			// load pixel shader
+			char pShaderPath[256];
+			strcpy(pShaderPath, filePath);
+			strcat(pShaderPath, ".p");
+
+			FILE* pPSFile = fopen(pShaderPath, "r+b");
+			if (pPSFile == 0)
+			{
+				printf("can't find the shader %s", pShaderPath);
+				assert(0);
+			}
+
+			fseek(pPSFile, 0, SEEK_END);
+			int iPSFileSize = ftell(pPSFile);
+			rewind(pPSFile);
+
+			void* pPSFileData = CreateBuffer(iPSFileSize, HALgfx::PIXEL_SHADER);
+			int iSize = fread(pPSFileData, 1, iPSFileSize, pPSFile);
+			if (iSize != iPSFileSize)
+			{
+				printf("Error reading shader file %s", pShaderPath);
+				assert(0);
+			}
+
+			fclose(pPSFile);
+		}
+		break;
 	}
-
-	fseek(pVSFile, 0, SEEK_END);
-	int iVSFileSize = ftell(pVSFile);
-	rewind(pVSFile);
-
-	void* pVSFileData = CreateBuffer(iVSFileSize, HALgfx::VERTEX_SHADER);
-	int iResult = fread(pVSFileData, 1, iVSFileSize, pVSFile);
-	if (iResult != iVSFileSize)
-	{
-		printf("Error reading shader file %s", pVSFileData);
-		assert(0);
-	}
-
-	fclose(pVSFile);
-
-	// load pixel shader
-
-	char pShaderPath[256];
-	strcpy(pShaderPath, filePath);
-	strcat(pShaderPath, ".p");
-
-	FILE* pPSFile = fopen(pShaderPath, "r+b");
-	if (pPSFile == 0)
-	{
-		printf("can't find the shader %s", pShaderPath);
-		assert(0);
-	}
-
-	fseek(pPSFile, 0, SEEK_END);
-	int iPSFileSize = ftell(pPSFile);
-	rewind(pPSFile);
-
-	void* pPSFileData = CreateBuffer(iPSFileSize, HALgfx::PIXEL_SHADER);
-	int iSize = fread(pPSFileData, 1, iPSFileSize, pPSFile);
-	if (iSize != iPSFileSize)
-	{
-		printf("Error reading shader file %s", pShaderPath);
-		assert(0);
-	}
-
-	fclose(pPSFile);
 
 	m_bIsLoaded = true;
 }

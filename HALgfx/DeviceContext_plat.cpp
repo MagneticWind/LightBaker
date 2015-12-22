@@ -298,7 +298,10 @@ void DeviceContext::SetRenderTargetViews(int iNumViews, IRenderTargetView* const
 	for(int i = 0; i < iNumViews; ++i)
 	{
 		RenderTargetView* pRTV = static_cast<RenderTargetView*>(rtvs[i]);
-		pRtvs[i] = pRTV->GetD3DPtr();
+		if (pRTV == NULL)
+			pRtvs[i] = NULL;
+		else
+			pRtvs[i] = pRTV->GetD3DPtr();
 	}
 
 	if (iNumViews == 0)
@@ -307,7 +310,10 @@ void DeviceContext::SetRenderTargetViews(int iNumViews, IRenderTargetView* const
 	}
 	else
 	{
-		m_pDeviceContext->OMSetRenderTargets(iNumViews, pRtvs, pDSV->GetD3DPtr());
+		if (pDSV == NULL)
+			m_pDeviceContext->OMSetRenderTargets(iNumViews, pRtvs, NULL);
+		else
+			m_pDeviceContext->OMSetRenderTargets(iNumViews, pRtvs, pDSV->GetD3DPtr());
 	}
 }
 
