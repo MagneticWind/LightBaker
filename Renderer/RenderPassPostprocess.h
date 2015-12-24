@@ -12,6 +12,8 @@ class IDevice;
 class IDeviceContext;
 class IBuffer;
 class IInputLayout;
+class IShader;
+class IUnorderedAccessView;
 }
 
 namespace Renderer
@@ -37,10 +39,10 @@ public:
 	void SetHDRSRV(HALgfx::IShaderResourceView* pHDRSRV);
 	void SetDepthSRV(HALgfx::IShaderResourceView* pDepthSRV);
 
-	void GenerateSSAOSamples();
-
 private:
 	void Initialize(HALgfx::IDevice* pDevice);
+	void GenerateSSAOSamples();
+	void ComputeAvgLuminance();
 
 private:
 	ShaderNode* m_pSSAOShaderNode;
@@ -67,7 +69,15 @@ private:
 	HALgfx::IRenderTargetView* m_pFinalRTV;
 	HALgfx::IDepthStencilView* m_pDSV;
 
+	ShaderNode* m_pReduceTo1DComputeShader;
+	ShaderNode* m_pReduceTo1PixelComputeShader;
 
+	HALgfx::IBuffer* m_pReductionBuffer0;
+	HALgfx::IBuffer* m_pReductionBuffer1;
+	HALgfx::IShaderResourceView* m_pReductionSRV0;
+	HALgfx::IShaderResourceView* m_pReductionSRV1;
+	HALgfx::IUnorderedAccessView* m_pReductionUAV0;
+	HALgfx::IUnorderedAccessView* m_pReductionUAV1;
 };
 
 inline void RenderPassPostprocess::SetParams(int iDimensionX, int iDimensionY, float fIntensityLevel)

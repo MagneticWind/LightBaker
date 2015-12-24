@@ -14,6 +14,7 @@
     <ClInclude Include="BlendState_plat.h" />
     <ClInclude Include="ComparisonFunc.h" />
     <ClInclude Include="ComparisonFunc_plat.h" />
+    <ClInclude Include="ComputeShader_plat.h" />
     <ClInclude Include="DepthStencilState_plat.h" />
     <ClInclude Include="DepthStencilView_plat.h" />
     <ClInclude Include="DeviceContext_plat.h" />
@@ -36,6 +37,8 @@
     <ClInclude Include="ISamplerState.h" />
     <ClInclude Include="IShader.h" />
     <ClInclude Include="IShaderResourceView.h" />
+    <ClInclude Include="ITexture1d.h" />
+    <ClInclude Include="IUnorderedAccessView.h" />
     <ClInclude Include="PixelShader_plat.h" />
     <ClInclude Include="RasterizerState_plat.h" />
     <ClInclude Include="RenderSystem_plat.h" />
@@ -46,7 +49,9 @@
     <ClInclude Include="ITexture2d.h" />
     <ClInclude Include="IView.h" />
     <ClInclude Include="ShaderResourceView_plat.h" />
+    <ClInclude Include="Texture1d_plat.h" />
     <ClInclude Include="Texture2d_plat.h" />
+    <ClInclude Include="UnorderedAccessView_plat.h" />
     <ClInclude Include="VertexShader_plat.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="ShaderType.h" />
@@ -55,6 +60,7 @@
     <ClCompile Include="BlendState_plat.cpp" />
     <ClCompile Include="Buffer_plat.cpp" />
     <ClCompile Include="ComparisonFunc_plat.cpp" />
+    <ClCompile Include="ComputeShader_plat.cpp" />
     <ClCompile Include="DepthStencilState_plat.cpp" />
     <ClCompile Include="DepthStencilView_plat.cpp" />
     <ClCompile Include="DeviceContext_plat.cpp" />
@@ -68,7 +74,9 @@
     <ClCompile Include="Resource_plat.cpp" />
     <ClCompile Include="SamplerState_plat.cpp" />
     <ClCompile Include="ShaderResourceView_plat.cpp" />
+    <ClCompile Include="Texture1d_plat.cpp" />
     <ClCompile Include="Texture2d_plat.cpp" />
+    <ClCompile Include="UnorderedAccessView_plat.cpp" />
     <ClCompile Include="VertexShader_plat.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

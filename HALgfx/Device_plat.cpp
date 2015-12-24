@@ -8,12 +8,14 @@
 #include "DepthStencilView_plat.h"
 #include "RenderTargetView_plat.h"
 #include "ShaderResourceView_plat.h"
+#include "UnorderedAccessView_plat.h"
 #include "Buffer_plat.h"
 #include "Texture2d_plat.h"
 #include "FeatureLevel.h"
 #include "InputLayout_plat.h"
 #include "PixelShader_plat.h"
 #include "VertexShader_plat.h"
+#include "ComputeShader_plat.h"
 
 namespace Magnet
 {
@@ -88,6 +90,12 @@ IShader* Device::CreateShader(ShaderType eType, int iShaderCodeSize, const void*
 			pPShader->Create(pShaderCode, iShaderCodeSize, m_pDevice);
 			return pPShader;
 		}
+	case COMPUTE_SHADER:
+		{
+			ComputeShader* pCShader = new ComputeShader();
+			pCShader->Create(pShaderCode, iShaderCodeSize, m_pDevice);
+			return pCShader;
+		}
 	}
 	return 0;
 }
@@ -147,6 +155,14 @@ IShaderResourceView* Device::CreateShaderResourceView(IResource* pResource, cons
 }
 
 //------------------------------------------------------------------
+IUnorderedAccessView* Device::CreateUnorderedAccessView(IResource* pResource, const UnorderedAccessViewDesc& desc)
+{
+	UnorderedAccessView* pUnorderedAccessView = new UnorderedAccessView();
+	pUnorderedAccessView->Create(desc, pResource, m_pDevice);
+	return pUnorderedAccessView;
+}
+
+//------------------------------------------------------------------
 void Device::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV)
 {
 	D3DX11_IMAGE_LOAD_INFO LoadInfo;
@@ -160,11 +176,6 @@ void Device::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, 
 	*ppTexture = new Texture2d(pCubeTexture);
 	*ppSRV = new ShaderResourceView(pCubeRV);
 }
-
-//------------------------------------------------------------------
-//IUnorderedAccessView* CreateUnorderedAccessView(IResource*)
-//{
-//}
 
 } // namespace HALgfx
 } // namespace Manget

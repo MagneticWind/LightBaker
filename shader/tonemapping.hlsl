@@ -1,4 +1,5 @@
 Texture2D tx2D : register( t0 );
+StructuredBuffer<float> lum : register(t1);
 
 cbuffer CBTransformation : register( b0 )
 {
@@ -63,12 +64,13 @@ float4 PS( PS_INPUT input) : SV_Target
     
     float4 f4Color = tx2D.Load(float3(param.x * input.Tex.x, param.y * input.Tex.y, 0.f));
     
-    f4Color.rgb *= MIDDLE_GRAY / (param.z + 0.001f);
+	float fLum = lum[0] * param.z;
+	f4Color.rgb *= MIDDLE_GRAY / (fLum + 0.001f);
     f4Color.rgb *= (1.0f + f4Color.rgb / LUM_WHITE);
     
-	f4Color.rgb = JimhejlTonemapping(f4Color.rgb);
+	f4Color.rgb = ReinhardTonemapping(f4Color.rgb); // JimhejlTonemapping(f4Color.rgb);
     
     // return gamma corrected color
-    return pow(abs(f4Color), 1.f/2.2f);
-    //return f4Color;
+    //return pow(abs(f4Color), 1.f/2.2f);
+    return f4Color;
 }

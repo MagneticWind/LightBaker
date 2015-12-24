@@ -43,6 +43,25 @@ void DrawNode::AddSRV(HALgfx::IShaderResourceView* pSRV)
 	m_ppSRVs[m_iNumberOfSRVs++] = pSRV;
 }
 
+void DrawNode::RemoveSRV(HALgfx::IShaderResourceView* pSRV)
+{
+	for (int i = 0; i < m_iNumberOfSRVs; ++i)
+	{
+		if (m_ppSRVs[i] == pSRV)
+		{
+			m_ppSRVs[i] = NULL;
+			// move the rest of elements forward
+			for (int j = i; j < m_iNumberOfSRVs - 1; ++j)
+			{
+				m_ppSRVs[j] = m_ppSRVs[j + 1];
+			}
+			break;
+		}
+	}
+
+	m_iNumberOfSRVs--;
+}
+
 void* DrawNode::CreateCBufferData(int iSize, HALgfx::ShaderType eType)
 {
 	void* pBuffer = 0;

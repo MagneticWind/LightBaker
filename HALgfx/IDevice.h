@@ -31,6 +31,7 @@ struct ScissorStateDesc;
 struct RenderTargetViewDesc;
 struct DepthStencilViewDesc;
 struct ShaderResourceViewDesc;
+struct UnorderedAccessViewDesc;
 struct ViewPort;
 struct BlendDesc;
 
@@ -64,7 +65,7 @@ public:
 	virtual IRenderTargetView* CreateRenderTargetView(IResource*, const RenderTargetViewDesc&) = 0;
 	virtual IDepthStencilView* CreateDepthStencilView(IResource*, const DepthStencilViewDesc&) = 0;
 	virtual IShaderResourceView* CreateShaderResourceView(IResource*, const ShaderResourceViewDesc&) = 0;
-	//virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*);
+	virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*, const UnorderedAccessViewDesc&) = 0;
 	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV) = 0;
 
 

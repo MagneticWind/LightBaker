@@ -23,7 +23,7 @@ public:
 
 	virtual void DrawIndexed(unsigned int uIndexCount, unsigned int uStartIndexLocation, int iBaseVertexLocation);
 
-//	virtual void ExuecuteCompute(unsigned int uX, unsigned int uY, unsigned int uZ);
+	virtual void ExuecuteCompute(unsigned int uX, unsigned int uY, unsigned int uZ);
 
 	virtual void SetInputlayout(IInputLayout* pInputLayout);
 	virtual void SetVertexBuffer(int iSlot, int iStride, int iOffset, IBuffer* pBuffer);
@@ -39,7 +39,7 @@ public:
 	virtual void SetShader(ShaderType shaderType, IShader* pShader);
 	virtual void SetSamplerStates(ShaderType shaderType, int iOffset, int iNumSamplers, ISamplerState* pState[]);
 	virtual void SetShaderResourceViews(ShaderType shaderType, int iOffset, int iNumViews, IShaderResourceView* pSRVs[]);
-
+	virtual void SetUnorderedAccessViews(ShaderType shaderType, int iOffset, int iNumViews, IUnorderedAccessView* pUAVs[]);
 	virtual void SetViewPort(const ViewPort& viewPort);
 
 	virtual void SetPrimitiveTopology(PrimitiveTopology eType);

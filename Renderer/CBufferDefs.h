@@ -63,6 +63,22 @@ struct CBufferSSAO
 	Math::Vector4f f4SamplePoints[NUM_SAMPLER_PAIRS];
 };
 
+struct CBufferReduceTo1D
+{
+	unsigned int dimX;
+	unsigned int dimY;
+	unsigned int textureX;
+	unsigned int textureY;
+};
+
+struct CBufferReduceTo1Pixel
+{
+	unsigned int numToReduce;
+	unsigned int dim;
+	unsigned int placeHolder1;
+	unsigned int placeHolder2;
+};
+
 } // namespace Renderer
 } // namespace Magnet
 

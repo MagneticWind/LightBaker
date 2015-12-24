@@ -6,6 +6,8 @@
 #include "HALgfx\IDeviceContext.h"
 #include "HALgfx\IResource.h"
 #include "HALgfx\ISamplerState.h"
+#include "HALgfx\IUnorderedAccessView.h"
+#include "HALgfx\IShaderResourceView.h"
 #include "HALgfx\IBuffer.h"
 #include "HALgfx\ShaderType.h"
 
@@ -20,7 +22,7 @@ namespace Magnet
 namespace Renderer
 {
 //------------------------------------------------------------------
-ShaderNode::ShaderNode(const char* pName) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0)
+	ShaderNode::ShaderNode(const char* pName) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_iNumberOfCSConstBuffers(0)
 {
 	strcpy(m_caShaderName, pName);
 
@@ -35,8 +37,10 @@ ShaderNode::ShaderNode(const char* pName) : m_iNumberOfVSConstBuffers(0), m_iNum
 	{
 		m_ppVSConstBuffers[i] = 0;
 		m_ppPSConstBuffers[i] = 0;
+		m_ppCSConstBuffers[i] = 0;
 		m_aVSConstBufferSizes[i] = 0;
 		m_aPSConstBufferSizes[i] = 0;
+		m_aCSConstBufferSizes[i] = 0;
 	}
 
 	m_iNumSamplerState = 0;
@@ -91,12 +95,19 @@ ShaderNode::~ShaderNode()
 			delete m_ppPSConstBuffers[i];
 			m_ppPSConstBuffers[i] = 0;
 		}
+
+		if (m_ppCSConstBuffers[i])
+		{
+			delete m_ppCSConstBuffers[i];
+			m_ppCSConstBuffers[i];
+		}
 	}
 
 	for (int i = 0; i < MAX_NUMBER_SAMPLERS; ++i)
 	{
 		m_ppSamplers[i] = 0;
 	}
+
 }
 
 //------------------------------------------------------------------
@@ -148,7 +159,7 @@ void ShaderNode::UnbindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, 
 	pDeviceContext->SetConstantBuffers(0, m_iNumberOfVSConstBuffers, HALgfx::VERTEX_SHADER, pBuffers);
 	pDeviceContext->SetConstantBuffers(m_iNumberOfVSConstBuffers, m_iNumberOfPSConstBuffers, HALgfx::PIXEL_SHADER, pBuffers);
 
-	HALgfx::IShaderResourceView* pSRVS[MAX_NUMBER_SRVS] = {0,0, 0, 0, 0, 0, 0, 0};
+	HALgfx::IShaderResourceView* pSRVS[MAX_NUMBER_SRVS] = {0, 0, 0, 0, 0, 0, 0, 0};
 	pDeviceContext->SetShaderResourceViews(HALgfx::PIXEL_SHADER, 0, drawNode.m_iNumberOfSRVs, pSRVS);
 }
 
@@ -267,6 +278,12 @@ void ShaderNode::AddConstantBuffer(const HALgfx::BufferDesc& desc, HALgfx::IDevi
 		m_aPSConstBufferSizes[m_iNumberOfPSConstBuffers] = desc.byteSize;
 		++m_iNumberOfPSConstBuffers;
 	}
+	else if (eType == HALgfx::COMPUTE_SHADER)
+	{
+		m_ppCSConstBuffers[m_iNumberOfCSConstBuffers] = pDevice->CreateBuffer(desc, data);
+		m_aCSConstBufferSizes[m_iNumberOfCSConstBuffers] = desc.byteSize;
+		++m_iNumberOfCSConstBuffers;
+	}
 }
 
 //------------------------------------------------------------------
@@ -374,9 +391,70 @@ void ShaderNode::LoadShader(HALgfx::ShaderType eType)
 			fclose(pPSFile);
 		}
 		break;
+	case HALgfx::COMPUTE_SHADER:
+		{
+			// load compute shader
+			char pShaderPath[256];
+			strcpy(pShaderPath, filePath);
+			strcat(pShaderPath, ".c");
+
+			FILE* pCSFile = fopen(pShaderPath, "r+b");
+			if (pCSFile == 0)
+			{
+				printf("can't find the shader %s", pShaderPath);
+				assert(0);
+			}
+
+			fseek(pCSFile, 0, SEEK_END);
+			int iCSFileSize = ftell(pCSFile);
+			rewind(pCSFile);
+
+			void* pCSFileData = CreateBuffer(iCSFileSize, HALgfx::COMPUTE_SHADER);
+			int iSize = fread(pCSFileData, 1, iCSFileSize, pCSFile);
+			if (iSize != iCSFileSize)
+			{
+				printf("Error reading shader file %s", pShaderPath);
+				assert(0);
+			}
+
+			fclose(pCSFile);
+		}
+		break;
 	}
 
 	m_bIsLoaded = true;
+}
+
+//------------------------------------------------------------------
+void ShaderNode::RunCompute(HALgfx::IDeviceContext* pDeviceContext, int iSRVCount, HALgfx::IShaderResourceView** ppSRVs,
+	void* CBufferData, int iUAVCount, HALgfx::IUnorderedAccessView** ppUAVs, unsigned int uX, unsigned int uY, unsigned uZ)
+{
+	assert(m_iNumberOfCSConstBuffers == 1);
+
+	pDeviceContext->SetShader(HALgfx::COMPUTE_SHADER, m_ppShader[HALgfx::COMPUTE_SHADER]);
+	
+	HALgfx::SubResourceData data;
+	pDeviceContext->Map(m_ppCSConstBuffers[0], 0, HALgfx::MAP_WRITE_DISCARD, 0, data);
+	memcpy(data.pMem, CBufferData, m_aCSConstBufferSizes[0]);
+	pDeviceContext->Unmap(m_ppCSConstBuffers[0], 0);
+	
+	pDeviceContext->SetConstantBuffers(0, m_iNumberOfCSConstBuffers, HALgfx::COMPUTE_SHADER, m_ppCSConstBuffers);
+	pDeviceContext->SetShaderResourceViews(HALgfx::COMPUTE_SHADER, 0, iSRVCount, ppSRVs);
+	pDeviceContext->SetUnorderedAccessViews(HALgfx::COMPUTE_SHADER, 0, iUAVCount, ppUAVs);
+
+	pDeviceContext->ExuecuteCompute(uX, uY, uZ);
+
+	// clear
+	pDeviceContext->SetShader(HALgfx::COMPUTE_SHADER, NULL);
+
+	HALgfx::IBuffer* pBuffers[MAX_NUMBER_BUFFERS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	pDeviceContext->SetConstantBuffers(0, m_iNumberOfCSConstBuffers, HALgfx::COMPUTE_SHADER, pBuffers);
+
+	HALgfx::IShaderResourceView* pSRVs[MAX_NUMBER_SRVS] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	pDeviceContext->SetShaderResourceViews(HALgfx::COMPUTE_SHADER, 0, iSRVCount, pSRVs);
+
+	HALgfx::IUnorderedAccessView* pUAVs[MAX_NUMBER_UAVS] = { 0, 0, 0, 0 };
+	pDeviceContext->SetUnorderedAccessViews(HALgfx::COMPUTE_SHADER, 0, iUAVCount, pUAVs);
 }
 
 } // namespace Renderer

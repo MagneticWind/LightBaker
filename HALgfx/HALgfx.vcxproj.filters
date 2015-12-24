@@ -79,6 +79,17 @@
     <ClInclude Include="DeviceContext_plat.h">
       <Filter>d3d11</Filter>
     </ClInclude>
+    <ClInclude Include="ITexture1d.h" />
+    <ClInclude Include="Texture1d_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeShader_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="IUnorderedAccessView.h" />
+    <ClInclude Include="UnorderedAccessView_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="d3d11">
@@ -138,6 +149,15 @@
       <Filter>d3d11</Filter>
     </ClCompile>
     <ClCompile Include="PixelShader_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture1d_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="ComputeShader_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="UnorderedAccessView_plat.cpp">
       <Filter>d3d11</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,6 +10,7 @@
 #include "HALgfx\ISamplerState.h"
 #include "HALgfx\IShaderResourceView.h"
 #include "HALgfx\ITexture2d.h"
+#include "HALgfx\IUnorderedAccessView.h"
 
 #include "Math\Math.h"
 
@@ -20,12 +21,25 @@ namespace Magnet
 {
 namespace Renderer
 {
+
+namespace RenderPassPostprocessPrivate
+{
+	static const float TONEMAPPING_TEXEL_SIZE = 81.f;
+	static const float TONEMAPPING_TEXEL_SCALE = 1.f / (TONEMAPPING_TEXEL_SIZE * TONEMAPPING_TEXEL_SIZE);
+	static const float REDUCTION_BLOCK_SIZE = 8.f;
+	static const float REDUCTION_1D_BLOCK_SIZE = 128.f;
+}
+
 //------------------------------------------------------------------
 RenderPassPostprocess::RenderPassPostprocess() : m_pSSAOShaderNode(NULL), m_pTonemappingShaderNode(NULL),
 		m_bInitialized(false), 
 		m_pQuadVertexBuffer(NULL), m_pQuadIndexBuffer(NULL), m_pInputLayout(NULL),
 		m_pSRVHDR(NULL), m_pSRVDepth(NULL),
-		m_pSSAOTexture(NULL), m_pSSAOTextureSRV(NULL), m_pSSAORTV(NULL)
+		m_pSSAOTexture(NULL), m_pSSAOTextureSRV(NULL), m_pSSAORTV(NULL),
+		m_pReductionBuffer0(NULL), m_pReductionBuffer1(NULL),
+		m_pReductionSRV0(NULL), m_pReductionSRV1(NULL),
+		m_pReductionUAV0(NULL), m_pReductionUAV1(NULL)
+
 {
 }
 
@@ -91,6 +105,55 @@ RenderPassPostprocess::~RenderPassPostprocess()
 		delete m_pSSAORTV;
 		m_pSSAORTV = NULL;
 	}
+
+	if (m_pReduceTo1DComputeShader)
+	{
+		delete m_pReduceTo1DComputeShader;
+		m_pReduceTo1DComputeShader = NULL;
+	}
+
+	if (m_pReduceTo1PixelComputeShader)
+	{
+		delete m_pReduceTo1PixelComputeShader;
+		m_pReduceTo1PixelComputeShader = NULL;
+	}
+
+	if (m_pReductionBuffer0)
+	{
+		delete m_pReductionBuffer0;
+		m_pReductionBuffer0 = NULL;
+	}
+
+	if (m_pReductionBuffer1)
+	{
+		delete m_pReductionBuffer1;
+		m_pReductionBuffer1 = NULL;
+	}
+
+	if (m_pReductionSRV0)
+	{
+		delete m_pReductionSRV0;
+		m_pReductionSRV0 = NULL;
+	}
+
+	if (m_pReductionSRV1)
+	{
+		delete m_pReductionSRV1;
+		m_pReductionSRV1 = NULL;
+	}
+
+	if (m_pReductionUAV0)
+	{
+		delete m_pReductionUAV0;
+		m_pReductionUAV0 = NULL;
+	}
+
+	if (m_pReductionUAV1)
+	{
+		delete m_pReductionUAV1;
+		m_pReductionUAV1 = NULL;
+	}
+
 }
 
 //------------------------------------------------------------------
@@ -113,19 +176,112 @@ void RenderPassPostprocess::SetRenderState(HALgfx::IDeviceContext* pDeviceContex
 }
 
 //------------------------------------------------------------------
+template <class T>
+static void SWAP(T* &x, T* &y)
+{
+	T* temp = x;
+	x = y;
+	y = temp;
+}
+
+//------------------------------------------------------------------
 void RenderPassPostprocess::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext)
 {
 	pDeviceContext->BeginEvent("RenderPassPostprocess");
 
-	pDeviceContext->SetRenderTargetViews(1, &m_pSSAORTV, NULL);
-	pDeviceContext->ClearRenderTargetView(m_pSSAORTV, Math::Vector4f(0, 0, 0, 0));
-	//pDeviceContext->ClearDepthStencilView(m_pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
-	m_pSSAOShaderNode->Draw(pDeviceContext);
+	// ssao
+	{
+		pDeviceContext->SetRenderTargetViews(1, &m_pSSAORTV, NULL);
+		pDeviceContext->ClearRenderTargetView(m_pSSAORTV, Math::Vector4f(0, 0, 0, 0));
+		//pDeviceContext->ClearDepthStencilView(m_pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+		m_pSSAOShaderNode->Draw(pDeviceContext);
+	}
 
-	pDeviceContext->SetRenderTargetViews(1, &m_pFinalRTV, NULL);
-	pDeviceContext->ClearRenderTargetView(m_pFinalRTV, Math::Vector4f(0, 0, 0, 0));
-//	pDeviceContext->ClearDepthStencilView(m_pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
-	m_pTonemappingShaderNode->Draw(pDeviceContext);
+	// compute avg luminance
+	{
+
+		pDeviceContext->BeginEvent("avg luminance");
+
+		int dimx = int(ceil(RenderPassPostprocessPrivate::TONEMAPPING_TEXEL_SIZE / RenderPassPostprocessPrivate::REDUCTION_BLOCK_SIZE));
+		int dimy = dimx;
+
+		CBufferReduceTo1D cbCS;
+		cbCS.dimX = dimx;
+		cbCS.dimY = dimy;
+		cbCS.textureX = m_iDimensionX;
+		cbCS.textureY = m_iDimensionY;
+
+		pDeviceContext->BeginEvent("reduceto1d");
+		m_pReduceTo1DComputeShader->RunCompute(pDeviceContext, 1, &m_pSRVHDR,
+			&cbCS, 1, &m_pReductionUAV0,
+			dimx, dimy, 1);
+		pDeviceContext->EndEvent();
+
+		// pingpong to reduce to 1 pixel
+		pDeviceContext->BeginEvent("reduceto1p");
+
+		int dim = dimx*dimy;
+		int nNumToReduce = dim;
+		dim = int(ceil(dim / RenderPassPostprocessPrivate::REDUCTION_1D_BLOCK_SIZE));
+		if (nNumToReduce > 1)
+		{
+			char debugStr[64];
+			for (;;)
+			{
+				CBufferReduceTo1Pixel cbCS;
+				cbCS.numToReduce = nNumToReduce;
+				cbCS.dim = dim;
+				cbCS.placeHolder1 = 0;
+				cbCS.placeHolder2 = 0;
+
+				sprintf(debugStr, "reduce_%d", nNumToReduce);
+				pDeviceContext->BeginEvent(debugStr);
+				m_pReduceTo1PixelComputeShader->RunCompute(pDeviceContext, 1, &m_pReductionSRV0,
+					&cbCS, 1, &m_pReductionUAV1,
+					dim, 1, 1);
+				pDeviceContext->EndEvent();
+
+				nNumToReduce = dim;
+				dim = int(ceil(dim / RenderPassPostprocessPrivate::REDUCTION_1D_BLOCK_SIZE));
+
+				if (nNumToReduce == 1)
+					break;
+				
+				SWAP(m_pReductionBuffer0, m_pReductionBuffer1);
+				SWAP(m_pReductionSRV0, m_pReductionSRV1);
+				SWAP(m_pReductionUAV0, m_pReductionUAV1);
+			}
+		}
+		else
+		{
+			SWAP(m_pReductionBuffer0, m_pReductionBuffer1);
+			SWAP(m_pReductionSRV0, m_pReductionSRV1);
+			SWAP(m_pReductionUAV0, m_pReductionUAV1);
+		}
+		pDeviceContext->EndEvent();
+
+		pDeviceContext->EndEvent();
+	}
+
+	// tone mapping
+	{
+
+		DrawNode& drawNode = m_pTonemappingShaderNode->GetDrawNode("quad");
+
+		CBufferToneMapping* pBuffer = static_cast<CBufferToneMapping*>(drawNode.m_pPSCBufferData[0]);
+		pBuffer->v4Param.x = m_iDimensionX;
+		pBuffer->v4Param.y = m_iDimensionY;
+		pBuffer->v4Param.z = RenderPassPostprocessPrivate::TONEMAPPING_TEXEL_SCALE;
+
+		drawNode.AddSRV(m_pReductionSRV1);
+
+		pDeviceContext->SetRenderTargetViews(1, &m_pFinalRTV, NULL);
+		pDeviceContext->ClearRenderTargetView(m_pFinalRTV, Math::Vector4f(0, 0, 0, 0));
+		//	pDeviceContext->ClearDepthStencilView(m_pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+		m_pTonemappingShaderNode->Draw(pDeviceContext);
+
+		drawNode.RemoveSRV(m_pReductionSRV1);
+	}
 
 	pDeviceContext->EndEvent();
 }
@@ -152,20 +308,6 @@ void RenderPassPostprocess::Setup(HALgfx::IDevice* pDevice)
 		m_bInitialized = true;
 	}
 
-	// ssao
-	{
-
-	}
-	
-	// tonemapping
-	{
-		DrawNode& drawNode = m_pTonemappingShaderNode->GetDrawNode("quad");
-
-		CBufferToneMapping* pBuffer = static_cast<CBufferToneMapping*>(drawNode.m_pPSCBufferData[0]);
-		pBuffer->v4Param.x = m_iDimensionX;
-		pBuffer->v4Param.y = m_iDimensionY;
-		pBuffer->v4Param.z = m_fIntensityLevel;
-	}
 }
 
 //------------------------------------------------------------------
@@ -315,6 +457,62 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice)
 		m_pSSAOShaderNode->AddDrawNode(drawNodeSSAO);
 	}
 
+	// avg luminance
+	{
+		char shaderName[256];
+		strcpy(shaderName, "reduceto1d");
+		m_pReduceTo1DComputeShader = new ShaderNode(shaderName);
+		m_pReduceTo1DComputeShader->LoadShader(HALgfx::COMPUTE_SHADER);
+		m_pReduceTo1DComputeShader->Create(pDevice);
+
+		strcpy(shaderName, "reduceto1pixel");
+		m_pReduceTo1PixelComputeShader = new ShaderNode(shaderName);
+		m_pReduceTo1PixelComputeShader->LoadShader(HALgfx::COMPUTE_SHADER);
+		m_pReduceTo1PixelComputeShader->Create(pDevice);
+
+		// create const buffers
+		HALgfx::BufferDesc desc;
+		HALgfx::SubResourceData data;
+		desc.bindFlags = HALgfx::BIND_CONSTANT_BUFFER;
+		desc.byteSize = sizeof(CBufferReduceTo1D);
+		desc.cpuAccessFlags = HALgfx::CPU_ACCESS_WRITE;
+		desc.usage = HALgfx::USAGE_DYNAMIC;
+		m_pReduceTo1DComputeShader->AddConstantBuffer(desc, pDevice, HALgfx::COMPUTE_SHADER);
+
+		desc.byteSize = sizeof(CBufferReduceTo1Pixel);
+		m_pReduceTo1PixelComputeShader->AddConstantBuffer(desc, pDevice, HALgfx::COMPUTE_SHADER);
+
+		// pingpong buffers, uavs, srvs
+		HALgfx::BufferDesc descBuffer;
+		HALgfx::SubResourceData bufferData;
+		bufferData.pMem = NULL;
+		descBuffer.bindFlags = HALgfx::BIND_UNORDERED_ACCESS | HALgfx::BIND_SHADER_RESOURCE;
+		descBuffer.byteSize = int(ceil(m_iDimensionX / RenderPassPostprocessPrivate::REDUCTION_BLOCK_SIZE) * ceil(m_iDimensionY / RenderPassPostprocessPrivate::REDUCTION_BLOCK_SIZE)) * sizeof(float);
+		descBuffer.miscFlags = HALgfx::MISC_BUFFER_STRUCTURED;
+		descBuffer.byteStride = sizeof(float);
+		descBuffer.usage = HALgfx::USAGE_DEFAULT;
+		m_pReductionBuffer0 = pDevice->CreateBuffer(descBuffer, bufferData);
+		m_pReductionBuffer1 = pDevice->CreateBuffer(descBuffer, bufferData);
+
+		HALgfx::UnorderedAccessViewDesc descUAV;
+		descUAV.format = HALgfx::FORMAT_UNKNOWN;
+		descUAV.viewDimension = HALgfx::UAV_DIMENSION_BUFFER;
+		descUAV.bufferUAV.firstElement = 0;
+		descUAV.bufferUAV.numElements = descBuffer.byteSize / sizeof(float);
+		descUAV.bufferUAV.flags = 0;
+		m_pReductionUAV0 = pDevice->CreateUnorderedAccessView(m_pReductionBuffer0, descUAV);
+		m_pReductionUAV1 = pDevice->CreateUnorderedAccessView(m_pReductionBuffer1, descUAV);
+
+		HALgfx::ShaderResourceViewDesc descSRV;
+		descSRV.format = HALgfx::FORMAT_UNKNOWN;
+		descSRV.viewDimension = HALgfx::SRV_DIMENSION_BUFFER;
+		descSRV.bufferSRV.firstElement = descUAV.bufferUAV.firstElement;
+		descSRV.bufferSRV.numElements = descUAV.bufferUAV.numElements;
+		m_pReductionSRV0 = pDevice->CreateShaderResourceView(m_pReductionBuffer0, descSRV);
+		m_pReductionSRV1 = pDevice->CreateShaderResourceView(m_pReductionBuffer1, descSRV);
+
+	}
+
 	// tone mapping shader
 	{
 		char shaderName[256];
@@ -400,6 +598,11 @@ void RenderPassPostprocess::GenerateSSAOSamples()
 	}
 
 	m_ssaoParams.fCenterWeight = 1.f / fTotalLength;
+}
+
+void RenderPassPostprocess::ComputeAvgLuminance()
+{
+
 }
 
 } // namespace Renderer

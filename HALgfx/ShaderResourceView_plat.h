@@ -1,5 +1,5 @@
 #ifndef SHADER_RESOURCE_VIEW_H
-#define SHADER_RESOURCE_VIWE_H
+#define SHADER_RESOURCE_VIEW_H
 
 #include "IShaderResourceView.h"
 #include <d3d11.h>

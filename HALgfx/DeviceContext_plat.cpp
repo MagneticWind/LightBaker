@@ -1,6 +1,7 @@
 #include <d3d9.h>
 
 #include "Buffer_plat.h"
+#include "ComputeShader_plat.h"
 #include "DeviceContext_plat.h"
 #include "DepthStencilState_plat.h"
 #include "DepthStencilView_plat.h"
@@ -12,6 +13,7 @@
 #include "RasterizerState_plat.h"
 #include "SamplerState_plat.h"
 #include "ShaderResourceView_plat.h"
+#include "UnorderedAccessView_plat.h"
 #include "Texture2d_plat.h"
 #include "VertexShader_plat.h"
 #include "Viewport.h"
@@ -85,6 +87,9 @@ void DeviceContext::SetConstantBuffers(int iSlot, int iNumBuffers, ShaderType eT
 	case PIXEL_SHADER:
 		m_pDeviceContext->PSSetConstantBuffers(iSlot, iNumBuffers, pD3DBuffer);
 		return;
+	case COMPUTE_SHADER:
+		m_pDeviceContext->CSSetConstantBuffers(iSlot, iNumBuffers, pD3DBuffer);
+		return;
 	}
 
 }
@@ -132,12 +137,31 @@ void DeviceContext::SetShader(ShaderType shaderType, IShader* pShader)
 			m_pDeviceContext->PSSetShader(0, 0, 0);
 		}
 	}
+	else if (shaderType == COMPUTE_SHADER)
+	{
+		if (pShader)
+		{
+			ComputeShader* pComputeShader = static_cast<ComputeShader*>(pShader);
+			ID3D11ComputeShader* pD3DShader = pComputeShader->GetD3DPtr();
+			m_pDeviceContext->CSSetShader(pD3DShader, 0, 0);
+		}
+		else
+		{
+			m_pDeviceContext->CSSetShader(0, 0, 0);
+		}
+	}
 }
 
 //------------------------------------------------------------------
 void DeviceContext::DrawIndexed(unsigned int uIndexCount, unsigned int uStartIndexLocation, int iBaseVertexLocation)
 {
 	m_pDeviceContext->DrawIndexed(uIndexCount, uStartIndexLocation, iBaseVertexLocation);
+}
+
+//------------------------------------------------------------------
+void DeviceContext::ExuecuteCompute(unsigned int uX, unsigned uY, unsigned uZ)
+{
+	m_pDeviceContext->Dispatch(uX, uY, uZ);
 }
 
 //------------------------------------------------------------------
@@ -272,6 +296,35 @@ void DeviceContext::SetShaderResourceViews(ShaderType shaderType, int iOffset, i
 	{
 	case PIXEL_SHADER:
 		m_pDeviceContext->PSSetShaderResources(iOffset, iNumViews, pD3Dsrvs);
+		break;
+	case COMPUTE_SHADER:
+		m_pDeviceContext->CSSetShaderResources(iOffset, iNumViews, pD3Dsrvs);
+	}
+}
+
+//------------------------------------------------------------------
+void DeviceContext::SetUnorderedAccessViews(ShaderType shaderType, int iOffset, int iNumViews, IUnorderedAccessView* pUAVs[])
+{
+	ID3D11UnorderedAccessView* pD3Duavs[MAX_NUMBER_UAVS];
+
+	for (int i = 0; i < iNumViews; ++i)
+	{
+		if (pUAVs[i] != 0)
+		{
+			UnorderedAccessView* pUAV = static_cast<UnorderedAccessView*>(pUAVs[i]);
+			pD3Duavs[i] = pUAV->GetD3DPtr();
+		}
+		else
+		{
+			pD3Duavs[i] = 0;
+		}
+	}
+
+	switch (shaderType)
+	{
+	case COMPUTE_SHADER:
+		m_pDeviceContext->CSSetUnorderedAccessViews(0, iNumViews, pD3Duavs, NULL);
+		break;
 	}
 }
 

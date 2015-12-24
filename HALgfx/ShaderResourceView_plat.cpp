@@ -1,6 +1,7 @@
 #include "ShaderResourceView_plat.h"
 #include "Texture2d_plat.h"
 #include "Format_plat.h"
+#include "Buffer_plat.h"
 
 namespace Magnet
 {
@@ -37,12 +38,23 @@ void ShaderResourceView::Create(const ShaderResourceViewDesc& srvDesc, IResource
 	switch(srvDesc.viewDimension)
 	{
 	case SRV_DIMENSION_TEXTURE2D:
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipLevels = srvDesc.texSRV.mipLevels;
-		desc.Texture2D.MostDetailedMip = srvDesc.texSRV.mostDetailedMip;
-		Texture2d* pTexture2d = static_cast<Texture2d*>(pResource);
-		pD3DResource = pTexture2d->GetD3DPtr();
-		break;
+		{
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = srvDesc.texSRV.mipLevels;
+			desc.Texture2D.MostDetailedMip = srvDesc.texSRV.mostDetailedMip;
+			Texture2d* pTexture2d = static_cast<Texture2d*>(pResource);
+			pD3DResource = pTexture2d->GetD3DPtr();
+			break; 
+		}
+	case SRV_DIMENSION_BUFFER:
+		{
+			desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+			desc.Buffer.FirstElement = srvDesc.bufferSRV.firstElement;
+			desc.Buffer.NumElements = srvDesc.bufferSRV.numElements;
+			Buffer* pBuffer = static_cast<Buffer*>(pResource);
+			pD3DResource = pBuffer->GetD3DPtr();
+			break;
+		}
 	};
 
 	pDevice->CreateShaderResourceView(pD3DResource , &desc, &m_pSRV);

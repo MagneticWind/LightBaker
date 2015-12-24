@@ -28,6 +28,7 @@ class IDepthStencilView;
 class IShader;
 class ISamplerState;
 class IShaderResourceView;
+class IUnorderedAccessView;
 class IRasterzerState;
 
 struct ViewPort;
@@ -58,7 +59,7 @@ public:
 
 	virtual void DrawIndexed(unsigned int uIndexCount, unsigned int uStartIndexLocation, int iBaseVertexLocation) = 0;
 
-	//virtual void ExuecuteCompute(unsigned int uX, unsigned int uY, unsigned int uZ) = 0;
+	virtual void ExuecuteCompute(unsigned int uX, unsigned int uY, unsigned int uZ) = 0;
 
 	virtual void SetInputlayout(IInputLayout* pInputLayout) = 0;
 	virtual void SetVertexBuffer(int iSlot, int iStride, int iOffset, IBuffer* pBuffer) = 0;
@@ -74,6 +75,7 @@ public:
 
 	virtual void SetShader(ShaderType shaderType, IShader* pShader) = 0;
 	virtual void SetShaderResourceViews(ShaderType shaderType, int iOffset, int iNumViews, IShaderResourceView* pSRVs[]) = 0;
+	virtual void SetUnorderedAccessViews(ShaderType shaderType, int iOffset, int iNumViews, IUnorderedAccessView* pUAVs[]) = 0;
 	virtual void SetViewPort(const ViewPort& viewPort) = 0;
 
 	virtual void SetPrimitiveTopology(PrimitiveTopology eType) = 0;

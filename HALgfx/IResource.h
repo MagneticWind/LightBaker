@@ -76,6 +76,7 @@ struct SampleDesc
 enum ResourceType
 {
 	RESOURCE_BUFFER,
+	RESOURCE_TEXTURE1D,
 	RESOURCE_TEXTURE2D
 
 };

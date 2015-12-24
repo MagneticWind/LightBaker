@@ -16,6 +16,8 @@ class IShader;
 class IBuffer;
 class IDevice;
 class IDeviceContext;
+class IShaderResourceView;
+class IUnorderedAccessView;
 struct BufferDesc;
 }
 
@@ -53,6 +55,10 @@ public:
 	void* CreateBuffer(int iSize, HALgfx::ShaderType eType);
 	bool IsLoaded() const;
 
+	// compute shader
+	void RunCompute(HALgfx::IDeviceContext* pDeviceContext, int iSRVCount, HALgfx::IShaderResourceView** ppSRVs, 
+		void* CBufferData, int iUAVCount, HALgfx::IUnorderedAccessView** pUAVs, unsigned int uX, unsigned int uY, unsigned uZ);
+
 	DrawNode& GetDrawNode(const char* name);
 
 private:
@@ -70,10 +76,13 @@ private:
 	// const buffers
 	HALgfx::IBuffer* m_ppVSConstBuffers[MAX_NUMBER_BUFFERS];
 	HALgfx::IBuffer* m_ppPSConstBuffers[MAX_NUMBER_BUFFERS];
+	HALgfx::IBuffer* m_ppCSConstBuffers[MAX_NUMBER_BUFFERS];
 	int m_aVSConstBufferSizes[MAX_NUMBER_BUFFERS];
 	int m_aPSConstBufferSizes[MAX_NUMBER_BUFFERS];
+	int m_aCSConstBufferSizes[MAX_NUMBER_BUFFERS];
 	int m_iNumberOfVSConstBuffers;
 	int m_iNumberOfPSConstBuffers;
+	int m_iNumberOfCSConstBuffers;
 
 	// samplers
 	HALgfx::ISamplerState* m_ppSamplers[MAX_NUMBER_SAMPLERS];

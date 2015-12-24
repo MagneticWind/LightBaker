@@ -31,6 +31,8 @@ struct DrawNode
 	~DrawNode();
 
 	void AddSRV(HALgfx::IShaderResourceView* pSRV);
+	void RemoveSRV(HALgfx::IShaderResourceView* pSRV);
+
 	void* CreateCBufferData(int iSize, HALgfx::ShaderType eType);
 	void DestroyCBufferData(void* pBuffer);
 
