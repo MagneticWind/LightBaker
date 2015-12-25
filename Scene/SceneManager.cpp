@@ -19,7 +19,6 @@ namespace Scene
 	SceneManager::SceneManager()
 	{
 		m_pScene = 0;
-		m_pScreenSpaceCamera = 0;
 		m_bSceneLoaded = false;
 		m_pSceneLoader = new SceneLoader();
 		//CreateScreenSpaceCamera();
@@ -96,52 +95,6 @@ namespace Scene
 	{
 		m_pScene->GetCurrentCamera()->SetGetCurrentMousePositionCallback(callbackGetMousePosition);
 	}
-
-#if 0
-	//------------------------------------------------------------------
-	void SceneManager::CreateScreenSpaceCamera()
-	{
-		m_pScreenSpaceCamera = new Camera(0, false);
-		m_pScreenSpaceCamera->SetPosition(Vector3f(0.f, 0.f, 1.f));
-		m_pScreenSpaceCamera->SetLookat(Vector3f(0.f, 0.f, 0.f));
-		m_pScreenSpaceCamera->SetUpVector(Vector3f(0.f, 1.f, 0.f));
-		m_pScreenSpaceCamera->SetNear(0.1f);
-		m_pScreenSpaceCamera->SetFar(2.f);
-		m_pScreenSpaceCamera->UpdateViewProjectMatrices();
-	}
-
-
-	//------------------------------------------------------------------
-	void SceneManager::CreateQuad()
-	{
-		Vertex aVertices[4];
-		aVertices[0].v3Position = Vector3f(-1.f, 1.f, 0.f);
-		aVertices[1].v3Position = Vector3f(-1.f, -1.f, 0.f);
-		aVertices[2].v3Position = Vector3f(1.f, -1.f, 0.f);
-		aVertices[3].v3Position = Vector3f(1.f, 1.f, 0.f);
-
-		aVertices[0].v3Normal = Vector3f(0.f, 0.f, 1.f);
-		aVertices[1].v3Normal = Vector3f(0.f, 0.f, 1.f);
-		aVertices[2].v3Normal = Vector3f(0.f, 0.f, 1.f);
-		aVertices[3].v3Normal = Vector3f(0.f, 0.f, 1.f);
-
-		aVertices[0].v2TexCoord = Vector2f(1.f, 0.f);
-		aVertices[1].v2TexCoord = Vector2f(1.f, 1.f);
-		aVertices[2].v2TexCoord = Vector2f(0.f, 1.f);
-		aVertices[3].v2TexCoord = Vector2f(0.f, 0.f);
-
-		m_pQuadRenderObject = new NormalObject();
-		TriangleMesh* pTriangleMesh = new TriangleMesh(false);
-		for (int i = 0; i < 4; ++i)
-			pTriangleMesh->AddVertex(aVertices[i]);
-		pTriangleMesh->AddTriangle(0, 1, 2);
-		pTriangleMesh->AddTriangle(0, 2, 3);
-
-		RenderUnit* pRenderUnit = new RenderUnit(static_cast<IGeometry*>(pTriangleMesh));
-		m_pQuadRenderObject->AddRenderUnit(pRenderUnit);
-
-	}
-#endif
 
 	//------------------------------------------------------------------
 	//void SceneManager::UpdateCurrentCameraParams(const Camera::CameraMoveParameter& cameraParam)

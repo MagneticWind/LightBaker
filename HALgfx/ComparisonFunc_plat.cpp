@@ -1,4 +1,4 @@
-
+#include <assert.h>
 #include "ComparisonFunc_plat.h"
 
 namespace Magnet
@@ -25,6 +25,10 @@ D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func)
 		return D3D11_COMPARISON_GREATER_EQUAL;
 	case COMPARISON_ALWAYS:
 		return D3D11_COMPARISON_ALWAYS;
+	case COMPARISON_LESS_EQUAL:
+		return D3D11_COMPARISON_LESS_EQUAL;
+	default:
+		assert(0);
 	}
 }
 } // namespace HALgfx

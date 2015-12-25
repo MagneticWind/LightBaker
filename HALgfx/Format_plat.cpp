@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "Format_plat.h"
 
 namespace Magnet
@@ -22,7 +23,18 @@ DXGI_FORMAT GetD3DFormat(Format format)
 		return DXGI_FORMAT_R32_TYPELESS;
 	case FORMAT_R32G32_FLOAT:
 		return DXGI_FORMAT_R32G32_FLOAT;
-
+	case FORMAT_D32_FLOAT:
+		return DXGI_FORMAT_D32_FLOAT;
+	case FORMAT_R32_FLOAT:
+		return DXGI_FORMAT_R32_FLOAT;
+	case FORMAT_R32_UINT:
+		return DXGI_FORMAT_R32_UINT;
+	case FORMAT_UNKNOWN:
+		return DXGI_FORMAT_UNKNOWN;
+	default:
+		{
+			assert(0);
+		}
 	};
 }
 

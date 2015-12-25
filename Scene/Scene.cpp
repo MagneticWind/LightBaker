@@ -35,13 +35,6 @@ Scene::Scene(const char* pSceneName)
 //------------------------------------------------------------------
 void Scene::Update(float fTimeLapse)
 {
-	int iWidth, iHeight;
-
-	//m_pQuadCamera->SetFOV(1.f);
-	//m_pQuadCamera->SetAspectRatio(float(iWidth) / float(iHeight));
-	//m_pQuadCamera->SetPosition(Math::Vector3f(0.f, 0.f, -1.f));
-	//m_pQuadCamera->SetLookat(Math::Vector3f(0.f, 0.f, 0.f));
-
 	// update scene graph
 	m_lCameras.clear();
 	m_lLights.clear();

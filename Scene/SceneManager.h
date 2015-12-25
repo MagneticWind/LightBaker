@@ -28,6 +28,7 @@ namespace Scene
 		static void Initialize();
 		static void Terminate();
 
+		SceneLoader* GetSceneLoader();
 		Scene* GetScene();
 
 		// Simulation
@@ -38,19 +39,16 @@ namespace Scene
 		void UpdateCurrentCameraTranslationParams(bool bTranslate, int iMoveForward, int iMoveLeft);
 		void SetCurrentCameraGetMousePositionCallback(CallbackGetCurrentMousePosition callbackGetMousePosition);
 
-
-
-	private:
-		//void CreateScreenSpaceCamera();
-		//void CreateQuad();
-
 	private:
 		SceneLoader* m_pSceneLoader;
 		Scene* m_pScene;
-		Camera* m_pScreenSpaceCamera;
-		IRenderObject* m_pQuadRenderObject;
 		bool m_bSceneLoaded;
 	};
+
+	inline SceneLoader* SceneManager::GetSceneLoader()
+	{
+		return m_pSceneLoader;
+	}
 
 	inline Scene* SceneManager::GetScene()
 	{
