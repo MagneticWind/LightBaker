@@ -116,9 +116,10 @@ int Mesh::GetNumPrimitives() const
 }
 
 //------------------------------------------------------------------
-float* Mesh::CreateVertexDataBuffer(int iNumVertices, int iVertexByteSize)
+float* Mesh::CreateVertexDataBuffer(int iNumVertices, int iNumFloats)
 {
-	m_pVertexDataBuffer = malloc(iNumVertices * iVertexByteSize);
+	m_iStride = iNumFloats;
+	m_pVertexDataBuffer = malloc(iNumVertices * iNumFloats * sizeof(float));
 	return static_cast<float*>(m_pVertexDataBuffer);
 }
 

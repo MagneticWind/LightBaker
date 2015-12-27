@@ -53,7 +53,7 @@ public:
 
 	void GetVetexDecls(int& iSize, VertexDecl* pDecls) const;
 
-	float* CreateVertexDataBuffer(int iNumVertices, int iVertexByteSize);
+	float* CreateVertexDataBuffer(int iNumVertices, int iNumFloats);
 	unsigned int* CreateIndexDataBuffer(int iNumFaces);
 
 protected:

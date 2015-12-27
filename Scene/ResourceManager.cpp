@@ -455,7 +455,7 @@ void ResourceManager::LoadMeshPly(Mesh* pMesh)
 	pMesh->SetNumVerts(iNumVertices);
 	pMesh->SetNumFaces(iNumFaces);
 
-	float* pVertexData = pMesh->CreateVertexDataBuffer(iNumVertices, iNumFloats * 4);
+	float* pVertexData = pMesh->CreateVertexDataBuffer(iNumVertices, iNumFloats);
 	unsigned int* pIndexData = pMesh->CreateIndexDataBuffer(iNumFaces);
 
 	// parse vertices
