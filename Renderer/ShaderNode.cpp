@@ -10,6 +10,7 @@
 #include "HALgfx\IShaderResourceView.h"
 #include "HALgfx\IBuffer.h"
 #include "HALgfx\ShaderType.h"
+#include "HALgfx\Viewport.h"
 
 #include "Math\Vector3f.h"
 #include "RenderManager.h"
@@ -113,6 +114,9 @@ ShaderNode::~ShaderNode()
 //------------------------------------------------------------------
 void ShaderNode::BindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, DrawNode& drawNode)
 {
+	if (drawNode.m_bSetViewport)
+		pDeviceContext->SetViewPort(drawNode.mViewport);
+
 	// vertex buffer and index buffer
 	HALgfx::BufferDesc desc;
 	drawNode.m_pVertexBuffer->GetDesc(desc);

@@ -1,8 +1,7 @@
-#ifndef RENDER_MANAGER_H
-#define RENDER_MANAGER_H
+#ifndef RENDER_MANAGER_OVR_H
+#define RENDER_MANAGER_OVR_H
 
 #include "DrawNode.h"
-#include "IRenderPass.h"
 
 namespace Magnet
 {
@@ -27,26 +26,26 @@ class Mesh;
 
 namespace Renderer
 {
-class IRenderPass;
+class RenderPassOpaque;
+class RenderPassSky;
 enum PassType;
 class Shader;
 
 typedef void(*CallBackLoadShader) (Shader* pShader);
 typedef void(*CallBackLoadMesh) (Scene::Mesh* pMesh);
 
-
-class RenderManager
+class RenderManagerOVR
 {
 private:
-	RenderManager();
-	~RenderManager();
-	RenderManager(const RenderManager&);
-	RenderManager& operator=(const RenderManager&);
+	RenderManagerOVR();
+	~RenderManagerOVR();
+	RenderManagerOVR(const RenderManagerOVR&);
+	RenderManagerOVR& operator=(const RenderManagerOVR&);
 
-	static RenderManager* ms_pInstance;
+	static RenderManagerOVR* ms_pInstance;
 
 public:
-	static RenderManager& GetInstance();
+	static RenderManagerOVR& GetInstance();
 	static void Initialize(int iWidth, int iHeight, void* pWindowHandle);
 	static bool Exist();
 	static void Terminate();
@@ -72,7 +71,7 @@ public:
 	void UpdateRenderPasses();
 	void SetupRenderPasses();
 	void DestroyPasses();
-	IRenderPass* GetPass(PassType eType);
+
 	void SetFrameBufferDimension(int iWidth, int iHeight);
 	void GetFrameBufferDimension(int& iWidth, int& iHeight) const;
 
@@ -82,7 +81,7 @@ public:
 	void SetLoadShaderCallBack(CallBackLoadShader callBackLoadShader);
 	void SetLoadMeshCallBack(CallBackLoadMesh callBackLoadMesh);
 
-//	void LoadTextureResource(const char* pPath, Scene::Texture* pTexture);
+	//	void LoadTextureResource(const char* pPath, Scene::Texture* pTexture);
 
 	void GetSHCubemap(Math::Vector4f shCoeffs[], int iNumCoeffs);
 
@@ -90,26 +89,15 @@ private:
 
 	void InitializeHALSystem(int iWidth, int iHeight);
 
-	void CopyShadowParameters();
-
-	// quad mesh
-	Scene::Mesh* m_pQuadMesh;
-	Shader* m_pTonemapShader;
-	Shader* m_pShadowShader;
-
-	IRenderPass* m_pRenderPasses[PASS_NUMBER];
+	RenderPassOpaque* m_pOpaquePass;
+	RenderPassSky* m_pSkyPass;
 
 	CallBackLoadShader m_callBackLoadShader;
 	CallBackLoadMesh m_callBackLoadMesh;
 
-	bool m_bPostProcessResourcesCreated;
-	bool m_bShadowResourcesCreated;
-
 	// 
 	int m_iWidth;
 	int m_iHeight;
-	float m_fIntensityLevel;
-	float m_fLightIntensityLevel;
 
 	//@TODO: design some structure for lights if support multiple lights
 	Math::Vector3f m_v3MajorLightDirection;

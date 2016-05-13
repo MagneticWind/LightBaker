@@ -4,6 +4,7 @@
 #include "Math\Matrix4f.h"
 #include "Math\Vector3f.h"
 #include "HALgfx\ShaderType.h"
+#include "HALgfx\Viewport.h"
 
 namespace Magnet
 {
@@ -12,6 +13,7 @@ namespace HALgfx
 class IBuffer;
 class ISamplerState;
 class IShaderResourceView;
+struct Viewport;
 }
 
 namespace Scene
@@ -54,6 +56,9 @@ struct DrawNode
 	int m_iNumberOfPrimitives;
 	int m_iNumberOfVSConstBuffers;
 	int m_iNumberOfPSConstBuffers;
+
+	bool m_bSetViewport;
+	HALgfx::ViewPort mViewport;
 };
 } // namespace Renderer
 } // namespace Magnet

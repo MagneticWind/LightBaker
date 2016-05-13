@@ -16,7 +16,7 @@ namespace Scene
 
 namespace ResourceManagerPrivate
 {
-	char MESH_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\";
+	char MESH_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\mesh\\";
 	char TEXTURE_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\texture\\";
 }
 
@@ -366,6 +366,8 @@ void ResourceManager::LoadMeshPly(Mesh* pMesh)
 				iNumFloats++;
 
 				pMesh->AddVertexDecl(NORMAL);
+
+				//m_bHasNormal = true;
 
 				continue;
 			}

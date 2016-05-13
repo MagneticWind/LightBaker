@@ -23,11 +23,13 @@
     <ClInclude Include="DrawNode.h" />
     <ClInclude Include="GPUResource.h" />
     <ClInclude Include="GPUResourceManager.h" />
+    <ClInclude Include="RenderPassNull.h" />
     <ClInclude Include="IRenderPass.h" />
     <ClInclude Include="RenderPassDepth.h" />
     <ClInclude Include="RenderPassOpaque.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="RenderPassPostprocess.h" />
+    <ClInclude Include="RenderPassShadow.h" />
     <ClInclude Include="RenderPassSky.h" />
     <ClInclude Include="ShaderNode.h" />
   </ItemGroup>
@@ -35,9 +37,11 @@
     <ClCompile Include="DrawNode.cpp" />
     <ClCompile Include="GPUResourceManager.cpp" />
     <ClCompile Include="RenderPassDepth.cpp" />
+    <ClCompile Include="RenderPassNull.cpp" />
     <ClCompile Include="RenderPassOpaque.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderPassPostprocess.cpp" />
+    <ClCompile Include="RenderPassShadow.cpp" />
     <ClCompile Include="RenderPassSky.cpp" />
     <ClCompile Include="ShaderNode.cpp" />
   </ItemGroup>
@@ -118,7 +122,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;C:\Users\Hong\Downloads\ovr_sdk_win_0.8.0.0\OculusSDK\LibOVR\Include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

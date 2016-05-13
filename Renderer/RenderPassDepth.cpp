@@ -70,6 +70,7 @@ void RenderPassDepth::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, con
 //------------------------------------------------------------------
 void RenderPassDepth::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext)
 {
+	
 	pDeviceContext->BeginEvent("RenderPassDepth");
 	std::list<ShaderNode*>::iterator it = m_lShaderNodes.begin();
 	std::list<ShaderNode*>::iterator itEnd = m_lShaderNodes.end();
@@ -79,12 +80,13 @@ void RenderPassDepth::Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* p
 		it++;
 	}
 	pDeviceContext->EndEvent();
+	
 }
 
 //------------------------------------------------------------------
 PassType RenderPassDepth::GetType()
 {
-	return PASS_DEPTH;
+	return PASS_OPAQUE;
 }
 
 //------------------------------------------------------------------
@@ -101,7 +103,7 @@ void RenderPassDepth::ClearDrawNodes()
 }
 
 //------------------------------------------------------------------
-void RenderPassDepth::Setup(HALgfx::IDevice* pDevice)
+void RenderPassDepth::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 {
 	Scene::Scene* pScene = Scene::SceneManager::GetInstance().GetScene();
 	std::list<Scene::IRenderObject*>&renderObjectList = pScene->GetRenderObjectList();

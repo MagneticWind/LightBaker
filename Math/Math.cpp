@@ -47,7 +47,7 @@ void MatrixLookAtRH(const Math::Vector3f& v3Position, const Math::Vector3f& v3Lo
 	mView.m2[3][0] =		 0; mView.m2[3][1] =		 0; mView.m2[3][2] =		 0; mView.m2[3][3] =						   1;
 }
 
-//@NOTE: this function is compute transpose of matrix in: http://msdn.microsoft.com/en-us/library/windows/desktop/bb281710(v=vs.85).aspx
+//@NOTE: this function is compute transpose of matrix in: https://msdn.microsoft.com/en-us/library/windows/desktop/bb281727(v=vs.85).aspx
 //       When we submite the matrix to GPU, we don't need another transpose operation
 void MatrixPerspectiveFovLH(float fFovAngle, float fAspectRatio, float fZNear, float fZFar, Math::Matrix4f& mProjection)
 {

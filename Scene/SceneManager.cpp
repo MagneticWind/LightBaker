@@ -66,7 +66,7 @@ namespace Scene
 		{
 			if (m_pScene == 0)
 			{
-				m_pScene = new Scene("C:\\Projects\\GitHub\\LightBaker\\data\\cornell_box.xml");
+				m_pScene = new Scene("C:\\Projects\\GitHub\\LightBaker\\data\\shadowtest.xml");
 			}
 
 			m_pSceneLoader->StartLoadingScene(m_pScene);

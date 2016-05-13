@@ -1,6 +1,7 @@
 #ifndef MATRIX4F_H
 #define MATRIX4F_H
 
+#include "Vector3f.h"
 #include "Vector4f.h"
 
 namespace Magnet
@@ -44,6 +45,14 @@ inline Vector4f operator*(const Matrix4f& mat4, const Vector4f& vec4)
 	float w = mat4.m1[12]*vec4.x + mat4.m1[13]*vec4.y + mat4.m1[14]*vec4.z + mat4.m1[15]*vec4.w;
 	return Vector4f(x,y,z,w);
 }
+
+inline Vector3f operator*(const Matrix4f& mat4, const Vector3f& vec3)
+{
+	Vector4f temp(vec3.x, vec3.y, vec3.z, 1.f);
+	Vector4f result = mat4 * temp;
+	return Vector3f(result.x / result.w, result.y / result.w, result.z / result.w);
+}
+
 } // namespace Math
 } // namespace Magnet
 

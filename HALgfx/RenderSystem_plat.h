@@ -63,20 +63,25 @@ public:
 	void Present();
 
 private:
+
+	// frame buffer
 	IRenderTargetView* m_pFrameBufferRTV;
 	
-	ITexture2d* m_pTexture2dHDR;
+	// depth
 	ITexture2d* m_pTexture2dDepthStencil;
+	IDepthStencilView* m_pFrameBufferDSV;
 	IShaderResourceView* m_pTexture2dDepthSRV;
 
+	// hdr frame buffer
+	ITexture2d* m_pTexture2dHDR;
 	IRenderTargetView* m_pFrameBufferRTVHDR;
-	IDepthStencilView* m_pFrameBufferDSV;
 	IShaderResourceView* m_pFrameBufferSRVHDR;
 
+	// depth stencil state
 	IDepthStencilState* m_pDepthStencilEnabled;
 	IDepthStencilState* m_pDepthStencilDisabled;
 
-
+	// rasterization state
 	IRasterizerState* m_pRasterizerState;
 	IBlendState* m_pColorWriteEnabled;
 	IBlendState* m_pColorWriteDisabled;

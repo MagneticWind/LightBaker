@@ -1,20 +1,21 @@
 #include <assert.h>
 #include <stdio.h>
 
+//#define USE_OCULUS_VR
+
 #include "Application.h"
 #include "RenderWindow.h"
+
+#ifdef USE_OCULUS_VR
+#include "Renderer\RenderManagerOVR.h"
+#else
 #include "Renderer\RenderManager.h"
+#endif
+
 #include "Scene\SceneManager.h"
 #include "Scene\ResourceManager.h"
 
 Application* Application::ms_pInstance = 0;
-
-namespace ApplicationPrivate
-{
-	const int g_iMaxIntensityLevel = 10;
-	const float g_faLightIntensityLevels[g_iMaxIntensityLevel] = { 1.0f, 10.f, 30.f, 50.f, 100.f, 500.f, 1000.f, 5000.f, 10000.f, 20000.f};
-	const float g_faIntensityLevels[g_iMaxIntensityLevel] =      { 5.0, 50.f, 150.f, 0.8f, 1.f, 5.f, 10.f, 50.f, 100.f, 200.f};
-}
 
 //------------------------------------------------------------------
 Application::Application()
@@ -126,9 +127,11 @@ void Application::Update()
 	}
 
 	// render
-	Magnet::Renderer::RenderManager::GetInstance().SetIntensityLevel(ApplicationPrivate::g_faIntensityLevels[m_iIntensityControl]);
-	Magnet::Renderer::RenderManager::GetInstance().SetLightIntensityLevel(ApplicationPrivate::g_faLightIntensityLevels[m_iIntensityControl]);
+#ifdef USE_OCULUS_VR
+	Magnet::Renderer::RenderManagerOVR::GetInstance().RenderOneFrame();
+#else
 	Magnet::Renderer::RenderManager::GetInstance().RenderOneFrame();
+#endif
 
 	m_fLastFrameTimeLapse = m_timer.GetElapsedSeconds();
 	m_timer.Stop();
@@ -182,14 +185,10 @@ void Application::OnKeyDown(WPARAM wParam)
 		break;
 	case VK_UP:
 		{
-			m_iIntensityControl++;
-			m_iIntensityControl = min(m_iIntensityControl, ApplicationPrivate::g_iMaxIntensityLevel - 1);
 			break;
 		}
 	case VK_DOWN:
 		{
-			m_iIntensityControl--;
-			m_iIntensityControl = max(m_iIntensityControl, 0);
 			break;
 		}
 	}
@@ -210,14 +209,25 @@ void Application::InitializeSingletons()
 {
 	Magnet::Scene::ResourceManager::Initialize();
 	Magnet::Scene::SceneManager::Initialize();
+
+#ifdef USE_OCULUS_VR
+	Magnet::Renderer::RenderManagerOVR::Initialize(m_pRenderWindow->GetWidth(), m_pRenderWindow->GetHeight(),
+		m_pRenderWindow->GetHandle());
+#else
 	Magnet::Renderer::RenderManager::Initialize(m_pRenderWindow->GetWidth(), m_pRenderWindow->GetHeight(),
 		m_pRenderWindow->GetHandle());
+#endif
 }
 
 //------------------------------------------------------------------
 void Application::TerminateSingletons()
 {
+#ifdef USE_OCULUS_VR
+	Magnet::Renderer::RenderManagerOVR::Terminate();
+#else
 	Magnet::Renderer::RenderManager::Terminate();
+#endif
+
 	Magnet::Scene::SceneManager::Terminate();
 	Magnet::Scene::ResourceManager::Terminate();
 }

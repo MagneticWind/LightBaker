@@ -48,6 +48,12 @@
     <ClInclude Include="RenderPassDepth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPassShadow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPassNull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RenderManager.cpp">
@@ -72,6 +78,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderPassDepth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPassShadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPassNull.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

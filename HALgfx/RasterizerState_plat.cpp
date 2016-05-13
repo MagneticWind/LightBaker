@@ -21,6 +21,7 @@ RasterizerState::~RasterizerState()
 void RasterizerState::Create(const RasterizerDesc& descRS, ID3D11Device* pDevice)
 {
 	D3D11_RASTERIZER_DESC desc;
+	desc.DepthClipEnable = descRS.depthClipEnable;
 	desc.DepthBias = descRS.depthBias;
 	desc.DepthBiasClamp = descRS.depthBiasClamp;
 	desc.FrontCounterClockwise = descRS.frontCounterClockwise;

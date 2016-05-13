@@ -1,5 +1,5 @@
-#ifndef RENDER_PASS_DEPTH
-#define RENDER_PASS_DEPTH
+#ifndef RENDER_PASS_NULL
+#define RENDER_PASS_NULL
 
 #include <list>
 #include <string>
@@ -12,8 +12,8 @@ namespace Magnet
 
 namespace HALgfx
 {
-	class IDevice;
-	class IDeviceContext;
+class IDevice;
+class IDeviceContext;
 }
 
 namespace Renderer
@@ -21,11 +21,11 @@ namespace Renderer
 
 class ShaderNode;
 
-class RenderPassDepth : public IRenderPass
+class RenderPassNull : public IRenderPass
 {
 public:
-	RenderPassDepth();
-	virtual ~RenderPassDepth();
+	RenderPassNull();
+	virtual ~RenderPassNull();
 
 public:
 	virtual void SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const HALgfx::ViewPort& viewPort,

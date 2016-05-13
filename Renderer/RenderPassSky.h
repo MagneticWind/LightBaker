@@ -33,7 +33,7 @@ public:
 	virtual void Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext);
 	virtual PassType GetType();
 	virtual void ClearDrawNodes();
-	virtual void Setup(HALgfx::IDevice* pDevice);
+	virtual void Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight);
 
 private:
 	std::list<ShaderNode*> m_lShaderNodes;

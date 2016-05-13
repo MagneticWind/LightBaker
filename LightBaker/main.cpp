@@ -46,7 +46,7 @@ int main()
 	{
 		if (pScene == 0)
 		{
-			pScene = new Magnet::Scene::Scene("C:\\Projects\\GitHub\\LightBaker\\data\\cornell_box.xml");
+			pScene = new Magnet::Scene::Scene("C:\\Projects\\GitHub\\LightBaker\\data\\shadowtest.xml");
 		}
 
 		pSceneLoader->StartLoadingScene(pScene);

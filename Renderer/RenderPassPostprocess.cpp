@@ -300,18 +300,18 @@ void RenderPassPostprocess::ClearDrawNodes()
 }
 
 //------------------------------------------------------------------
-void RenderPassPostprocess::Setup(HALgfx::IDevice* pDevice)
+void RenderPassPostprocess::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 {
 	if (!m_bInitialized)
 	{
-		Initialize(pDevice);
+		Initialize(pDevice, iWidth, iHeight);
 		m_bInitialized = true;
 	}
 
 }
 
 //------------------------------------------------------------------
-void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice)
+void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 {
 	float vertexData[5 * 4] = {
 		-1.f, 1.f, 0.f, 0.f, 0.f,
@@ -377,8 +377,8 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice)
 		// resources
 		HALgfx::Texture2dDesc texDesc;
 		texDesc.format = HALgfx::FORMAT_R8G8B8A8_UNORM;
-		texDesc.width = 800;
-		texDesc.height = 600;
+		texDesc.width = iWidth;
+		texDesc.height = iHeight;
 		texDesc.mipLevels = 1;
 		texDesc.arraySize = 1;
 		texDesc.bindFlags = HALgfx::BIND_RENDER_TARGET | HALgfx::BIND_SHADER_RESOURCE;
@@ -562,7 +562,7 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice)
 		int iDimensionX, iDimensionY;
 
 		pTonemap->v4Param.x = static_cast<float>(800);
-		pTonemap->v4Param.y = static_cast<float>(600);
+		pTonemap->v4Param.y = static_cast<float>(800);
 		pTonemap->v4Param.z = 10.f;
 
 		// framebuffer texture

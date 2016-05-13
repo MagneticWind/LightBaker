@@ -31,9 +31,11 @@ enum PassType
 {
 	PASS_DEPTH,
 	PASS_SKY,
+	PASS_SHADOW,
 	PASS_OPAQUE,
 	PASS_POSTPROCESS,
-	PASS_NUMBER
+	PASS_NUMBER,
+	PASS_NULL
 };
 
 class IRenderPass
@@ -47,7 +49,7 @@ public:
 	virtual void Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext) = 0;
 	virtual PassType GetType() = 0;
 	virtual void ClearDrawNodes() = 0;
-	virtual void Setup(HALgfx::IDevice* pDevice) = 0;
+	virtual void Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight) = 0;
 };
 } // namespace Renderer
 } // namespace Magnet

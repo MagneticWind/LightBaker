@@ -23,10 +23,10 @@ Camera::Camera(const char* pName)
 
 	//default camera parameters
 	m_v3Up = Math::Vector3f(0.0, 1.f, 0.0);
-	m_fAspectRatio = 8.f / 6.f;
+	m_fAspectRatio = 1.0;
 	m_fFOV = 60.f;
-	m_fZNear = 0.1f;
-	m_fZFar = 10000.f;
+	m_fZNear = 0.5f;
+	m_fZFar = 50.f;
 
 	m_fVelocity = 0.1f;
 	m_fRotationScaler = 0.01f;
@@ -63,48 +63,10 @@ void Camera::UpdateViewFrustum()
 	Math::Vector3f v3YDirection = Math::Cross3f(v3LookDirection, v3Left);
 	v3YDirection.Normalize();
 
-	Math::Vector3f v3NearCenter = m_v3Position + v3LookDirection * (m_fZNear);
-	Math::Vector3f v3FarCenter = m_v3Position + v3LookDirection * (m_fZFar);
+	SetDirection(v3LookDirection);
 
-	float fNearHeight = 2.f * tanf(m_fFOV * M_PI / 180.f * 0.5f) * m_fZNear;
-	float fFarHeight = 2.f * tanf(m_fFOV * M_PI / 180.f* 0.5f) * m_fZFar;
-	float fNearWidth = fNearHeight * m_fAspectRatio;
-	float fFarWidth = fFarHeight * m_fAspectRatio;
+	m_frustum.Update(m_v3Position, v3LookDirection, v3Left, v3YDirection, m_fZNear, m_fZFar, m_fFOV, m_fAspectRatio);
 
-	// @NOTE: more efficient method exist
-	Math::Vector3f v3FarTopLeft = v3FarCenter + v3YDirection * fFarHeight * 0.5f + v3Left * fFarWidth * 0.5f;
-	Math::Vector3f v3FarTopRight = v3FarCenter + v3YDirection * fFarHeight * 0.5f - v3Left * fFarWidth * 0.5f;
-	Math::Vector3f v3FarBottomLeft = v3FarCenter - v3YDirection * fFarHeight * 0.5f + v3Left * fFarWidth * 0.5f;
-	Math::Vector3f v3FarBottomRight = v3FarCenter - v3YDirection * fFarHeight * 0.5f - v3Left * fFarWidth * 0.5f;
-
-	Math::Vector3f v3NearTopLeft = v3NearCenter + v3YDirection * fNearHeight * 0.5f + v3Left * fNearWidth * 0.5f;
-	Math::Vector3f v3NearTopRight = v3NearCenter + v3YDirection * fNearHeight * 0.5f - v3Left * fNearWidth * 0.5f;
-	Math::Vector3f v3NearBottomLeft = v3NearCenter - v3YDirection * fNearHeight * 0.5f + v3Left * fNearWidth * 0.5f;
-	Math::Vector3f v3NearBottomRight = v3NearCenter - v3YDirection * fNearHeight * 0.5f - v3Left * fNearWidth * 0.5f;
-
-	m_frustum.m_CornerPoints[0] = v3NearTopLeft;
-	m_frustum.m_CornerPoints[1] = v3NearBottomLeft;
-	m_frustum.m_CornerPoints[2] = v3NearBottomRight;
-	m_frustum.m_CornerPoints[3] = v3NearTopRight;
-	m_frustum.m_CornerPoints[4] = v3FarTopLeft;
-	m_frustum.m_CornerPoints[5] = v3FarBottomLeft;
-	m_frustum.m_CornerPoints[6] = v3FarBottomRight;
-	m_frustum.m_CornerPoints[7] = v3FarTopRight;
-
-	//@NOTE: check Frustum.h for order or planes, can't use enum in Frustum, don't know why
-	/*m_frustum.m_Planes[0].SetBy3Points(v3FarTopLeft, v3NearTopLeft, v3NearTopRight);
-	m_frustum.m_Planes[1].SetBy3Points(v3NearBottomLeft, v3FarBottomLeft, v3FarBottomRight);
-	m_frustum.m_Planes[2].SetBy3Points(v3NearBottomLeft, v3NearTopLeft, v3FarTopLeft);
-	m_frustum.m_Planes[3].SetBy3Points(v3NearTopRight, v3NearBottomRight, v3FarBottomRight);
-	m_frustum.m_Planes[4].SetBy3Points(v3NearTopLeft, v3NearBottomLeft, v3NearBottomRight);
-	m_frustum.m_Planes[5].SetBy3Points(v3FarTopLeft, v3FarTopRight, v3FarBottomRight);*/
-
-	m_frustum.m_Planes[0].SetBy3Points(v3FarTopLeft, v3NearTopRight, v3NearTopLeft);
-	m_frustum.m_Planes[1].SetBy3Points(v3NearBottomLeft, v3FarBottomRight, v3FarBottomLeft);
-	m_frustum.m_Planes[2].SetBy3Points(v3NearBottomLeft, v3FarTopLeft, v3NearTopLeft);
-	m_frustum.m_Planes[3].SetBy3Points(v3NearTopRight, v3FarBottomRight, v3NearBottomRight);
-	m_frustum.m_Planes[4].SetBy3Points(v3NearTopLeft, v3NearBottomRight, v3NearBottomLeft);
-	m_frustum.m_Planes[5].SetBy3Points(v3FarTopLeft, v3FarBottomRight, v3FarTopRight);
 }
 
 //------------------------------------------------------------------

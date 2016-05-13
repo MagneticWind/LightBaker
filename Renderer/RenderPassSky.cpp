@@ -53,7 +53,7 @@ void RenderPassSky::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const
 	pDeviceContext->SetDepthStencilState(pDSState);
 
 	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
-	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+//	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -93,7 +93,7 @@ void RenderPassSky::ClearDrawNodes()
 }
 
 //------------------------------------------------------------------
-void RenderPassSky::Setup(HALgfx::IDevice* pDevice)
+void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 {
 	Scene::Scene* pScene = Scene::SceneManager::GetInstance().GetScene();
 	std::list<Scene::IRenderObject*>&renderObjectList = pScene->GetRenderObjectList();

@@ -39,6 +39,7 @@ void DepthStencilState::Create(ID3D11Device* pDevice)
 	desc.DepthEnable = m_desc.depthEnable;
 	desc.DepthFunc = GetD3DComparisonFunc(m_desc.depthFunc);
 	desc.StencilEnable = m_desc.stencilEnable;
+	
 	if (m_desc.depthWriteMask == DEPTH_WRITE_MASK_ZERO)
 		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	else if (m_desc.depthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL)

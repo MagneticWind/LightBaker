@@ -33,14 +33,14 @@ public:
 	virtual void Render(HALgfx::IDevice* pDevice, HALgfx::IDeviceContext* pDeviceContext);
 	virtual PassType GetType();
 	virtual void ClearDrawNodes();
-	virtual void Setup(HALgfx::IDevice* pDevice);
+	virtual void Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight);
 
 	void SetParams(int iDimensionX, int iDimensionY, float fIntensityLevel);
 	void SetHDRSRV(HALgfx::IShaderResourceView* pHDRSRV);
 	void SetDepthSRV(HALgfx::IShaderResourceView* pDepthSRV);
 
 private:
-	void Initialize(HALgfx::IDevice* pDevice);
+	void Initialize(HALgfx::IDevice* pDevice, int iWidth, int iHeight);
 	void GenerateSSAOSamples();
 	void ComputeAvgLuminance();
 

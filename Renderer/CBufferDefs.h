@@ -4,6 +4,8 @@
 #include "Math\Matrix4f.h"
 #include "Math\Vector4f.h"
 
+#define MAX_CASCADE_COUNT 4
+
 namespace Magnet
 {
 namespace Renderer
@@ -24,10 +26,20 @@ struct CBufferMaterialNormal
 	Math::Vector4f v4Ke;
 };
 
+struct CBufferShadow
+{
+	Math::Matrix4f mProjection[MAX_CASCADE_COUNT];
+	Math::Matrix4f mView;
+	Math::Vector4f v4DepthRange;
+};
+
 struct CBufferLights
 {
-	Math::Vector4f v4LightPosition;
-	Math::Vector4f v4LightColor;
+	Math::Vector4f v4DirectionalLightDir;
+	Math::Vector4f v4DirectionalLightColor;
+
+	Math::Vector4f v4PointLightPosition[3];
+	Math::Vector4f v4PointLightColor[3];
 };
 
 struct CBufferToneMapping
@@ -41,7 +53,7 @@ struct CBufferSSAO
 	CBufferSSAO()
 	{
 		fWidth = 800.f;
-		fHeight = 600.f;
+		fHeight = 800.f;
 		fFarPlaneZ = 30.f;
 		fCenterWeight = 0.5f;
 		fInnerRadius = 0.3f;

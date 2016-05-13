@@ -10,6 +10,7 @@
 #include "RenderPassOpaque.h"
 #include "RenderPassPostprocess.h"
 #include "RenderPassSky.h"
+#include "RenderPassShadow.h"
 
 #include "Scene\IRenderObject.h"
 #include "Scene\RenderObject.h"
@@ -76,6 +77,7 @@ namespace Renderer
 	{
 		m_pRenderPasses[PASS_DEPTH] = new RenderPassDepth();
 		m_pRenderPasses[PASS_SKY] = new RenderPassSky();
+		m_pRenderPasses[PASS_SHADOW] = new RenderPassShadow();
 		m_pRenderPasses[PASS_OPAQUE] = new RenderPassOpaque();
 		m_pRenderPasses[PASS_POSTPROCESS] = new RenderPassPostprocess();
 	}
@@ -177,18 +179,6 @@ namespace Renderer
 	}
 
 	//------------------------------------------------------------------
-	void RenderManager::SetIntensityLevel(float fIntensityLevel)
-	{
-		m_fIntensityLevel = fIntensityLevel;
-	}
-
-	//------------------------------------------------------------------
-	void RenderManager::SetLightIntensityLevel(float fLightIntensityLevel)
-	{
-		m_fLightIntensityLevel = fLightIntensityLevel;
-	}
-
-	//------------------------------------------------------------------
 	void RenderManager::RenderOneFrame()
 	{
 		// create gpu resources for meshes, textures
@@ -215,15 +205,15 @@ namespace Renderer
 		pDepthPass->ClearDrawNodes();
 
 		IRenderPass* pSkyboxPass = m_pRenderPasses[PASS_SKY];
-		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
+		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateDisabled);
 		pSkyboxPass->Render(pDevice, pDeviceContext);
 		pSkyboxPass->ClearDrawNodes();
 
-		//IRenderPass* pShadowPass = m_pRenderPasses[PASS_SHADOW];
-		//pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateDisabled);
-		//pShadowPass->Setup(pDevice);
-		//pShadowPass->Render(pDevice, pDeviceContext);
-		//pShadowPass->ClearDrawNodes();
+		IRenderPass* pShadowPass = m_pRenderPasses[PASS_SHADOW];
+		pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateEnabled);
+		pShadowPass->Setup(pDevice, m_iWidth, m_iHeight);
+		pShadowPass->Render(pDevice, pDeviceContext);
+		pShadowPass->ClearDrawNodes();
 
 		IRenderPass* pOpaquePass = m_pRenderPasses[PASS_OPAQUE];
 		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
@@ -232,7 +222,7 @@ namespace Renderer
 
 		IRenderPass* pPostprocessPass = m_pRenderPasses[PASS_POSTPROCESS];
 		pPostprocessPass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateDisabled);
-		pPostprocessPass->Setup(pDevice);
+		pPostprocessPass->Setup(pDevice, m_iWidth, m_iHeight);
 		pPostprocessPass->Render(pDevice, pDeviceContext);
 
 		renderSystem.Present();
@@ -293,42 +283,60 @@ namespace Renderer
 		}
 	}
 
-	//------------------------------------------------------------------
-	void RenderManager::UpdateRenderPasses()
+//------------------------------------------------------------------
+void RenderManager::UpdateRenderPasses()
+{
+	HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
+	HALgfx::IDevice* pDevice = renderSystem.GetDevice();
+	for (int i = 0; i < PASS_NUMBER; ++i)
 	{
-		HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
-		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
-		for (int i = 0; i < PASS_NUMBER; ++i)
+		if (i == PASS_DEPTH)
 		{
-			if (i == PASS_POSTPROCESS)
-			{
-				RenderPassPostprocess* pPass = static_cast<RenderPassPostprocess*>(m_pRenderPasses[i]);
-				pPass->SetParams(m_iWidth, m_iHeight, m_fIntensityLevel);
-				pPass->SetHDRSRV(GetFrameBufferSRVHDR());
-				pPass->SetDepthSRV(GetDepthSRV());
-			}
-			else if (i == PASS_OPAQUE)
-			{
-				RenderPassOpaque* pPass = static_cast<RenderPassOpaque*>(m_pRenderPasses[i]);
-				pPass->SetLightIntensityLevel(m_fLightIntensityLevel);
-			}
-			m_pRenderPasses[i]->Setup(pDevice);
+			RenderPassDepth* pPass = static_cast<RenderPassDepth*>(m_pRenderPasses[i]);
+			pPass->Setup(pDevice, m_iWidth, m_iHeight);
+		}
+		else if (i == PASS_SKY)
+		{
+			RenderPassSky* pPass = static_cast<RenderPassSky*>(m_pRenderPasses[i]);
+			pPass->Setup(pDevice, m_iWidth, m_iHeight);
+		}
+		else if (i == PASS_SHADOW)
+		{
+			RenderPassShadow* pPass = static_cast<RenderPassShadow*>(m_pRenderPasses[i]);
+			pPass->Setup(pDevice, m_iWidth, m_iHeight);
+		}
+		else if (i == PASS_OPAQUE)
+		{
+			CopyShadowParameters();
+
+			RenderPassOpaque* pPass = static_cast<RenderPassOpaque*>(m_pRenderPasses[i]);
+			pPass->SetLightIntensityLevel(m_fLightIntensityLevel);
+			m_pRenderPasses[i]->Setup(pDevice, m_iWidth, m_iHeight);
+		}
+		else if (i == PASS_POSTPROCESS)
+		{
+			RenderPassPostprocess* pPass = static_cast<RenderPassPostprocess*>(m_pRenderPasses[i]);
+			pPass->SetParams(m_iWidth, m_iHeight, m_fIntensityLevel);
+			pPass->SetHDRSRV(GetFrameBufferSRVHDR());
+			pPass->SetDepthSRV(GetDepthSRV());
+			m_pRenderPasses[i]->Setup(pDevice, m_iWidth, m_iHeight);
 		}
 	}
+}
 
-	//------------------------------------------------------------------
-	void RenderManager::SetMajorLightData(const Math::Vector3f& v3Direction, const Math::Vector3f& v3Color)
-	{
-		m_v3MajorLightDirection = v3Direction;
-		m_v3MajorLightColor = v3Color;
-	}
+//------------------------------------------------------------------
+void RenderManager::SetMajorLightData(const Math::Vector3f& v3Direction, const Math::Vector3f& v3Color)
+{
+	m_v3MajorLightDirection = v3Direction;
+	m_v3MajorLightColor = v3Color;
+}
 
-	//------------------------------------------------------------------
-	void RenderManager::GetMajorLightData(Math::Vector3f& v3Direction, Math::Vector3f& v3Color) const
-	{
-		v3Direction = m_v3MajorLightDirection;
-		v3Color = m_v3MajorLightColor;
-	}
+//------------------------------------------------------------------
+void RenderManager::GetMajorLightData(Math::Vector3f& v3Direction, Math::Vector3f& v3Color) const
+{
+	v3Direction = m_v3MajorLightDirection;
+	v3Color = m_v3MajorLightColor;
+}
 
 //------------------------------------------------------------------
 void RenderManager::SetLoadShaderCallBack(CallBackLoadShader callBackLoadShader)
@@ -369,5 +377,20 @@ void RenderManager::GetSHCubemap(Math::Vector4f shCoeffs[], int iNumCoeffs)
 	shCoeffs[5] = Math::Vector4f(faSHBlue[2], faSHBlue[3], faSHBlue[4], faSHBlue[5]);
 	shCoeffs[6] = Math::Vector4f(faSHBlue[6], faSHBlue[7], faSHBlue[8], 0.f);
 }
+
+void RenderManager::CopyShadowParameters()
+{
+	RenderPassShadow* pShadowPass = static_cast<RenderPassShadow*>(m_pRenderPasses[PASS_SHADOW]);
+	RenderPassOpaque* pOpaquePass = static_cast<RenderPassOpaque*>(m_pRenderPasses[PASS_OPAQUE]);
+
+	Math::Matrix4f mProjection[MAX_CASCADE_COUNT];
+	Math::Matrix4f mView;
+	HALgfx::IShaderResourceView* pShadowSRV = 0;
+	Math::Vector4f v4Range;
+
+	pShadowPass->GetShadowParameters(&mView, mProjection, &pShadowSRV, &v4Range);
+	pOpaquePass->SetShadowParameters(&mView, mProjection, &pShadowSRV, &v4Range);
+}
+
 } // namespace Renderer
 } // namespace Magnet

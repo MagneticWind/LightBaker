@@ -14,7 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// initialize window and system
 	Application& application = Application::GetInstance();
-	application.InitializeWindow(800, 600, 0, 0, "Viewer");
+	application.InitializeWindow(800, 800, 0, 0, "Viewer");
 	application.InitializeSystem(g_bPrintDebugInfo);
 
 	// create the console window

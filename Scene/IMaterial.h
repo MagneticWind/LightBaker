@@ -52,10 +52,6 @@ public:
 		{
 			strcat(pTechString, "_l");
 		}
-		if (m_tech & SHADOW_CASTER)
-		{
-			strcat(pTechString, "_sc");
-		}
 		if (m_tech & SHADOW_RECEIVER)
 		{
 			strcat(pTechString, "_sr");
@@ -66,7 +62,7 @@ public:
 		}
 		if (m_tech & SKY_SH)
 		{
-			strcat(pTechString, "sh");
+			strcat(pTechString, "_sh");
 		}
 
 	}

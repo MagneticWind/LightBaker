@@ -134,13 +134,16 @@ void SceneLoader::ParseLight(tinyxml2::XMLElement* pElement, Light* pLight)
 	const char* type = pElement->FirstChildElement("lighttype")->GetText();
 	if (strcmp(type, "directional") == 0)
 	{
-		Math::Vector3f v3Direction, v3Color;
+		Math::Vector3f v3Direction, v3Position, v3Color;
 		const char* direction = pElement->FirstChildElement("direction")->GetText();
+		const char* position = pElement->FirstChildElement("position")->GetText();
 		const char* color = pElement->FirstChildElement("color")->GetText();
 		sscanf(direction, "%f %f %f", &v3Direction.x, &v3Direction.y, &v3Direction.z);
+		sscanf(position, "%f %f %f", &v3Position.x, &v3Position.y, &v3Position.z);
 		sscanf(color, "%f %f %f", &v3Color.x, &v3Color.y, &v3Color.z);
 		pLight->SetType(LIGHT_DIRECTIONAL);
 		pLight->SetDirection(v3Direction);
+		pLight->SetPosition(v3Position);
 		pLight->SetColor(v3Color);
 	}
 	else if (strcmp(type, "point") == 0)
@@ -253,6 +256,10 @@ void SceneLoader::ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface
 			Mesh* pNewMesh = new Mesh(pMeshName);
 			pSurface->SetGeometry(pNewMesh);
 			ResourceManager::GetInstance().AddGeometry(pNewMesh);
+		}
+		else
+		{
+			pSurface->SetGeometry(pGeometry);
 		}
 	}
 

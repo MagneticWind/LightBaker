@@ -7,7 +7,7 @@ namespace Magnet
 namespace Renderer
 {
 
-DrawNode::DrawNode() : m_iNumberOfSamplers(0), m_iNumberOfSRVs(0), m_pVertexBuffer(0), m_pIndexBuffer(0), m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0)
+DrawNode::DrawNode() : m_iNumberOfSamplers(0), m_iNumberOfSRVs(0), m_pVertexBuffer(0), m_pIndexBuffer(0), m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_bSetViewport(false)
 {
 	for (int i = 0; i < MAX_NUMBER_SRVS; ++i)
 	{

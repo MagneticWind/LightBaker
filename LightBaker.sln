@@ -35,8 +35,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Render
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shader", "shader", "{A420EC2E-496A-4744-8677-87CB0848A22C}"
 	ProjectSection(SolutionItems) = preProject
+		shader\csm_pn.hlsl = shader\csm_pn.hlsl
 		shader\depth_pn.hlsl = shader\depth_pn.hlsl
 		shader\norm.hlsl = shader\norm.hlsl
+		shader\norm_sr.hlsl = shader\norm_sr.hlsl
 		shader\reduceto1d.hlsl = shader\reduceto1d.hlsl
 		shader\reduceto1pixel.hlsl = shader\reduceto1pixel.hlsl
 		shader\ShaderCompiler.bat = shader\ShaderCompiler.bat

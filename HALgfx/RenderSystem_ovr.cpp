@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include "OVR_CAPI_D3D.h"
+
 #include "BlendState_plat.h"
 #include "Device_plat.h"
 #include "DeviceContext_plat.h"
@@ -9,7 +11,7 @@
 #include "DepthStencilState_plat.h"
 #include "IDevice.h"
 #include "ITexture2d.h"
-#include "RenderSystem_plat.h"
+#include "RenderSystem_ovr.h"
 #include "RenderTargetView_plat.h"
 #include "RasterizerState_plat.h"
 #include "ShaderResourceView_plat.h"
@@ -22,10 +24,10 @@ namespace HALgfx
 {
 
 //------------------------------------------------------------------
-RenderSystem* RenderSystem::ms_pInstance = 0;
+RenderSystemOVR* RenderSystemOVR::ms_pInstance = 0;
 
 //------------------------------------------------------------------
-RenderSystem::RenderSystem()
+RenderSystemOVR::RenderSystemOVR()
 {
 	m_pFrameBufferRTV = 0;
 	m_pTexture2dHDR = 0;
@@ -47,14 +49,14 @@ RenderSystem::RenderSystem()
 }
 
 //------------------------------------------------------------------
-RenderSystem::~RenderSystem()
+RenderSystemOVR::~RenderSystemOVR()
 {
 	if (m_pFrameBufferRTV)
 	{
 		delete m_pFrameBufferRTV;
 		m_pFrameBufferRTV = 0;
 	}
-	
+
 	if (m_pTexture2dHDR)
 	{
 		delete m_pTexture2dHDR;
@@ -79,7 +81,7 @@ RenderSystem::~RenderSystem()
 		m_pFrameBufferRTVHDR = 0;
 	}
 
-	if( m_pFrameBufferDSV)
+	if (m_pFrameBufferDSV)
 	{
 		delete m_pFrameBufferDSV;
 		m_pFrameBufferDSV = 0;
@@ -134,35 +136,67 @@ RenderSystem::~RenderSystem()
 }
 
 //------------------------------------------------------------------
-void RenderSystem::Initialize()
+void RenderSystemOVR::Initialize()
 {
 	assert(ms_pInstance == 0);
-	ms_pInstance = new RenderSystem();
+	ms_pInstance = new RenderSystemOVR();
 }
 
 //------------------------------------------------------------------
-RenderSystem& RenderSystem::GetInstance()
+RenderSystemOVR& RenderSystemOVR::GetInstance()
 {
 	assert(ms_pInstance != 0);
 	return *ms_pInstance;
 }
 
 //------------------------------------------------------------------
-bool RenderSystem::Exist()
+bool RenderSystemOVR::Exist()
 {
 	return ms_pInstance != 0;
 }
 
 //------------------------------------------------------------------
-void RenderSystem::Terminate()
+void RenderSystemOVR::Terminate()
 {
 	delete ms_pInstance;
 	ms_pInstance = 0;
 }
 
 //------------------------------------------------------------------
-bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, void* pWindowHandle)
+bool RenderSystemOVR::InitializeSystem(bool retryCreate, unsigned int uWidth, unsigned int uHeight, void* pWindowHandle)
 {
+
+	ovrResult result = ovr_Create(&m_HMD, &m_luid);
+	if (!OVR_SUCCESS(result))
+		return retryCreate;
+
+	ovrHmdDesc hmdDesc = ovr_GetHmdDesc(m_HMD);
+
+	/*RECT size = { 0, 0, uWidth, uHeight };
+	AdjustWindowRect(&size, WS_OVERLAPPEDWINDOW, false);
+	const UINT flags = SWP_NOMOVE | SWP_NOZORDER | SWP_SHOWWINDOW;
+	if (!SetWindowPos(pWindowHandle, nullptr, 0, 0, size.right - size.left, size.bottom - size.top, flags))
+		return false;
+
+	IDXGIFactory * DXGIFactory = nullptr;
+	HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory), (void**)(&DXGIFactory));
+	VALIDATE((hr == ERROR_SUCCESS), "CreateDXGIFactory1 failed");
+
+	IDXGIAdapter * Adapter = nullptr;
+	for (UINT iAdapter = 0; DXGIFactory->EnumAdapters(iAdapter, &Adapter) != DXGI_ERROR_NOT_FOUND; ++iAdapter)
+	{
+		DXGI_ADAPTER_DESC adapterDesc;
+		Adapter->GetDesc(&adapterDesc);
+		if ((pLuid == nullptr) || memcmp(&adapterDesc.AdapterLuid, pLuid, sizeof(LUID)) == 0)
+			break;
+		Release(Adapter);
+	}
+
+	auto DriverType = Adapter ? D3D_DRIVER_TYPE_UNKNOWN : D3D_DRIVER_TYPE_HARDWARE;
+	hr = D3D11CreateDevice(Adapter, DriverType, 0, 0, 0, 0, D3D11_SDK_VERSION, &Device, 0, &Context);
+	Release(Adapter);
+	VALIDATE((hr == ERROR_SUCCESS), "D3D11CreateDevice failed");*/
+
 	HRESULT hr = S_OK;
 
 	UINT createDeviceFlags = 0;
@@ -173,15 +207,15 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 
 	D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE;
 
-	D3D_FEATURE_LEVEL featureLevels[] = 
+	D3D_FEATURE_LEVEL featureLevels[] =
 	{
 		D3D_FEATURE_LEVEL_11_0
 	};
-	UINT numFeatureLevels = ARRAYSIZE( featureLevels );
+	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
 	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory( &sd, sizeof(sd) );
-	sd.BufferCount = 1;
+	ZeroMemory(&sd, sizeof(sd));
+	sd.BufferCount = 2;
 	sd.BufferDesc.Width = uWidth;
 	sd.BufferDesc.Height = uHeight;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -195,12 +229,12 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 
 	ID3D11Device* pD3DDevice = 0;
 	ID3D11DeviceContext* pImmediateContext = 0;
-	
-	m_driverType = D3D_DRIVER_TYPE_HARDWARE;
-	hr = D3D11CreateDeviceAndSwapChain( NULL, m_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-		D3D11_SDK_VERSION, &sd, &m_pSwapChain, &pD3DDevice, &m_featureLevel, &pImmediateContext );
 
-	if( FAILED( hr ) )
+	m_driverType = D3D_DRIVER_TYPE_HARDWARE;
+	hr = D3D11CreateDeviceAndSwapChain(NULL, m_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
+		D3D11_SDK_VERSION, &sd, &m_pSwapChain, &pD3DDevice, &m_featureLevel, &pImmediateContext);
+
+	if (FAILED(hr))
 	{
 		printf("Failed to create DirectX 11 system.");
 		assert(0);
@@ -215,12 +249,67 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	// final render target
 	m_pFrameBufferRTV = pDevice->CreateRenderTargetView(m_pSwapChain);
 
+	// ovr
+	// Create backbuffer
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&m_pBackBufferTexture);
+	hr = pD3DDevice->CreateRenderTargetView(m_pBackBufferTexture, NULL, &m_pBackBufferRTV);
+	assert(hr == ERROR_SUCCESS);
+
+	// Main depth buffer
+	m_pMainDepthBuffer = new DepthBuffer(pD3DDevice, uWidth, uHeight);
+	//pDeviceContext->OMSetRenderTargets(1, &BackBufferRT, MainDepthBuffer->TexDsv);
+
+	// Make the eye render buffers (caution if actual size < requested due to HW limits). 
+	ovrRecti         eyeRenderViewport[2];
+
+	for (int eye = 0; eye < 2; ++eye)
+	{
+		ovrSizei idealSize = ovr_GetFovTextureSize(m_HMD, (ovrEyeType)eye, hmdDesc.DefaultEyeFov[eye], 1.0f);
+		pEyeRenderTexture[eye] = new OculusTexture();
+		if (!pEyeRenderTexture[eye]->Init(m_HMD, idealSize.w, idealSize.h))
+		{
+			//if (retryCreate) goto Done;
+			assert(OVR_SUCCESS(result));
+		}
+		pEyeDepthBuffer[eye] = new DepthBuffer(pD3DDevice, idealSize.w, idealSize.h);
+		eyeRenderViewport[eye].Pos.x = 0;
+		eyeRenderViewport[eye].Pos.y = 0;
+		eyeRenderViewport[eye].Size = idealSize;
+		if (!pEyeRenderTexture[eye]->TextureSet)
+		{
+			//if (retryCreate) goto Done;
+			assert(false);
+		}
+	}
+
+	// Create a mirror to see on the monitor.
+	D3D11_TEXTURE2D_DESC td;
+	td.ArraySize = 1;
+	td.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	td.Width = uWidth;
+	td.Height = uHeight;
+	td.Usage = D3D11_USAGE_DEFAULT;
+	td.SampleDesc.Count = 1;
+	td.MipLevels = 1;
+	result = ovr_CreateMirrorTextureD3D11(m_HMD, pD3DDevice, &td, 0, &m_pMirrorTexture);
+	if (!OVR_SUCCESS(result))
+	{
+		//if (retryCreate) goto Done;
+		assert(false);
+	}
+
+	// Setup VR components, filling out description
+	ovrEyeRenderDesc eyeRenderDesc[2];
+	eyeRenderDesc[0] = ovr_GetRenderDesc(m_HMD, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
+	eyeRenderDesc[1] = ovr_GetRenderDesc(m_HMD, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+
+#if 0
 	// view port
 	m_viewPort.width = uWidth;
 	m_viewPort.height = uHeight;
 	m_viewPort.topLeftX = 0;
 	m_viewPort.topLeftY = 0;
-	m_viewPort.minDepth = 0.0f;
+	m_viewPort.minDepth = 0.f;
 	m_viewPort.maxDepth = 1.f;
 
 	// HDR render target texture
@@ -230,7 +319,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	texture2dDesc.format = FORMAT_R16G16B16A16_FLOAT;
 	texture2dDesc.usage = USAGE_DEFAULT;
 	texture2dDesc.bindFlags = BIND_SHADER_RESOURCE | BIND_RENDER_TARGET;
-	
+
 	SubResourceData subResourceData;
 	subResourceData.pMem = 0;
 	m_pTexture2dHDR = pDevice->CreateTexture2d(texture2dDesc, subResourceData);
@@ -254,21 +343,21 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	Texture2dDesc texture2dDSTDesc;
 	texture2dDSTDesc.width = uWidth;
 	texture2dDSTDesc.height = uHeight;
-	texture2dDSTDesc.format = FORMAT_R24G8_TYPELESS;
+	texture2dDSTDesc.format = FORMAT_R32_TYPELESS;
 	texture2dDSTDesc.usage = USAGE_DEFAULT;
 	texture2dDSTDesc.bindFlags = BIND_SHADER_RESOURCE | BIND_DEPTH_STENCIL;
 	m_pTexture2dDepthStencil = pDevice->CreateTexture2d(texture2dDSTDesc, subResourceData);
 
 	// depth stencil target
 	DepthStencilViewDesc dstDesc;
-	dstDesc.format = FORMAT_D24_UNORM_S8_UINT;
+	dstDesc.format = FORMAT_D32_FLOAT;
 	dstDesc.viewDimension = DSV_DIMENSION_TEXTURE2D;
 	dstDesc.texture2d.mipSlice = 0;
 	m_pFrameBufferDSV = pDevice->CreateDepthStencilView(m_pTexture2dDepthStencil, dstDesc);
 
 	// depth SRV
 	ShaderResourceViewDesc srvDescDepth;
-	srvDescDepth.format = FORMAT_R24_UNORM_X8_TYPELESS;
+	srvDescDepth.format = FORMAT_R32_FLOAT;
 	srvDescDepth.viewDimension = SRV_DIMENSION_TEXTURE2D;
 	srvDescDepth.texSRV.mipLevels = 1;
 	srvDescDepth.texSRV.mostDetailedMip = 0;
@@ -298,8 +387,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	rDesc.cullMode = CULL_BACK;
 	rDesc.frontCounterClockwise = false;
 	rDesc.depthBias = 0;
-	rDesc.depthClipEnable = true;
-	rDesc.slopeScaleDepthBias = 0.f;
+	rDesc.depthClipEnable = false;
 	rDesc.scissorEnable = false;
 	rDesc.depthBiasClamp = 0.f;
 	rDesc.fillMode = FILL_SOLID;
@@ -310,14 +398,15 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	// initialize perf\debug event wrapper
 	//ID3DUserDefinedAnnotation* pPerf;
 	//HRESULT hr = pImmediateContext->QueryInterface( __uuidof(pPerf), reinterpret_cast<void**>(&pPerf) );
+#endif
 
 	return true;
 }
 
 //------------------------------------------------------------------
-void RenderSystem::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float faSHBlue[9]) const
+void RenderSystemOVR::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float faSHBlue[9]) const
 {
-	for(int i = 0; i < 9; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		faSHRed[i] = m_faSHRed[i];
 		faSHGreen[i] = m_faSHGreen[i];
@@ -326,15 +415,15 @@ void RenderSystem::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float 
 }
 
 //------------------------------------------------------------------
-void RenderSystem::Present()
+void RenderSystemOVR::Present()
 {
 	m_pSwapChain->Present(0, 0);
 }
 
 //------------------------------------------------------------------
-void RenderSystem::TerminateSystem()
+void RenderSystemOVR::TerminateSystem()
 {
-	
+
 }
 
 } // namespace HALgfx
