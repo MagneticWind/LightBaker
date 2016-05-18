@@ -31,7 +31,7 @@ namespace Renderer
 
 namespace RenderPassShadowPrivate
 {
-	static const float CASCADE_DISTANCES[MAX_CASCADE_COUNT + 1] = { 0.5, 5, 10, 15, 50 };
+	static const float CASCADE_DISTANCES[MAX_CASCADE_COUNT + 1] = { 1, 8, 15, 20, 50 };
 	
 	//debug
 	//static const float CASCADE_DISTANCES[MAX_CASCADE_COUNT + 1] = { 0.5, 20, 30, 40, 50 };

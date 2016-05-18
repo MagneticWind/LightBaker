@@ -56,6 +56,7 @@ public:
 	// HALgfx::RenderSystem related
 	HALgfx::IDevice* GetDevice();
 	HALgfx::IDeviceContext* GetDeviceContext();
+	HALgfx::IDeviceContext* GetDeferredDeviceContext();
 	HALgfx::IRenderTargetView* GetFrameBufferRTV();
 	HALgfx::IRenderTargetView* GetFrameBufferRTVHDR();
 	HALgfx::IShaderResourceView* GetFrameBufferSRVHDR();

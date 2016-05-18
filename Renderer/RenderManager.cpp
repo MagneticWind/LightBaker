@@ -111,6 +111,12 @@ namespace Renderer
 	}
 
 	//------------------------------------------------------------------
+	HALgfx::IDeviceContext* RenderManager::GetDeferredDeviceContext()
+	{
+		return HALgfx::RenderSystem::GetInstance().GetDeferredDeviceContext();
+	}
+
+	//------------------------------------------------------------------
 	HALgfx::IRenderTargetView* RenderManager::GetFrameBufferRTV()
 	{
 		return HALgfx::RenderSystem::GetInstance().GetFrameBufferRTV();
@@ -189,7 +195,12 @@ namespace Renderer
 
 		HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
 		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
+
+#ifdef USE_COMMAND_BUFFER
+		HALgfx::IDeviceContext* pDeviceContext = renderSystem.GetDeferredDeviceContext();
+#else
 		HALgfx::IDeviceContext* pDeviceContext = renderSystem.GetDeviceContext();
+#endif
 
 		HALgfx::ViewPort viewPort = renderSystem.GetViewPort();
 		HALgfx::IRenderTargetView* pRTV = renderSystem.GetFrameBufferRTV();

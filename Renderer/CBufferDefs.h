@@ -52,8 +52,8 @@ struct CBufferSSAO
 {
 	CBufferSSAO()
 	{
-		fWidth = 800.f;
-		fHeight = 800.f;
+		fWidth = 1024.f;
+		fHeight = 1024.f;
 		fFarPlaneZ = 30.f;
 		fCenterWeight = 0.5f;
 		fInnerRadius = 0.3f;

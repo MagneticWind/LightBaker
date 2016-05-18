@@ -17,8 +17,8 @@ struct VS_INPUT
 
 struct PS_INPUT
 {
-    float4 Pos : SV_POSITION;
-    float3 Dir : TEXCOORD0;
+	float4 Pos : SV_POSITION;
+	float3 Dir : TEXCOORD0;
 };
 
 //--------------------------------------------------------------------------------------
@@ -27,12 +27,15 @@ struct PS_INPUT
 PS_INPUT VS( VS_INPUT input )
 {
     PS_INPUT output = (PS_INPUT)0;
-    float4 pos = mul( input.Pos, mWorld );
-    pos = mul( pos, mView );
-    pos = mul( pos, mProjection );
-    
-    output.Pos = input.Pos;
-    output.Dir = normalize(pos.xyz);// - mView[3].xyz);
+	float4 pos = mul(input.Pos, mWorld);
+	pos = mul(pos, mView);
+
+	output.Dir = normalize(pos.xyz);// - mView[3].xyz);
+
+	pos = mul(pos, mProjection);
+
+	output.Pos = input.Pos;
+	
     
     return output;
 }
@@ -42,6 +45,6 @@ PS_INPUT VS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 float4 PS( PS_INPUT input) : SV_Target
 {
-    float4 color = cubeMap.Sample( linearSampler, normalize(input.Dir) );
+	float4 color = cubeMap.Sample(linearSampler, normalize(input.Dir));
     return color;
 }

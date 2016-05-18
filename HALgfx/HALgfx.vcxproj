@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlendState_plat.h" />
+    <ClInclude Include="CommandBuffer_plat.h" />
     <ClInclude Include="ComparisonFunc.h" />
     <ClInclude Include="ComparisonFunc_plat.h" />
     <ClInclude Include="ComputeShader_plat.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="IBlendState.h" />
     <ClInclude Include="IBuffer.h" />
     <ClInclude Include="Buffer_plat.h" />
+    <ClInclude Include="ICommandBuffer.h" />
     <ClInclude Include="IDepthStencilState.h" />
     <ClInclude Include="IDepthStencilView.h" />
     <ClInclude Include="IDevice.h" />
@@ -67,6 +69,7 @@
   <ItemGroup>
     <ClCompile Include="BlendState_plat.cpp" />
     <ClCompile Include="Buffer_plat.cpp" />
+    <ClCompile Include="CommandBuffer_plat.cpp" />
     <ClCompile Include="ComparisonFunc_plat.cpp" />
     <ClCompile Include="ComputeShader_plat.cpp" />
     <ClCompile Include="DepthStencilState_plat.cpp" />

@@ -7,6 +7,8 @@
 #include "IRenderTargetView.h"
 #include "IShaderResourceView.h"
 
+//#define USE_COMMAND_BUFFER
+
 namespace Magnet
 {
 namespace HALgfx
@@ -46,6 +48,7 @@ public:
 
 	IDevice* GetDevice();
 	IDeviceContext* GetDeviceContext();
+	IDeviceContext* GetDeferredDeviceContext();
 
 	IShaderResourceView* GetFrameBufferSRVHDR();
 	IShaderResourceView* GetDepthSRV();
@@ -90,6 +93,8 @@ private:
 	
 	IDevice* m_pDevice;
 	IDeviceContext* m_pImmediateDeviceContext;
+	IDeviceContext* m_pDeferredDeviceContext;
+	
 	D3D_DRIVER_TYPE m_driverType;
 	D3D_FEATURE_LEVEL m_featureLevel;
 	IDXGISwapChain* m_pSwapChain;
@@ -107,6 +112,11 @@ inline IDevice* RenderSystem::GetDevice()
 inline IDeviceContext* RenderSystem::GetDeviceContext()
 {
 	return m_pImmediateDeviceContext;
+}
+
+inline IDeviceContext* RenderSystem::GetDeferredDeviceContext()
+{
+	return m_pDeferredDeviceContext;
 }
 
 inline IRenderTargetView* RenderSystem::GetFrameBufferRTV()

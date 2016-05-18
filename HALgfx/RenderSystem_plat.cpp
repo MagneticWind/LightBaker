@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "BlendState_plat.h"
+#include "CommandBuffer_plat.h"
 #include "Device_plat.h"
 #include "DeviceContext_plat.h"
 #include "DepthStencilView_plat.h"
@@ -212,6 +213,10 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	DeviceContext* pDeviceContext = new DeviceContext(pImmediateContext);
 	m_pImmediateDeviceContext = static_cast<IDeviceContext*>(pDeviceContext);
 
+	ID3D11DeviceContext* pDeferredContext;
+	hr = pD3DDevice->CreateDeferredContext(0, &pDeferredContext);
+	m_pDeferredDeviceContext = new DeviceContext(pDeferredContext);
+
 	// final render target
 	m_pFrameBufferRTV = pDevice->CreateRenderTargetView(m_pSwapChain);
 
@@ -328,6 +333,11 @@ void RenderSystem::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float 
 //------------------------------------------------------------------
 void RenderSystem::Present()
 {
+#ifdef USE_COMMAND_BUFFER
+	HALgfx::ICommandBuffer* pCommandBuffer = m_pDeferredDeviceContext->FinishCommandBuffer();
+	m_pImmediateDeviceContext->ExecuteCommandBuffer(pCommandBuffer, false);
+#endif
+
 	m_pSwapChain->Present(0, 0);
 }
 

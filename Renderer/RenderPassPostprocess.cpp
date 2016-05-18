@@ -561,8 +561,8 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		CBufferToneMapping* pTonemap = static_cast<CBufferToneMapping*>(drawNodeTonemapping.CreateCBufferData(sizeof(CBufferToneMapping), HALgfx::PIXEL_SHADER));
 		int iDimensionX, iDimensionY;
 
-		pTonemap->v4Param.x = static_cast<float>(800);
-		pTonemap->v4Param.y = static_cast<float>(800);
+		pTonemap->v4Param.x = static_cast<float>(1024);
+		pTonemap->v4Param.y = static_cast<float>(1024);
 		pTonemap->v4Param.z = 10.f;
 
 		// framebuffer texture

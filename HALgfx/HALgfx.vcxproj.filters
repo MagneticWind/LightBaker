@@ -90,6 +90,10 @@
     <ClInclude Include="UnorderedAccessView_plat.h">
       <Filter>d3d11</Filter>
     </ClInclude>
+    <ClInclude Include="ICommandBuffer.h" />
+    <ClInclude Include="CommandBuffer_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="d3d11">
@@ -158,6 +162,9 @@
       <Filter>d3d11</Filter>
     </ClCompile>
     <ClCompile Include="UnorderedAccessView_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandBuffer_plat.cpp">
       <Filter>d3d11</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,6 +20,7 @@ class IResource;
 struct SubResourceData;
 class IInputLayout;
 class IBuffer;
+class ICommandBuffer;
 class IRasterizerState;
 class IDepthStencilState;
 class IBlendState;
@@ -88,6 +89,9 @@ public:
 
 	virtual void BeginEvent(const char* debugInfo) = 0;
 	virtual void EndEvent() = 0;
+
+	virtual ICommandBuffer* FinishCommandBuffer() = 0;
+	virtual void ExecuteCommandBuffer(ICommandBuffer* pCommandBuffer, bool bRestoreContextState) = 0;
 
 };
 

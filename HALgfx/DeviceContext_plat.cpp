@@ -1,6 +1,7 @@
 #include <d3d9.h>
 
 #include "Buffer_plat.h"
+#include "CommandBuffer_plat.h"
 #include "ComputeShader_plat.h"
 #include "DeviceContext_plat.h"
 #include "DepthStencilState_plat.h"
@@ -432,6 +433,20 @@ void DeviceContext::BeginEvent(const char* debugInfo)
 void DeviceContext::EndEvent()
 {
 	D3DPERF_EndEvent();
+}
+
+ICommandBuffer* DeviceContext::FinishCommandBuffer()
+{
+	ID3D11CommandList* pCommandList;
+	CommandBuffer* pCommandBuffer = new CommandBuffer();
+	pCommandBuffer->Create(m_pDeviceContext);
+	return pCommandBuffer;
+}
+
+void DeviceContext::ExecuteCommandBuffer(ICommandBuffer* pCommandBuffer, bool bRestoreContextState)
+{
+	CommandBuffer* pCmdBuffer = static_cast<CommandBuffer*>(pCommandBuffer);
+	m_pDeviceContext->ExecuteCommandList(pCmdBuffer->GetD3DPtr(), bRestoreContextState);
 }
 
 } // namespace HALgfx

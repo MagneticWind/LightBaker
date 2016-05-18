@@ -55,6 +55,9 @@ public:
 	virtual void BeginEvent(const char* debugInfo);
 	virtual void EndEvent();
 
+	virtual ICommandBuffer* FinishCommandBuffer();
+	virtual void ExecuteCommandBuffer(ICommandBuffer* pCommandBuffer, bool bRestoreContextState);
+
 private:
 	ID3D11DeviceContext* m_pDeviceContext;
 
