@@ -11,6 +11,7 @@ namespace HALgfx
 {
 class IDevice;
 class IDeviceContext;
+class IRenderSystem;
 class IRenderTargetView;
 class IDepthStencilView;
 class IRasterizerState;
@@ -89,6 +90,8 @@ public:
 
 private:
 
+	static HALgfx::IRenderSystem* ms_pRenderSystem;
+
 	void InitializeHALSystem(int iWidth, int iHeight);
 
 	void CopyShadowParameters();
@@ -99,6 +102,7 @@ private:
 	Shader* m_pShadowShader;
 
 	IRenderPass* m_pRenderPasses[PASS_NUMBER];
+	int m_iPassCount;
 
 	CallBackLoadShader m_callBackLoadShader;
 	CallBackLoadMesh m_callBackLoadMesh;

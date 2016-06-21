@@ -74,6 +74,7 @@ public:
 
 	virtual void SetRenderTargetViews(int iNumViews, IRenderTargetView* const rtvs[], IDepthStencilView* dsv) = 0;
 
+	//virtual void SetProgram();
 	virtual void SetShader(ShaderType shaderType, IShader* pShader) = 0;
 	virtual void SetShaderResourceViews(ShaderType shaderType, int iOffset, int iNumViews, IShaderResourceView* pSRVs[]) = 0;
 	virtual void SetUnorderedAccessViews(ShaderType shaderType, int iOffset, int iNumViews, IUnorderedAccessView* pUAVs[]) = 0;

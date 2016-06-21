@@ -217,9 +217,8 @@ void RenderPassShadow::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							// add shader node
 							if (pShaderNode == NULL)
 							{
-								pShaderNode = new ShaderNode(shaderName);
+								pShaderNode = new ShaderNode(shaderName, pDevice);
 								pShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
-								pShaderNode->Create(pDevice);
 
 								// create const buffers
 								HALgfx::BufferDesc desc;
@@ -237,6 +236,8 @@ void RenderPassShadow::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 								GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 								MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
 								pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+
+								pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
 								m_lShaderNodes.push_back(pShaderNode);
 							}

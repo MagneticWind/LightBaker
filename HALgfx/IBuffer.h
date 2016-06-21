@@ -8,6 +8,8 @@ namespace Magnet
 namespace HALgfx
 {
 
+class IDevice;
+
 struct BufferDesc
 {
 	BufferDesc()
@@ -34,7 +36,7 @@ public:
 	virtual ~IBuffer(){}
 	virtual void GetDesc(BufferDesc&) const = 0;
 	virtual ResourceType GetType() const = 0;
-	//virtual void Create(Device* pDevice, BufferDesc& bufferDesc, SubResourceData* pSubResourceData) = 0;
+	//virtual void Create(IDevice* pDevice, BufferDesc& bufferDesc, SubResourceData* pSubResourceData) = 0;
 };
 
 } // namespace HALgfx

@@ -1,8 +1,8 @@
-#ifndef DEVICE_CONTEXT_H
-#define DEVICE_CONTEXT_H
+#ifndef GL_DEVICE_CONTEXT_H
+#define GL_DEVICE_CONTEXT_H
 
+#include <Windows.h>
 #include "IDeviceContext.h"
-#include <d3d11.h>
 
 namespace Magnet
 {
@@ -10,16 +10,16 @@ namespace HALgfx
 {
 struct ViewPort;
 
-class DeviceContext : public IDeviceContext
+class GLDeviceContext : public IDeviceContext
 {
 public:
 
-	DeviceContext(ID3D11DeviceContext* pContext);
-	~DeviceContext();
+	GLDeviceContext(HGLRC hRC);
+	~GLDeviceContext();
 
-//	virtual void CopyResource(IResource* pDest, IResource* pSource);
-//	virtual void CopySubResource(IResource* pDest, int iDestIndex, IResource* pSource, int iSourceIndex);
-//	virtual void UpdateSubResource(IResource* pDest, const SubResourceData&, int iDestIndex);
+	//	virtual void CopyResource(IResource* pDest, IResource* pSource);
+	//	virtual void CopySubResource(IResource* pDest, int iDestIndex, IResource* pSource, int iSourceIndex);
+	//	virtual void UpdateSubResource(IResource* pDest, const SubResourceData&, int iDestIndex);
 
 	virtual void DrawIndexed(unsigned int uIndexCount, unsigned int uStartIndexLocation, int iBaseVertexLocation);
 
@@ -27,9 +27,8 @@ public:
 
 	virtual void SetInputlayout(IInputLayout* pInputLayout);
 	virtual void SetVertexBuffer(int iSlot, int iStride, int iOffset, IBuffer* pBuffer);
-	virtual void SetConstantBuffers(int iSlot, int iNumBuffers, ShaderType eType,IBuffer* pBuffer[]);
+	virtual void SetConstantBuffers(int iSlot, int iNumBuffers, ShaderType eType, IBuffer* pBuffer[]);
 	virtual void SetIndexBuffer(IBuffer* pBuffer, Format format, int iOffset);
-	//virtual void SetProgram();
 
 	virtual void SetRasterizerState(IRasterizerState* pState);
 	virtual void SetDepthStencilState(IDepthStencilState* pState);
@@ -51,8 +50,6 @@ public:
 	void ClearRenderTargetView(IRenderTargetView* pRTV, const Math::Vector4f& v4Color);
 	void ClearDepthStencilView(IDepthStencilView* pDSV, unsigned int uFlag, float fDepth, int iStencil);
 
-	ID3D11DeviceContext* GetD3DPtr();
-
 	virtual void BeginEvent(const char* debugInfo);
 	virtual void EndEvent();
 
@@ -60,7 +57,8 @@ public:
 	virtual void ExecuteCommandBuffer(ICommandBuffer* pCommandBuffer, bool bRestoreContextState);
 
 private:
-	ID3D11DeviceContext* m_pDeviceContext;
+	HGLRC m_hRC;
+	GLenum m_ePrimitiveMode;
 
 };
 

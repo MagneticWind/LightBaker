@@ -15,6 +15,7 @@ class IRasterizerState;
 class ISamplerState;
 class IScissorState;
 class IInputLayout;
+class IProgram;
 class IShader;
 class IBuffer;
 class ITexture2d;
@@ -59,6 +60,7 @@ public:
 
 	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode) = 0;
 	virtual IShader* CreateShader(ShaderType eType, int iShaderCodeSize, const void* pShaderCode) = 0;
+	virtual IProgram* CreateProgram(const char* pName) = 0;
 	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData&) = 0;
 	virtual IBuffer* CreateBuffer(const BufferDesc&, const SubResourceData&) = 0;
 
@@ -66,10 +68,8 @@ public:
 	virtual IDepthStencilView* CreateDepthStencilView(IResource*, const DepthStencilViewDesc&) = 0;
 	virtual IShaderResourceView* CreateShaderResourceView(IResource*, const ShaderResourceViewDesc&) = 0;
 	virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*, const UnorderedAccessViewDesc&) = 0;
+
 	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV) = 0;
-
-
-
 };
 
 } // namespace HALgfx

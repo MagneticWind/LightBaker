@@ -12,7 +12,7 @@ namespace Magnet
 namespace HALgfx
 {
 class IInputLayout;
-class IShader;
+class IProgram;
 class IBuffer;
 class IDevice;
 class IDeviceContext;
@@ -34,7 +34,7 @@ bool ShaderNodeExists(const char* pName, std::list<ShaderNode*>& shaderNodeList,
 class ShaderNode
 {
 public:
-	ShaderNode(const char* pName);
+	ShaderNode(const char* pName, HALgfx::IDevice* pDevice);
 	~ShaderNode();
 
 	void BindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, DrawNode& drawNode);
@@ -51,7 +51,7 @@ public:
 
 	// load compiled shades, create cbuffer, input layout and such
 	void LoadShader(HALgfx::ShaderType eType);
-	void Create(HALgfx::IDevice* pDevice);
+	void Create(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
 	void* CreateBuffer(int iSize, HALgfx::ShaderType eType);
 	bool IsLoaded() const;
 
@@ -62,16 +62,13 @@ public:
 	DrawNode& GetDrawNode(const char* name);
 
 private:
-	char m_caShaderName[256];
-	void* m_ppFileData[HALgfx::MAX_SHADER_NUM];
-	int m_iFileSize[HALgfx::MAX_SHADER_NUM];
-	bool m_bIsLoaded;
-
-	// shaders
-	HALgfx::IShader* m_ppShader[HALgfx::MAX_SHADER_NUM];
+	// shader program
+	HALgfx::IProgram* m_pShaderProgram;
 
 	// input layout
 	HALgfx::IInputLayout* m_pInputLayout;
+	int m_iNumElements;
+	HALgfx::InputElementDesc m_inputElements[MAX_NUM_ELEMENTS];
 
 	// const buffers
 	HALgfx::IBuffer* m_ppVSConstBuffers[MAX_NUMBER_BUFFERS];
@@ -91,11 +88,6 @@ private:
 	// list of draw nodes
 	std::list<DrawNode> m_lDrawNodes;
 };
-
-inline const char* ShaderNode::GetName() const
-{
-	return m_caShaderName;
-}
 
 } // namespace Renderer
 } // namespace Magnet

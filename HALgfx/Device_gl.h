@@ -1,7 +1,10 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef GL_DEVICE_H
+#define GL_DEVICE_H
 
-#include <d3d11.h>
+#include "glew.h"		// has to be included before gl.h
+#include <gl/gl.h>
+#include <gl/glu.h>
+
 #include "IDevice.h"
 
 namespace Magnet
@@ -9,10 +12,10 @@ namespace Magnet
 namespace HALgfx
 {
 
-class Device : public IDevice
+class GLDevice : public IDevice
 {
 public:
-	Device(ID3D11Device* pDevice) : m_pDevice(pDevice)
+	GLDevice()
 	{
 	}
 	virtual FeatureLevel GetFeatureLevel();
@@ -34,14 +37,10 @@ public:
 	virtual IShaderResourceView* CreateShaderResourceView(IResource*, const ShaderResourceViewDesc&);
 	virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*, const UnorderedAccessViewDesc&);
 
-	void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV);
-
-	ID3D11Device* GetD3DPtr();
-
-	IRenderTargetView* CreateRenderTargetView(IDXGISwapChain*);
+	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV);
 
 private:
-	ID3D11Device* m_pDevice;
+
 };
 
 } // namespace HALgfx

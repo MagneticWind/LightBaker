@@ -24,6 +24,7 @@ struct InputElementDesc
 	InputClassification inputClassification;
 	unsigned int semanticIndex;
 	unsigned int inputSlot;
+	unsigned int size;
 	unsigned int alignedByteOffset;
 	unsigned int instanceDataStepRate;
 };

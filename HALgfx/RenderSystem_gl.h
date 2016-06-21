@@ -1,12 +1,13 @@
 #ifndef RENDER_SYSTEM_H
 #define RENDER_SYSTEM_H
 
-#include <d3d11.h>
-#include "Viewport.h"
+#include <Windows.h>	//TODO: move this to RenderWindow, so this lib can be platform independents
 
 #include "IRenderSystem.h"
 #include "IRenderTargetView.h"
 #include "IShaderResourceView.h"
+
+#include "Viewport.h"
 
 //#define USE_COMMAND_BUFFER
 
@@ -27,19 +28,20 @@ class ITexture2d;
 class IRasterizerState;
 class ISamplerState;
 
-class RenderSystem : public IRenderSystem
+class GLRenderSystem : public IRenderSystem
 {
-private:
-	RenderSystem();
-	~RenderSystem();
-	RenderSystem(const RenderSystem&);
-	RenderSystem& operator=(const RenderSystem&);
 
-	static RenderSystem* ms_pInstance;
+private:
+	GLRenderSystem();
+	~GLRenderSystem();
+	GLRenderSystem(const GLRenderSystem&);
+	GLRenderSystem& operator=(const GLRenderSystem&);
+
+	static GLRenderSystem* ms_pInstance;
 
 public:
 	static void Initialize();
-	static RenderSystem* GetInstance();
+	static GLRenderSystem* GetInstance();
 	static bool Exist();
 	static void Terminate();
 
@@ -47,17 +49,10 @@ public:
 	virtual void TerminateSystem() override;
 	virtual void Present() override;
 
-	void GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float faSHBlue[9]) const;
-
 private:
-	
-	D3D_DRIVER_TYPE m_driverType;
-	D3D_FEATURE_LEVEL m_featureLevel;
-	IDXGISwapChain* m_pSwapChain;
 
-	float m_faSHRed[9];
-	float m_faSHGreen[9];
-	float m_faSHBlue[9];
+	HDC m_hDC;
+
 };
 
 } // namespace HALgfx

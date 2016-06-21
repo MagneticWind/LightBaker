@@ -23,9 +23,8 @@ void Buffer::GetDesc(BufferDesc& bufferDesc) const
 	bufferDesc = mDesc;
 }
 
-void Buffer::Create(const SubResourceData& subResourceData, ID3D11Device* pDevice)
+void Buffer::Create(ID3D11Device* pDevice, const BufferDesc& bufferDesc, const SubResourceData& pSubResourceData)
 {
-
 	// Setup D3D descriptor.
 	D3D11_BUFFER_DESC descD3D;
 	descD3D.ByteWidth           = mDesc.byteSize;
@@ -37,11 +36,11 @@ void Buffer::Create(const SubResourceData& subResourceData, ID3D11Device* pDevic
 
 	// Setup initialization data.
 	D3D11_SUBRESOURCE_DATA initialData;
-	if (subResourceData.pMem)
+	if (pSubResourceData.pMem)
 	{
-		initialData.pSysMem = subResourceData.pMem;
-		initialData.SysMemPitch = subResourceData.uMemPitch;
-		initialData.SysMemSlicePitch = subResourceData.uMemSlicePitch;
+		initialData.pSysMem = pSubResourceData.pMem;
+		initialData.SysMemPitch = pSubResourceData.uMemPitch;
+		initialData.SysMemSlicePitch = pSubResourceData.uMemSlicePitch;
 
 		pDevice->CreateBuffer(&descD3D, &initialData, &m_pBuffer);
 	}

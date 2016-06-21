@@ -14,6 +14,7 @@
 #include "FeatureLevel.h"
 #include "InputLayout_plat.h"
 #include "PixelShader_plat.h"
+#include "Program_plat.h"
 #include "VertexShader_plat.h"
 #include "ComputeShader_plat.h"
 
@@ -101,6 +102,13 @@ IShader* Device::CreateShader(ShaderType eType, int iShaderCodeSize, const void*
 }
 
 //------------------------------------------------------------------
+IProgram* Device::CreateProgram(const char* pName)
+{
+	IProgram* pProgram = new Program(pName);
+	return pProgram;
+}
+
+//------------------------------------------------------------------
 ITexture2d* Device::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData& subResourceData)
 {
 	Texture2d* pTexture2d = new Texture2d();
@@ -112,7 +120,7 @@ ITexture2d* Device::CreateTexture2d(const Texture2dDesc& desc, const SubResource
 IBuffer* Device::CreateBuffer(const BufferDesc& desc, const SubResourceData& subResourceData)
 {
 	Buffer* pBuffer = new Buffer(desc);
-	pBuffer->Create(subResourceData, m_pDevice);
+	pBuffer->Create(m_pDevice, desc, subResourceData);
 	return pBuffer;
 }
 

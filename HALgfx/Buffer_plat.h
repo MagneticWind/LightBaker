@@ -22,7 +22,7 @@ public:
 	virtual ResourceType GetType() const ;
 	//virtual unsigned int GetElementCount() const;
 	//virtual unsigned int GetElementStride() const;
-	void Create(const SubResourceData&, ID3D11Device* pDevice);
+	void Create(ID3D11Device* pDevice, const BufferDesc& bufferDesc, const SubResourceData& pSubResourceData);
 	ID3D11Buffer* GetD3DPtr();
 
 private:

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CBufferDefs.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="DrawNode.h" />
     <ClInclude Include="GPUResource.h" />
     <ClInclude Include="GPUResourceManager.h" />

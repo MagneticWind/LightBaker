@@ -9,6 +9,7 @@
 #include "HALgfx\IUnorderedAccessView.h"
 #include "HALgfx\IShaderResourceView.h"
 #include "HALgfx\IBuffer.h"
+#include "HALgfx\IShader.h"
 #include "HALgfx\ShaderType.h"
 #include "HALgfx\Viewport.h"
 
@@ -23,16 +24,12 @@ namespace Magnet
 namespace Renderer
 {
 //------------------------------------------------------------------
-	ShaderNode::ShaderNode(const char* pName) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_iNumberOfCSConstBuffers(0)
+ShaderNode::ShaderNode(const char* pName, HALgfx::IDevice* pDevice) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_iNumberOfCSConstBuffers(0)
 {
-	strcpy(m_caShaderName, pName);
-
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
-	{
-		m_ppShader[i] = 0;
-	}
+	m_pShaderProgram = pDevice->CreateProgram(pName);
 
 	m_pInputLayout = 0;
+	m_iNumElements = 0;
 
 	for (int i = 0; i < MAX_NUMBER_BUFFERS; ++i)
 	{
@@ -49,32 +46,15 @@ namespace Renderer
 	{
 		m_ppSamplers[i] = 0;
 	}
-
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
-	{
-		m_ppFileData[i] = 0;
-		m_iFileSize[i] = 0;
-	}
-
-	m_bIsLoaded = false;
 }
 
 //------------------------------------------------------------------
 ShaderNode::~ShaderNode()
 {
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
+	if (m_pShaderProgram)
 	{
-		if (m_ppFileData[i])
-		{
-			free(m_ppFileData[i]);
-			m_ppFileData[i] = 0;
-		}
-
-		if (m_ppShader[i])
-		{
-			delete m_ppShader[i];
-			m_ppShader[i] = 0;
-		}
+		delete m_pShaderProgram;
+		m_pShaderProgram = 0;
 	}
 
 	if (m_pInputLayout)
@@ -170,14 +150,13 @@ void ShaderNode::UnbindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, 
 //------------------------------------------------------------------
 void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 {
-	pDeviceContext->BeginEvent(m_caShaderName);
+	pDeviceContext->BeginEvent(m_pShaderProgram->GetName());
 
 	pDeviceContext->SetInputlayout(m_pInputLayout);
 
 	pDeviceContext->SetSamplerStates(HALgfx::PIXEL_SHADER, 0, m_iNumSamplerState, m_ppSamplers);
 
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
-		pDeviceContext->SetShader(static_cast<HALgfx::ShaderType>(i), m_ppShader[i]);
+	m_pShaderProgram->SetShaders(pDeviceContext);
 
 	std::list<DrawNode>::iterator it = m_lDrawNodes.begin();
 	std::list<DrawNode>::iterator itEnd = m_lDrawNodes.end();
@@ -195,9 +174,6 @@ void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 
 		it++;
 	}
-
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
-		pDeviceContext->SetShader(static_cast<HALgfx::ShaderType>(i), 0);
 
 	pDeviceContext->EndEvent();
 }
@@ -261,7 +237,13 @@ void ShaderNode::SetSamplerStates(HALgfx::ISamplerState* pSamplerStates[], int i
 //------------------------------------------------------------------
 void ShaderNode::CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice)
 {
-	m_pInputLayout = pDevice->CreateInputLayout(iNumElements, inputElements, m_iFileSize[HALgfx::VERTEX_SHADER], m_ppFileData[HALgfx::VERTEX_SHADER]);
+	m_iNumElements = iNumElements;
+	for (int i = 0; i < iNumElements; ++i)
+	{
+		m_inputElements[i] = inputElements[i];
+	}
+
+	m_pInputLayout = pDevice->CreateInputLayout(iNumElements, inputElements, m_pShaderProgram->GetFileSize(HALgfx::VERTEX_SHADER), m_pShaderProgram->GetFileData(HALgfx::VERTEX_SHADER));
 }
 
 //------------------------------------------------------------------
@@ -310,123 +292,15 @@ bool ShaderNodeExists(const char* pName, std::list<ShaderNode*>& shaderNodeList,
 }
 
 //------------------------------------------------------------------
-void ShaderNode::Create(HALgfx::IDevice* pDevice)
+void ShaderNode::Create(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice)
 {
-	for (int i = 0; i < HALgfx::MAX_SHADER_NUM; ++i)
-	{
-		if (m_ppFileData[i] && m_iFileSize[i])
-			m_ppShader[i] = pDevice->CreateShader(static_cast<HALgfx::ShaderType>(i), m_iFileSize[i], m_ppFileData[i]);
-	}
-}
-
-//------------------------------------------------------------------
-void* ShaderNode::CreateBuffer(int iSize, HALgfx::ShaderType eType)
-{
-	m_ppFileData[eType] = malloc(iSize);
-	m_iFileSize[eType] = iSize;
-	return m_ppFileData[eType];
+	m_pShaderProgram->CreateShaders(iNumElements, inputElements, pDevice);
 }
 
 //------------------------------------------------------------------
 void ShaderNode::LoadShader(HALgfx::ShaderType eType)
 {
-	static const char SHADER_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\shader\\";
-	char filePath[256];
-	strcpy(filePath, SHADER_PATH);
-	strcat(filePath, m_caShaderName);
-
-	switch (eType)
-	{
-	case HALgfx::VERTEX_SHADER:
-		{
-			// load vertex shader
-			char vShaderPath[256];
-			strcpy(vShaderPath, filePath);
-			strcat(vShaderPath, ".v");
-
-			FILE* pVSFile = fopen(vShaderPath, "r+b");
-			if (pVSFile == 0)
-			{
-				printf("can't find the shader %s", vShaderPath);
-				assert(0);
-			}
-
-			fseek(pVSFile, 0, SEEK_END);
-			int iVSFileSize = ftell(pVSFile);
-			rewind(pVSFile);
-
-			void* pVSFileData = CreateBuffer(iVSFileSize, HALgfx::VERTEX_SHADER);
-			int iResult = fread(pVSFileData, 1, iVSFileSize, pVSFile);
-			if (iResult != iVSFileSize)
-			{
-				printf("Error reading shader file %s", pVSFileData);
-				assert(0);
-			}
-
-			fclose(pVSFile);
-		}
-		break;
-	case HALgfx::PIXEL_SHADER:
-		{
-			// load pixel shader
-			char pShaderPath[256];
-			strcpy(pShaderPath, filePath);
-			strcat(pShaderPath, ".p");
-
-			FILE* pPSFile = fopen(pShaderPath, "r+b");
-			if (pPSFile == 0)
-			{
-				printf("can't find the shader %s", pShaderPath);
-				assert(0);
-			}
-
-			fseek(pPSFile, 0, SEEK_END);
-			int iPSFileSize = ftell(pPSFile);
-			rewind(pPSFile);
-
-			void* pPSFileData = CreateBuffer(iPSFileSize, HALgfx::PIXEL_SHADER);
-			int iSize = fread(pPSFileData, 1, iPSFileSize, pPSFile);
-			if (iSize != iPSFileSize)
-			{
-				printf("Error reading shader file %s", pShaderPath);
-				assert(0);
-			}
-
-			fclose(pPSFile);
-		}
-		break;
-	case HALgfx::COMPUTE_SHADER:
-		{
-			// load compute shader
-			char pShaderPath[256];
-			strcpy(pShaderPath, filePath);
-			strcat(pShaderPath, ".c");
-
-			FILE* pCSFile = fopen(pShaderPath, "r+b");
-			if (pCSFile == 0)
-			{
-				printf("can't find the shader %s", pShaderPath);
-				assert(0);
-			}
-
-			fseek(pCSFile, 0, SEEK_END);
-			int iCSFileSize = ftell(pCSFile);
-			rewind(pCSFile);
-
-			void* pCSFileData = CreateBuffer(iCSFileSize, HALgfx::COMPUTE_SHADER);
-			int iSize = fread(pCSFileData, 1, iCSFileSize, pCSFile);
-			if (iSize != iCSFileSize)
-			{
-				printf("Error reading shader file %s", pShaderPath);
-				assert(0);
-			}
-
-			fclose(pCSFile);
-		}
-		break;
-	}
-
-	m_bIsLoaded = true;
+	m_pShaderProgram->LoadShader(eType);
 }
 
 //------------------------------------------------------------------
@@ -435,7 +309,7 @@ void ShaderNode::RunCompute(HALgfx::IDeviceContext* pDeviceContext, int iSRVCoun
 {
 	assert(m_iNumberOfCSConstBuffers == 1);
 
-	pDeviceContext->SetShader(HALgfx::COMPUTE_SHADER, m_ppShader[HALgfx::COMPUTE_SHADER]);
+	pDeviceContext->SetShader(HALgfx::COMPUTE_SHADER, m_pShaderProgram->GetShader(HALgfx::COMPUTE_SHADER));
 	
 	HALgfx::SubResourceData data;
 	pDeviceContext->Map(m_ppCSConstBuffers[0], 0, HALgfx::MAP_WRITE_DISCARD, 0, data);
@@ -459,6 +333,11 @@ void ShaderNode::RunCompute(HALgfx::IDeviceContext* pDeviceContext, int iSRVCoun
 
 	HALgfx::IUnorderedAccessView* pUAVs[MAX_NUMBER_UAVS] = { 0, 0, 0, 0 };
 	pDeviceContext->SetUnorderedAccessViews(HALgfx::COMPUTE_SHADER, 0, iUAVCount, pUAVs);
+}
+
+const char* ShaderNode::GetName() const
+{
+	return m_pShaderProgram->GetName();
 }
 
 } // namespace Renderer

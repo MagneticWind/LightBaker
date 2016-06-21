@@ -53,8 +53,8 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 	pDeviceContext->SetDepthStencilState(pDSState);
 	pDeviceContext->SetRenderTargetViews(1, &pRTV, pDSV);
 
-//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
-//	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(1, 0, 0, 0));
+	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -150,10 +150,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 								// add shader node
 								if (pShaderNode == NULL)
 								{
-									pShaderNode = new ShaderNode(shaderName);
+									pShaderNode = new ShaderNode(shaderName, pDevice);
 									pShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
 									pShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
-									pShaderNode->Create(pDevice);
 
 									// create const buffers
 									HALgfx::BufferDesc desc;
@@ -182,6 +181,8 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 									MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
 									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+
+									pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
 									m_lShaderNodes.push_back(pShaderNode);
 								}
@@ -263,10 +264,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 								// add shader node
 								if (pShaderNode == NULL)
 								{
-									pShaderNode = new ShaderNode(shaderName);
+									pShaderNode = new ShaderNode(shaderName, pDevice);
 									pShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
 									pShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
-									pShaderNode->Create(pDevice);
 
 									// create const buffers
 									HALgfx::BufferDesc desc;
@@ -288,13 +288,13 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									desc.byteSize = sizeof(CBufferLights);
 									pShaderNode->AddConstantBuffer(desc, pDevice, HALgfx::PIXEL_SHADER);
 
-
-
 									// input layout, it requires v shader byte code, and input elements from mesh
 									const char* meshName = pSurface->GetGeometry()->GetName();
 									GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 									MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
 									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+
+									pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
 									m_lShaderNodes.push_back(pShaderNode);
 								}

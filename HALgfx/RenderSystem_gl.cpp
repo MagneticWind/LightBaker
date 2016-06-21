@@ -1,21 +1,25 @@
-//#include <d3d11_1.h>
+
 #include <assert.h>
 #include <stdio.h>
 
-#include "BlendState_plat.h"
-#include "CommandBuffer_plat.h"
-#include "Device_plat.h"
-#include "DeviceContext_plat.h"
-#include "DepthStencilView_plat.h"
-#include "DepthStencilState_plat.h"
+#include "glew.h"		// has to be included before gl.h
+#include <gl/gl.h>
+#include <gl/glu.h>
+
+#include "BlendState_gl.h"
+#include "CommandBuffer_gl.h"
+#include "Device_gl.h"
+#include "DeviceContext_gl.h"
+#include "DepthStencilView_gl.h"
+#include "DepthStencilState_gl.h"
 #include "IDevice.h"
 #include "ITexture2d.h"
-#include "RenderSystem_plat.h"
-#include "RenderTargetView_plat.h"
-#include "RasterizerState_plat.h"
-#include "ShaderResourceView_plat.h"
-#include "SamplerState_plat.h"
-#include "Texture2d_plat.h"
+#include "RenderSystem_gl.h"
+#include "RenderTargetView_gl.h"
+#include "RasterizerState_gl.h"
+#include "ShaderResourceView_gl.h"
+#include "SamplerState_gl.h"
+#include "Texture2d_gl.h"
 
 namespace Magnet
 {
@@ -23,10 +27,10 @@ namespace HALgfx
 {
 
 //------------------------------------------------------------------
-RenderSystem* RenderSystem::ms_pInstance = 0;
+GLRenderSystem* GLRenderSystem::ms_pInstance = 0;
 
 //------------------------------------------------------------------
-RenderSystem::RenderSystem()
+GLRenderSystem::GLRenderSystem()
 {
 	m_pFrameBufferRTV = 0;
 	m_pTexture2dHDR = 0;
@@ -44,18 +48,17 @@ RenderSystem::RenderSystem()
 
 	m_pImmediateDeviceContext = 0;
 
-	m_pSwapChain = 0;
 }
 
 //------------------------------------------------------------------
-RenderSystem::~RenderSystem()
+GLRenderSystem::~GLRenderSystem()
 {
 	if (m_pFrameBufferRTV)
 	{
 		delete m_pFrameBufferRTV;
 		m_pFrameBufferRTV = 0;
 	}
-	
+
 	if (m_pTexture2dHDR)
 	{
 		delete m_pTexture2dHDR;
@@ -80,7 +83,7 @@ RenderSystem::~RenderSystem()
 		m_pFrameBufferRTVHDR = 0;
 	}
 
-	if( m_pFrameBufferDSV)
+	if (m_pFrameBufferDSV)
 	{
 		delete m_pFrameBufferDSV;
 		m_pFrameBufferDSV = 0;
@@ -127,98 +130,84 @@ RenderSystem::~RenderSystem()
 		delete m_pImmediateDeviceContext;
 		m_pImmediateDeviceContext = 0;
 	}
-
-	if (m_pSwapChain)
-	{
-		m_pSwapChain->Release();
-	}
 }
 
 //------------------------------------------------------------------
-void RenderSystem::Initialize()
+void GLRenderSystem::Initialize()
 {
 	assert(ms_pInstance == 0);
-	ms_pInstance = new RenderSystem();
+	ms_pInstance = new GLRenderSystem();
 }
 
 //------------------------------------------------------------------
-RenderSystem* RenderSystem::GetInstance()
+GLRenderSystem* GLRenderSystem::GetInstance()
 {
 	assert(ms_pInstance != 0);
 	return ms_pInstance;
 }
 
 //------------------------------------------------------------------
-bool RenderSystem::Exist()
+bool GLRenderSystem::Exist()
 {
 	return ms_pInstance != 0;
 }
 
 //------------------------------------------------------------------
-void RenderSystem::Terminate()
+void GLRenderSystem::Terminate()
 {
 	delete ms_pInstance;
 	ms_pInstance = 0;
 }
 
 //------------------------------------------------------------------
-bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, void* pWindowHandle)
+bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, void* pWindowHandle)
 {
-	HRESULT hr = S_OK;
-
-	UINT createDeviceFlags = 0;
-
-#ifdef _DEBUG
-	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE;
-
-	D3D_FEATURE_LEVEL featureLevels[] = 
+	static PIXELFORMATDESCRIPTOR pfd =	// pfd Tells Windows How We Want Things To Be
 	{
-		D3D_FEATURE_LEVEL_11_0
+		sizeof(PIXELFORMATDESCRIPTOR),	// Size Of This Pixel Format Descriptor
+		1,								// Version Number
+		PFD_DRAW_TO_WINDOW |			// Format Must Support Window
+		PFD_SUPPORT_OPENGL |			// Format Must Support OpenGL
+		PFD_DOUBLEBUFFER,				// Must Support Double Buffering
+		PFD_TYPE_RGBA,					// Request An RGBA Format
+		8,								// Select Our Color Depth
+		0, 0, 0, 0, 0, 0,				// Color Bits Ignored
+		0,								// No Alpha Buffer
+		0,								// Shift Bit Ignored
+		0,								// No Accumulation Buffer
+		0, 0, 0, 0,						// Accumulation Bits Ignored
+		16,								// 16Bit Z-Buffer (Depth Buffer)
+		0,								// No Stencil Buffer
+		0,								// No Auxiliary Buffer
+		PFD_MAIN_PLANE,					// Main Drawing Layer
+		0,								// Reserved
+		0, 0, 0							// Layer Masks Ignored
 	};
-	UINT numFeatureLevels = ARRAYSIZE( featureLevels );
 
-	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory( &sd, sizeof(sd) );
-	sd.BufferCount = 1;
-	sd.BufferDesc.Width = uWidth;
-	sd.BufferDesc.Height = uHeight;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_UNORDERED_ACCESS;
-	sd.OutputWindow = static_cast<HWND>(pWindowHandle);
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.Windowed = TRUE;
+	HWND hWnd = static_cast<HWND>(pWindowHandle);
+	m_hDC = GetDC(hWnd);
+	int pixelFormat = ChoosePixelFormat(m_hDC, &pfd);
+	SetPixelFormat(m_hDC, pixelFormat, &pfd);
+	HGLRC hRC = wglCreateContext(m_hDC);
+	wglMakeCurrent(m_hDC, hRC);
 
-	ID3D11Device* pD3DDevice = 0;
-	ID3D11DeviceContext* pImmediateContext = 0;
+	ShowWindow(static_cast<HWND>(pWindowHandle), SW_SHOW);		// Show The Window
+	SetForegroundWindow(hWnd);									// Slightly Higher Priority
+	SetFocus(hWnd);												// Sets Keyboard Focus To The Window
 	
-	m_driverType = D3D_DRIVER_TYPE_HARDWARE;
-	hr = D3D11CreateDeviceAndSwapChain( NULL, m_driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-		D3D11_SDK_VERSION, &sd, &m_pSwapChain, &pD3DDevice, &m_featureLevel, &pImmediateContext );
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-	if( FAILED( hr ) )
-	{
-		printf("Failed to create DirectX 11 system.");
-		assert(0);
-	}
-
-	Device* pDevice = new Device(pD3DDevice);
+	GLDevice* pDevice = new GLDevice();
 	m_pDevice = static_cast<IDevice*>(pDevice);
 
-	DeviceContext* pDeviceContext = new DeviceContext(pImmediateContext);
+	GLDeviceContext* pDeviceContext = new GLDeviceContext(hRC);
 	m_pImmediateDeviceContext = static_cast<IDeviceContext*>(pDeviceContext);
 
-	ID3D11DeviceContext* pDeferredContext;
-	hr = pD3DDevice->CreateDeferredContext(0, &pDeferredContext);
-	m_pDeferredDeviceContext = new DeviceContext(pDeferredContext);
-
 	// final render target
-	m_pFrameBufferRTV = pDevice->CreateRenderTargetView(m_pSwapChain);
+	//m_pFrameBufferRTV = pDevice->CreateRenderTargetView();
 
 	// view port
 	m_viewPort.width = uWidth;
@@ -228,6 +217,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	m_viewPort.minDepth = 0.0f;
 	m_viewPort.maxDepth = 1.f;
 
+#if 0
 	// HDR render target texture
 	Texture2dDesc texture2dDesc;
 	texture2dDesc.width = uWidth;
@@ -235,7 +225,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	texture2dDesc.format = FORMAT_R16G16B16A16_FLOAT;
 	texture2dDesc.usage = USAGE_DEFAULT;
 	texture2dDesc.bindFlags = BIND_SHADER_RESOURCE | BIND_RENDER_TARGET;
-	
+
 	SubResourceData subResourceData;
 	subResourceData.pMem = 0;
 	m_pTexture2dHDR = pDevice->CreateTexture2d(texture2dDesc, subResourceData);
@@ -312,39 +302,26 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	rDesc.multisampleEnable = true;
 	m_pRasterizerState = pDevice->CreateRasterizerState(rDesc);
 
-	// initialize perf\debug event wrapper
-	//ID3DUserDefinedAnnotation* pPerf;
-	//HRESULT hr = pImmediateContext->QueryInterface( __uuidof(pPerf), reinterpret_cast<void**>(&pPerf) );
+#endif
 
 	return true;
 }
 
 //------------------------------------------------------------------
-void RenderSystem::GetSHFromCubemap(float faSHRed[9], float faSHGreen[9], float faSHBlue[9]) const
-{
-	for(int i = 0; i < 9; ++i)
-	{
-		faSHRed[i] = m_faSHRed[i];
-		faSHGreen[i] = m_faSHGreen[i];
-		faSHBlue[i] = m_faSHBlue[i];
-	}
-}
-
-//------------------------------------------------------------------
-void RenderSystem::Present()
+void GLRenderSystem::Present()
 {
 #ifdef USE_COMMAND_BUFFER
 	HALgfx::ICommandBuffer* pCommandBuffer = m_pDeferredDeviceContext->FinishCommandBuffer();
 	m_pImmediateDeviceContext->ExecuteCommandBuffer(pCommandBuffer, false);
 #endif
 
-	m_pSwapChain->Present(0, 0);
+	SwapBuffers(m_hDC);
 }
 
 //------------------------------------------------------------------
-void RenderSystem::TerminateSystem()
+void GLRenderSystem::TerminateSystem()
 {
-	
+
 }
 
 } // namespace HALgfx

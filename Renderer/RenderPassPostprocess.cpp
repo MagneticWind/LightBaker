@@ -407,11 +407,10 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		char shaderName[256];
 		strcpy(shaderName, "ssao");
-		m_pSSAOShaderNode = new ShaderNode(shaderName);
+		m_pSSAOShaderNode = new ShaderNode(shaderName, pDevice);
 
 		m_pSSAOShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
 		m_pSSAOShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
-		m_pSSAOShaderNode->Create(pDevice);
 
 		// create const buffers
 		HALgfx::BufferDesc desc;
@@ -427,6 +426,8 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		// input layout
 		m_pSSAOShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
+
+		m_pSSAOShaderNode->Create(2, aInputElementsDesc, pDevice);
 
 		GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);
@@ -461,14 +462,14 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 	{
 		char shaderName[256];
 		strcpy(shaderName, "reduceto1d");
-		m_pReduceTo1DComputeShader = new ShaderNode(shaderName);
+		m_pReduceTo1DComputeShader = new ShaderNode(shaderName, pDevice);
 		m_pReduceTo1DComputeShader->LoadShader(HALgfx::COMPUTE_SHADER);
-		m_pReduceTo1DComputeShader->Create(pDevice);
+		m_pReduceTo1DComputeShader->Create(2, aInputElementsDesc, pDevice);
 
 		strcpy(shaderName, "reduceto1pixel");
-		m_pReduceTo1PixelComputeShader = new ShaderNode(shaderName);
+		m_pReduceTo1PixelComputeShader = new ShaderNode(shaderName, pDevice);
 		m_pReduceTo1PixelComputeShader->LoadShader(HALgfx::COMPUTE_SHADER);
-		m_pReduceTo1PixelComputeShader->Create(pDevice);
+		m_pReduceTo1PixelComputeShader->Create(2, aInputElementsDesc, pDevice);
 
 		// create const buffers
 		HALgfx::BufferDesc desc;
@@ -517,11 +518,10 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 	{
 		char shaderName[256];
 		strcpy(shaderName, "tonemapping");
-		m_pTonemappingShaderNode = new ShaderNode(shaderName);
+		m_pTonemappingShaderNode = new ShaderNode(shaderName, pDevice);
 
 		m_pTonemappingShaderNode->LoadShader(HALgfx::VERTEX_SHADER);
 		m_pTonemappingShaderNode->LoadShader(HALgfx::PIXEL_SHADER);
-		m_pTonemappingShaderNode->Create(pDevice);
 
 		// create const buffers
 		HALgfx::BufferDesc desc;
@@ -537,6 +537,8 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		// input layout
 		m_pTonemappingShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
+
+		m_pTonemappingShaderNode->Create(2, aInputElementsDesc, pDevice);
 
 		GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);

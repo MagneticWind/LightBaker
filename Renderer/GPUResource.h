@@ -60,6 +60,7 @@ namespace Renderer
 			else if (iNumFloats == 4)
 				m_aInputElementsDesc[m_iNumElements].format = HALgfx::FORMAT_R32G32B32A32_FLOAT;
 
+			m_aInputElementsDesc[m_iNumElements].size = iNumFloats;
 			m_aInputElementsDesc[m_iNumElements].inputSlot = 0;
 			m_aInputElementsDesc[m_iNumElements].alignedByteOffset = m_iStride;
 			m_aInputElementsDesc[m_iNumElements].semanticIndex = 0;

@@ -94,10 +94,71 @@
     <ClInclude Include="CommandBuffer_plat.h">
       <Filter>d3d11</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSystem_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="Device_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceContext_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="BlendState_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandBuffer_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilView_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthStencilState_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTargetView_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="RasterizerState_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderResourceView_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="SamplerState_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2d_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderSystem.h" />
+    <ClInclude Include="Buffer_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="Inputlayout_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="Program_plat.h">
+      <Filter>d3d11</Filter>
+    </ClInclude>
+    <ClInclude Include="Program_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="d3d11">
       <UniqueIdentifier>{52c1f2c5-c969-4b88-a42f-fc04e01b9cd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="opengl">
+      <UniqueIdentifier>{2bea549c-bf83-4c8a-b5df-c0e577af0b84}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +227,36 @@
     </ClCompile>
     <ClCompile Include="CommandBuffer_plat.cpp">
       <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Device_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceContext_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Inputlayout_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Program_plat.cpp">
+      <Filter>d3d11</Filter>
+    </ClCompile>
+    <ClCompile Include="Program_gl.cpp">
+      <Filter>opengl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

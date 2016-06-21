@@ -1,8 +1,16 @@
+
 #include <assert.h>
+
+#include "Config.h"
 
 #include "GPUResourceManager.h"
 
+#ifdef USE_DIRECTX
 #include "HALgfx\RenderSystem_plat.h"
+#else
+#include "HALgfx\RenderSystem_gl.h"
+#endif
+
 #include "IRenderPass.h"
 
 #include "RenderManager.h"
@@ -26,6 +34,7 @@ namespace Magnet
 namespace Renderer
 {
 	RenderManager* RenderManager::ms_pInstance = 0;
+	HALgfx::IRenderSystem* RenderManager::ms_pRenderSystem = 0;
 
 	//------------------------------------------------------------------
 	RenderManager::RenderManager() : m_bPostProcessResourcesCreated(false)
@@ -34,12 +43,14 @@ namespace Renderer
 		{
 			m_pRenderPasses[i] = 0;
 		}
+
+		m_iPassCount = 0;
 	}
 
 	//------------------------------------------------------------------
 	RenderManager::~RenderManager()
 	{
-		for (int i = 0; i < PASS_NUMBER; ++i)
+		for (int i = 0; i < m_iPassCount; ++i)
 		{
 			delete m_pRenderPasses[i];
 			m_pRenderPasses[i] = 0;
@@ -56,9 +67,17 @@ namespace Renderer
 	//------------------------------------------------------------------
 	void RenderManager::Initialize(int iWidth, int iHeight, void* pWindowHandle)
 	{
-		// initializa HALRenderSystem
+		// initialize HALRenderSystem
+
+#ifdef USE_DIRECTX
 		HALgfx::RenderSystem::Initialize();
-		HALgfx::RenderSystem::GetInstance().InitializeSystem(iWidth, iHeight, pWindowHandle);
+		HALgfx::RenderSystem::GetInstance()->InitializeSystem(iWidth, iHeight, pWindowHandle);
+		ms_pRenderSystem = HALgfx::RenderSystem::GetInstance();
+#else
+		HALgfx::GLRenderSystem::Initialize();
+		HALgfx::GLRenderSystem::GetInstance()->InitializeSystem(iWidth, iHeight, pWindowHandle);
+		ms_pRenderSystem = HALgfx::GLRenderSystem::GetInstance();
+#endif
 
 		GPUResourceManager::Initialize();
 
@@ -75,11 +94,15 @@ namespace Renderer
 	//------------------------------------------------------------------
 	void RenderManager::SetupRenderPasses()
 	{
-		m_pRenderPasses[PASS_DEPTH] = new RenderPassDepth();
-		m_pRenderPasses[PASS_SKY] = new RenderPassSky();
-		m_pRenderPasses[PASS_SHADOW] = new RenderPassShadow();
-		m_pRenderPasses[PASS_OPAQUE] = new RenderPassOpaque();
-		m_pRenderPasses[PASS_POSTPROCESS] = new RenderPassPostprocess();
+#ifdef USE_DIRECTX
+		m_pRenderPasses[m_iPassCount++] = new RenderPassDepth();
+		m_pRenderPasses[m_iPassCount++] = new RenderPassSky();
+		m_pRenderPasses[m_iPassCount++] = new RenderPassShadow();
+		m_pRenderPasses[m_iPassCount++] = new RenderPassOpaque();
+		m_pRenderPasses[m_iPassCount++] = new RenderPassPostprocess();
+#else
+		m_pRenderPasses[m_iPassCount++] = new RenderPassOpaque();
+#endif
 	}
 
 	//------------------------------------------------------------------
@@ -95,79 +118,84 @@ namespace Renderer
 		ms_pInstance = 0;
 
 		GPUResourceManager::Terminate();
-		HALgfx::RenderSystem::Terminate();
+		ms_pRenderSystem->TerminateSystem();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IDevice* RenderManager::GetDevice()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetDevice();
+		return ms_pRenderSystem->GetDevice();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IDeviceContext* RenderManager::GetDeviceContext()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetDeviceContext();
+		return ms_pRenderSystem->GetDeviceContext();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IDeviceContext* RenderManager::GetDeferredDeviceContext()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetDeferredDeviceContext();
+		return ms_pRenderSystem->GetDeferredDeviceContext();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IRenderTargetView* RenderManager::GetFrameBufferRTV()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetFrameBufferRTV();
+		return ms_pRenderSystem->GetFrameBufferRTV();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IRenderTargetView* RenderManager::GetFrameBufferRTVHDR()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetFrameBufferRTVHDR();
+		return ms_pRenderSystem->GetFrameBufferRTVHDR();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IShaderResourceView* RenderManager::GetFrameBufferSRVHDR()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetFrameBufferSRVHDR();
+		return ms_pRenderSystem->GetFrameBufferSRVHDR();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IShaderResourceView* RenderManager::GetDepthSRV()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetDepthSRV();
+		return ms_pRenderSystem->GetDepthSRV();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IDepthStencilView* RenderManager::GetFrameBufferDSV()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetFrameBufferDSV();
+		return ms_pRenderSystem->GetFrameBufferDSV();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IRasterizerState* RenderManager::GetRasterizerState()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetRasterizerState();
+		return ms_pRenderSystem->GetRasterizerState();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::ViewPort RenderManager::GetViewPort()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetViewPort();
+		return ms_pRenderSystem->GetViewPort();
 	}
 
 	//------------------------------------------------------------------
 	HALgfx::IDepthStencilState* RenderManager::GetDepthStencilState()
 	{
-		return HALgfx::RenderSystem::GetInstance().GetDepthStencilState();
+		return ms_pRenderSystem->GetDepthStencilState();
 	}
 
 	//------------------------------------------------------------------
 	IRenderPass* RenderManager::GetPass(PassType eType)
 	{
-		return m_pRenderPasses[eType];
+		for (int i = 0; i > m_iPassCount; ++i)
+		{
+			if (m_pRenderPasses[i]->GetType() == eType)
+				return m_pRenderPasses[i];
+		}
+		return NULL;
 	}
 
 	//------------------------------------------------------------------
@@ -193,56 +221,71 @@ namespace Renderer
 		// create shader related resources, setup shader nodes, draw nodes
 		UpdateRenderPasses();
 
-		HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
-		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
+		HALgfx::IDevice* pDevice = ms_pRenderSystem->GetDevice();
 
 #ifdef USE_COMMAND_BUFFER
-		HALgfx::IDeviceContext* pDeviceContext = renderSystem.GetDeferredDeviceContext();
+		HALgfx::IDeviceContext* pDeviceContext = ms_pRenderSystem->GetDeferredDeviceContext();
 #else
-		HALgfx::IDeviceContext* pDeviceContext = renderSystem.GetDeviceContext();
+		HALgfx::IDeviceContext* pDeviceContext = ms_pRenderSystem->GetDeviceContext();
 #endif
 
-		HALgfx::ViewPort viewPort = renderSystem.GetViewPort();
-		HALgfx::IRenderTargetView* pRTV = renderSystem.GetFrameBufferRTV();
-		HALgfx::IRenderTargetView* pHDRRTV = renderSystem.GetFrameBufferRTVHDR();
-		HALgfx::IDepthStencilView* pDSV = renderSystem.GetFrameBufferDSV();
-		HALgfx::IDepthStencilState* pDSVStateEnabled = renderSystem.GetDepthStencilState();
-		HALgfx::IDepthStencilState* pDSVStateDisabled = renderSystem.GetDepthStencilStateDisabled();
-		HALgfx::IRasterizerState* pRState = renderSystem.GetRasterizerState();
+		HALgfx::ViewPort viewPort = ms_pRenderSystem->GetViewPort();
+		HALgfx::IRenderTargetView* pRTV = ms_pRenderSystem->GetFrameBufferRTV();
+		HALgfx::IRenderTargetView* pHDRRTV = ms_pRenderSystem->GetFrameBufferRTVHDR();
+		HALgfx::IDepthStencilView* pDSV = ms_pRenderSystem->GetFrameBufferDSV();
+		HALgfx::IDepthStencilState* pDSVStateEnabled = ms_pRenderSystem->GetDepthStencilState();
+		HALgfx::IDepthStencilState* pDSVStateDisabled = ms_pRenderSystem->GetDepthStencilStateDisabled();
+		HALgfx::IRasterizerState* pRState = ms_pRenderSystem->GetRasterizerState();
 
-		IRenderPass* pDepthPass = m_pRenderPasses[PASS_DEPTH];
-		pDepthPass->SetRenderState(pDeviceContext, viewPort, NULL, pDSV, pRState, pDSVStateEnabled);
-		pDepthPass->Render(pDevice, pDeviceContext);
-		pDepthPass->ClearDrawNodes();
+		// draw render passes
+		for (int i = 0; i < m_iPassCount; ++i)
+		{
+			const PassType type = m_pRenderPasses[i]->GetType();
 
-		IRenderPass* pSkyboxPass = m_pRenderPasses[PASS_SKY];
-		pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateDisabled);
-		pSkyboxPass->Render(pDevice, pDeviceContext);
-		pSkyboxPass->ClearDrawNodes();
+			if (type == PASS_DEPTH)
+			{
+				IRenderPass* pDepthPass = m_pRenderPasses[i];
+				pDepthPass->SetRenderState(pDeviceContext, viewPort, NULL, pDSV, pRState, pDSVStateEnabled);
+				pDepthPass->Render(pDevice, pDeviceContext);
+				pDepthPass->ClearDrawNodes();
+			}
+			else if (type == PASS_SKY)
+			{
+				IRenderPass* pSkyboxPass = m_pRenderPasses[i];
+				pSkyboxPass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateDisabled);
+				pSkyboxPass->Render(pDevice, pDeviceContext);
+				pSkyboxPass->ClearDrawNodes();
+			}
+			else if (type == PASS_SHADOW)
+			{
+				IRenderPass* pShadowPass = m_pRenderPasses[i];
+				pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateEnabled);
+				pShadowPass->Setup(pDevice, m_iWidth, m_iHeight);
+				pShadowPass->Render(pDevice, pDeviceContext);
+				pShadowPass->ClearDrawNodes();
+			}
+			else if (type == PASS_OPAQUE)
+			{
+				IRenderPass* pOpaquePass = m_pRenderPasses[i];
+				pOpaquePass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
+				pOpaquePass->Render(pDevice, pDeviceContext);
+				pOpaquePass->ClearDrawNodes();
+			}
+			else if (type == PASS_POSTPROCESS)
+			{
+				IRenderPass* pPostprocessPass = m_pRenderPasses[i];
+				pPostprocessPass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateDisabled);
+				pPostprocessPass->Setup(pDevice, m_iWidth, m_iHeight);
+				pPostprocessPass->Render(pDevice, pDeviceContext);
+			}
+		}
 
-		IRenderPass* pShadowPass = m_pRenderPasses[PASS_SHADOW];
-		pShadowPass->SetRenderState(pDeviceContext, viewPort, 0, 0, pRState, pDSVStateEnabled);
-		pShadowPass->Setup(pDevice, m_iWidth, m_iHeight);
-		pShadowPass->Render(pDevice, pDeviceContext);
-		pShadowPass->ClearDrawNodes();
-
-		IRenderPass* pOpaquePass = m_pRenderPasses[PASS_OPAQUE];
-		pOpaquePass->SetRenderState(pDeviceContext, viewPort, pHDRRTV, pDSV, pRState, pDSVStateEnabled);
-		pOpaquePass->Render(pDevice, pDeviceContext);
-		pOpaquePass->ClearDrawNodes();
-
-		IRenderPass* pPostprocessPass = m_pRenderPasses[PASS_POSTPROCESS];
-		pPostprocessPass->SetRenderState(pDeviceContext, viewPort, pRTV, pDSV, pRState, pDSVStateDisabled);
-		pPostprocessPass->Setup(pDevice, m_iWidth, m_iHeight);
-		pPostprocessPass->Render(pDevice, pDeviceContext);
-
-		renderSystem.Present();
+		ms_pRenderSystem->Present();
 	}
 
 	void RenderManager::UpdateRenderResources()
 	{
-		HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
-		HALgfx::IDevice* pDevice = renderSystem.GetDevice();
+		HALgfx::IDevice* pDevice = ms_pRenderSystem->GetDevice();
 
 		Scene::Scene* pScene = Scene::SceneManager::GetInstance().GetScene();
 		std::list<Scene::IRenderObject*>&renderObjectList = pScene->GetRenderObjectList();
@@ -297,40 +340,41 @@ namespace Renderer
 //------------------------------------------------------------------
 void RenderManager::UpdateRenderPasses()
 {
-	HALgfx::RenderSystem& renderSystem = HALgfx::RenderSystem::GetInstance();
-	HALgfx::IDevice* pDevice = renderSystem.GetDevice();
-	for (int i = 0; i < PASS_NUMBER; ++i)
+	HALgfx::IDevice* pDevice = ms_pRenderSystem->GetDevice();
+	for (int i = 0; i < m_iPassCount; ++i)
 	{
-		if (i == PASS_DEPTH)
+		const PassType type = m_pRenderPasses[i]->GetType();
+
+		if (type == PASS_DEPTH)
 		{
 			RenderPassDepth* pPass = static_cast<RenderPassDepth*>(m_pRenderPasses[i]);
 			pPass->Setup(pDevice, m_iWidth, m_iHeight);
 		}
-		else if (i == PASS_SKY)
+		else if (type == PASS_SKY)
 		{
 			RenderPassSky* pPass = static_cast<RenderPassSky*>(m_pRenderPasses[i]);
 			pPass->Setup(pDevice, m_iWidth, m_iHeight);
 		}
-		else if (i == PASS_SHADOW)
+		else if (type == PASS_SHADOW)
 		{
 			RenderPassShadow* pPass = static_cast<RenderPassShadow*>(m_pRenderPasses[i]);
 			pPass->Setup(pDevice, m_iWidth, m_iHeight);
 		}
-		else if (i == PASS_OPAQUE)
+		else if (type == PASS_OPAQUE)
 		{
 			CopyShadowParameters();
 
 			RenderPassOpaque* pPass = static_cast<RenderPassOpaque*>(m_pRenderPasses[i]);
 			pPass->SetLightIntensityLevel(m_fLightIntensityLevel);
-			m_pRenderPasses[i]->Setup(pDevice, m_iWidth, m_iHeight);
+			pPass->Setup(pDevice, m_iWidth, m_iHeight);
 		}
-		else if (i == PASS_POSTPROCESS)
+		else if (type == PASS_POSTPROCESS)
 		{
 			RenderPassPostprocess* pPass = static_cast<RenderPassPostprocess*>(m_pRenderPasses[i]);
 			pPass->SetParams(m_iWidth, m_iHeight, m_fIntensityLevel);
 			pPass->SetHDRSRV(GetFrameBufferSRVHDR());
 			pPass->SetDepthSRV(GetDepthSRV());
-			m_pRenderPasses[i]->Setup(pDevice, m_iWidth, m_iHeight);
+			pPass->Setup(pDevice, m_iWidth, m_iHeight);
 		}
 	}
 }
