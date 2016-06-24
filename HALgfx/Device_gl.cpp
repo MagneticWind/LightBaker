@@ -4,13 +4,13 @@
 //#include "BlendState_plat.h"
 //#include "DepthStencilState_plat.h"
 //#include "RasterizerState_plat.h"
-//#include "SamplerState_plat.h"
+#include "SamplerState_gl.h"
 //#include "DepthStencilView_plat.h"
 //#include "RenderTargetView_plat.h"
-//#include "ShaderResourceView_plat.h"
+#include "ShaderResourceView_gl.h"
 //#include "UnorderedAccessView_plat.h"
-//#include "Buffer_plat.h"
-//#include "Texture2d_plat.h"
+#include "Buffer_gl.h"
+#include "Texture2d_gl.h"
 //#include "FeatureLevel.h"
 #include "InputLayout_gl.h"
 #include "PixelShader_gl.h"
@@ -56,13 +56,15 @@ IRasterizerState* GLDevice::CreateRasterizerState(const RasterizerDesc& desc)
 //------------------------------------------------------------------
 ISamplerState* GLDevice::CreateSamplerState(const SamplerStateDesc& desc)
 {
-	return 0;
+	GLSamplerState* pSamplerState = new GLSamplerState(desc);
+	return pSamplerState;
 }
 
 //------------------------------------------------------------------
 IInputLayout* GLDevice::CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode)
 {
-	return 0;
+	GLInputLayout* pInputLayout = new GLInputLayout(iNumElements, pInputElementDescs);
+	return pInputLayout;
 }
 
 //------------------------------------------------------------------
@@ -78,7 +80,9 @@ IShader* GLDevice::CreateShader(ShaderType eType, int iShaderCodeSize, const voi
 	}
 	case PIXEL_SHADER:
 	{
-		return 0;
+		GLPixelShader* pPShader = new GLPixelShader();
+		pPShader->Create(pShaderCode, iShaderCodeSize);
+		return pPShader;
 	}
 	case COMPUTE_SHADER:
 	{
@@ -91,13 +95,17 @@ IShader* GLDevice::CreateShader(ShaderType eType, int iShaderCodeSize, const voi
 //------------------------------------------------------------------
 ITexture2d* GLDevice::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData& subResourceData)
 {
-	return 0;
+	GLTexture2d* pTexture = new GLTexture2d();
+	pTexture->Create(desc, subResourceData);
+	return pTexture;
 }
 
 //------------------------------------------------------------------
 IBuffer* GLDevice::CreateBuffer(const BufferDesc& desc, const SubResourceData& subResourceData)
 {
-	return 0;
+	GLBuffer* pBuffer = new GLBuffer(desc);
+	pBuffer->Create(desc, subResourceData);
+	return pBuffer;
 }
 
 //------------------------------------------------------------------
@@ -122,7 +130,9 @@ IDepthStencilView* GLDevice::CreateDepthStencilView(IResource* pResource, const 
 //------------------------------------------------------------------
 IShaderResourceView* GLDevice::CreateShaderResourceView(IResource* pResource, const ShaderResourceViewDesc& desc)
 {
-	return 0;
+	GLShaderResourceView* pSRV = new GLShaderResourceView();
+	pSRV->Create(desc, pResource);
+	return pSRV;
 }
 
 //------------------------------------------------------------------

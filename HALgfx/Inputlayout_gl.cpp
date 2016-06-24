@@ -4,10 +4,9 @@ namespace Magnet
 {
 namespace HALgfx
 {
-	GLInputLayout::GLInputLayout(int iNumElements, int iStride, const InputElementDesc *pInputElementDescs)
+	GLInputLayout::GLInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs)
 	{
 		m_iNumElements = iNumElements;
-		m_iStride = iStride;
 
 		for (int i = 0; i < m_iNumElements; ++i)
 		{
@@ -23,11 +22,6 @@ namespace HALgfx
 	int GLInputLayout::GetElementCount() const
 	{
 		return m_iNumElements;
-	}
-
-	int GLInputLayout::GetStride() const
-	{
-		return m_iStride;
 	}
 
 	GLInputLayout::~GLInputLayout()

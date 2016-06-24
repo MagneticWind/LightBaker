@@ -201,10 +201,36 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 		desc.format = texDesc.format;
 		textureResource.m_pShaderResourceView = pDevice->CreateShaderResourceView(textureResource.m_pTexture2D, desc);
 
+		// set label name
+		switch (pTexture->GetLabel())
+		{
+		case Scene::TEXTURE_LABEL_COLOR_0:
+			strcpy(textureResource.m_caLabel, "txColor0");
+			break;
+		case Scene::TEXTURE_LABEL_COLOR_1:
+			strcpy(textureResource.m_caLabel, "txColor1");
+			break;
+		case Scene::TEXTURE_LABEL_NORMAL:
+			strcpy(textureResource.m_caLabel, "txNormal");
+			break;
+		case Scene::TEXTURE_LABEL_SPECULAR:
+			strcpy(textureResource.m_caLabel, "txSpecular");
+			break;
+		case Scene::TEXTURE_LABEL_EMISSIVE:
+			strcpy(textureResource.m_caLabel, "txEmissive");
+			break;
+		case Scene::TEXTURE_LABEL_SHADOW:
+			strcpy(textureResource.m_caLabel, "txShadow");
+			break;
+		default:
+			assert(0);
+		}
+
+		CreateSamplerState(pTexture->GetSamplerMode(), pDevice);
+		textureResource.m_pSampler = GetSamplerState(pTexture->GetSamplerMode());
+
 		m_TextureMap[name] = textureResource;
 	}
-
-	CreateSamplerState(pTexture->GetSamplerMode(), pDevice);
 }
 
 //------------------------------------------------------------------
@@ -240,7 +266,7 @@ void GPUResourceManager::CreateSamplerState(const Scene::SamplerMode mode, HALgf
 	{
 		switch (mode)
 		{
-		case Scene::NOMIP_LINEAR_WRAP:
+		case Scene::SAMPLER_NOMIP_LINEAR_WRAP:
 		{
 			// linear sampler state
 			HALgfx::SamplerStateDesc desc;

@@ -48,6 +48,7 @@ private:
 	void ParseTransformation(tinyxml2::XMLElement* pElement, IRenderObject* pObject);
 	void ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface);
 	void ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pMaterial);
+	void ParseTexture(tinyxml2::XMLElement* pElement, Texture* pTexture);
 
 private:
 	char m_caSceneName[256];

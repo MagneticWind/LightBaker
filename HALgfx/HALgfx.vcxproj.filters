@@ -152,6 +152,12 @@
     <ClInclude Include="Program_gl.h">
       <Filter>opengl</Filter>
     </ClInclude>
+    <ClInclude Include="Format_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="ComparisonFunc_gl.h">
+      <Filter>opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="d3d11">
@@ -256,6 +262,21 @@
       <Filter>d3d11</Filter>
     </ClCompile>
     <ClCompile Include="Program_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2d_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="Format_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerState_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="ComparisonFunc_gl.cpp">
+      <Filter>opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderResourceView_gl.cpp">
       <Filter>opengl</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,6 +15,7 @@
 #include "Scene\Surface.h"
 #include "Scene\Material.h"
 #include "Scene\Light.h"
+#include "Scene\Texture.h"
 
 #include "Math\Frustum.h"
 #include "RenderPassOpaque.h"
@@ -143,7 +144,6 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							if (pMaterial->GetTech() & Scene::SHADOW_RECEIVER)
 							{
 								// cascade shadowmap
-
 								ShaderNode* pShaderNode = NULL;
 								ShaderNodeExists(shaderName, m_lShaderNodes, &pShaderNode);
 
@@ -182,6 +182,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
 									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
+									// texture names in shader (needed for OpenGL)
+									pShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_SHADOW);
+									
 									pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
 									m_lShaderNodes.push_back(pShaderNode);
@@ -211,7 +214,6 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									pTransform->mView = mView;
 									pTransform->mProjection = mProjection;
 
-
 									const Scene::Material* pMaterialNormal = static_cast<const Scene::Material*>(pMaterial);
 									CBufferMaterialNormal* pMaterialBuffer = static_cast<CBufferMaterialNormal*>(drawNode.CreateCBufferData(sizeof(CBufferMaterialNormal), HALgfx::PIXEL_SHADER));
 									pMaterialNormal->GetAmbient(pMaterialBuffer->v4Ka);
@@ -232,7 +234,7 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 										pShadowBuffer->mProjection[i] = m_mProjection[i];
 									pShadowBuffer->v4DepthRange = m_v4Range;
 									
-									// textures
+									// textures, samplers
 									int iNumTextures = pSurface->GetNumTextures();
 									for (int i = 0; i < iNumTextures; ++i)
 									{
@@ -240,17 +242,12 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 										std::string texName(pTexture->GetName());
 										TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 										drawNode.AddSRV(texResource.m_pShaderResourceView);
+										drawNode.AddSampler(texResource.m_pSampler);
 									}
 
 									// shadowmap
 									drawNode.AddSRV(m_pShadowSRV);
-
-									// assume all textures use the first texture sampler now
-									if (iNumTextures > 0)
-									{
-										HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(pSurface->GetTexture(0)->GetSamplerMode());
-										pShaderNode->SetSamplerStates(&pSampler, 1);
-									}
+									drawNode.AddSampler(gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP));
 
 									pShaderNode->AddDrawNode(drawNode);
 								}
@@ -347,16 +344,11 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 										std::string texName(pTexture->GetName());
 										TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 										drawNode.AddSRV(texResource.m_pShaderResourceView);
-									}
-
-									// assume all textures use the first texture sampler now
-									if (iNumTextures > 0)
-									{
-										HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(pSurface->GetTexture(0)->GetSamplerMode());
-										pShaderNode->SetSamplerStates(&pSampler, 1);
+										drawNode.AddSampler(texResource.m_pSampler);
 									}
 
 									pShaderNode->AddDrawNode(drawNode);
+
 								}
 							}
 

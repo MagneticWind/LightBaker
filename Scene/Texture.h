@@ -14,18 +14,34 @@ enum TextureFormat
 
 enum SamplerMode
 {
-	NOMIP_LINEAR_WRAP,
-	NOMIP_LINEAR_UNWRAP,
-	NOMIP_ANISO2X_WRAP,
-	NOMIP_ANISO2X_UNWRAP,
-	MIP_LINEAR_WRAP,
-	MIP_LINEAR_UNWRAP
+	SAMPLER_NOMIP_LINEAR_WRAP,
+	SAMPLER_NOMIP_LINEAR_UNWRAP,
+	SAMPLER_NOMIP_ANISO2X_WRAP,
+	SAMPLER_NOMIP_ANISO2X_UNWRAP,
+	SAMPLER_MIP_LINEAR_WRAP,
+	SAMPLER_MIP_LINEAR_UNWRAP,
+
+};
+
+// the label will be used in shader
+enum TextureLabel
+{
+	TEXTURE_LABEL_COLOR_0,
+	TEXTURE_LABEL_COLOR_1,
+	TEXTURE_LABEL_NORMAL,
+	TEXTURE_LABEL_SPECULAR,
+	TEXTURE_LABEL_EMISSIVE,
+	TEXTURE_LABEL_SHADOW,
+	TEXTURE_LABEL_DEPTH,
+	TEXTURE_LABEL_FRAME,
+	MAX_TEXTURE_LABEL_COUNT
 };
 
 class Texture
 {
 public:
 	Texture(const char* pName);
+	Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat);
 	Texture(const char* pName, int iWidth, int iHeight, TextureFormat eFormat);
 	~Texture();
 
@@ -34,6 +50,8 @@ public:
 
 	TextureFormat GetFormat() const;
 	SamplerMode GetSamplerMode() const;
+	TextureLabel GetLabel() const;
+
 	int GetWidth() const;
 	int GetHeight() const;
 
@@ -47,10 +65,12 @@ public:
 
 private:
 	char m_name[256];
+	char m_labelName[256];	// name in shader
 	int m_iWidth;
 	int m_iHeight;
 	TextureFormat m_eFormat;
 	SamplerMode m_eSamplerMode;
+	TextureLabel m_eLabel;
 	void* m_pData;
 	bool m_bLoaded;
 };
@@ -74,6 +94,11 @@ inline TextureFormat Texture::GetFormat() const
 inline SamplerMode Texture::GetSamplerMode() const
 {
 	return m_eSamplerMode;
+}
+
+inline TextureLabel Texture::GetLabel() const
+{
+	return m_eLabel;
 }
 
 inline int Texture::GetWidth() const

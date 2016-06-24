@@ -28,6 +28,11 @@ DrawNode::~DrawNode()
 		m_ppSRVs[i] = 0;
 	}
 
+	for (int i = 0; i < MAX_NUMBER_SAMPLERS; ++i)
+	{
+		m_ppSamplers[i] = 0;
+	}
+
 	for (int i = 0; i < MAX_NUMBER_BUFFERS; ++i)
 	{
 		m_pVSCBufferData[i] = 0;
@@ -41,6 +46,11 @@ DrawNode::~DrawNode()
 void DrawNode::AddSRV(HALgfx::IShaderResourceView* pSRV)
 {
 	m_ppSRVs[m_iNumberOfSRVs++] = pSRV;
+}
+
+void DrawNode::AddSampler(HALgfx::ISamplerState* pSampler)
+{
+	m_ppSamplers[m_iNumberOfSamplers++] = pSampler;
 }
 
 void DrawNode::RemoveSRV(HALgfx::IShaderResourceView* pSRV)

@@ -190,10 +190,9 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 							drawNode.AddSRV(texResource.m_pShaderResourceView);
 
-							// assume all textures use the first texture sampler now
-							gpuResourceManager.CreateSamplerState(Scene::NOMIP_LINEAR_WRAP, pDevice);
-							HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);
-							pShaderNode->SetSamplerStates(&pSampler, 1);
+							gpuResourceManager.CreateSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice);
+							HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+							drawNode.AddSampler(pSampler);
 
 							pShaderNode->AddDrawNode(drawNode);
 						}

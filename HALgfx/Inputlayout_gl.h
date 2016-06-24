@@ -11,11 +11,10 @@ namespace HALgfx
 class GLInputLayout : public IInputLayout
 {
 public:
-	GLInputLayout(int iNumElements, int iStride, const InputElementDesc *pInputElementDescs);
+	GLInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs);
 	~GLInputLayout();
 
 	int GetElementCount() const;
-	int GetStride() const;
 	const InputElementDesc& GetElementDesc(int iIndex) const;
 
 private:

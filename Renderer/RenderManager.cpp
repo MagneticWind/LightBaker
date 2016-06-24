@@ -362,7 +362,9 @@ void RenderManager::UpdateRenderPasses()
 		}
 		else if (type == PASS_OPAQUE)
 		{
+#ifdef USE_DIRECTX
 			CopyShadowParameters();
+#endif
 
 			RenderPassOpaque* pPass = static_cast<RenderPassOpaque*>(m_pRenderPasses[i]);
 			pPass->SetLightIntensityLevel(m_fLightIntensityLevel);

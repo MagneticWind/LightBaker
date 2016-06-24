@@ -17,6 +17,8 @@
 #include "RenderManager.h"
 
 #include "Scene\Material.h"
+#include "Scene\Texture.h"
+
 #include "ShaderNode.h"
 
 namespace Magnet
@@ -24,12 +26,14 @@ namespace Magnet
 namespace Renderer
 {
 //------------------------------------------------------------------
-ShaderNode::ShaderNode(const char* pName, HALgfx::IDevice* pDevice) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_iNumberOfCSConstBuffers(0)
+	ShaderNode::ShaderNode(const char* pName, HALgfx::IDevice* pDevice) : m_iNumberOfVSConstBuffers(0), m_iNumberOfPSConstBuffers(0), m_iNumberOfCSConstBuffers(0)
 {
 	m_pShaderProgram = pDevice->CreateProgram(pName);
 
 	m_pInputLayout = 0;
 	m_iNumElements = 0;
+
+	m_iNumTextureLabels = 0;
 
 	for (int i = 0; i < MAX_NUMBER_BUFFERS; ++i)
 	{
@@ -39,12 +43,6 @@ ShaderNode::ShaderNode(const char* pName, HALgfx::IDevice* pDevice) : m_iNumberO
 		m_aVSConstBufferSizes[i] = 0;
 		m_aPSConstBufferSizes[i] = 0;
 		m_aCSConstBufferSizes[i] = 0;
-	}
-
-	m_iNumSamplerState = 0;
-	for (int i = 0; i < MAX_NUMBER_SAMPLERS; ++i)
-	{
-		m_ppSamplers[i] = 0;
 	}
 }
 
@@ -84,11 +82,6 @@ ShaderNode::~ShaderNode()
 		}
 	}
 
-	for (int i = 0; i < MAX_NUMBER_SAMPLERS; ++i)
-	{
-		m_ppSamplers[i] = 0;
-	}
-
 }
 
 //------------------------------------------------------------------
@@ -117,7 +110,7 @@ void ShaderNode::BindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, Dr
 	}
 	pDeviceContext->SetConstantBuffers(0, m_iNumberOfVSConstBuffers, HALgfx::VERTEX_SHADER, m_ppVSConstBuffers);
 
-	// update pixel shader const buffers
+	// update pixel shader const buffers, const buffers have unique indicies in the vertex\pixel shader
 	for (int i = 0; i < m_iNumberOfPSConstBuffers; ++i)
 	{
 		assert(drawNode.m_pPSCBufferData[i] != 0);
@@ -130,6 +123,9 @@ void ShaderNode::BindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, Dr
 
 	// textures
 	pDeviceContext->SetShaderResourceViews(HALgfx::PIXEL_SHADER, 0, drawNode.m_iNumberOfSRVs, drawNode.m_ppSRVs);
+
+	// samplers
+	pDeviceContext->SetSamplerStates(HALgfx::PIXEL_SHADER, 0, drawNode.m_iNumberOfSamplers, drawNode.m_ppSamplers);
 
 }
 
@@ -154,9 +150,7 @@ void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 
 	pDeviceContext->SetInputlayout(m_pInputLayout);
 
-	pDeviceContext->SetSamplerStates(HALgfx::PIXEL_SHADER, 0, m_iNumSamplerState, m_ppSamplers);
-
-	m_pShaderProgram->SetShaders(pDeviceContext);
+	m_pShaderProgram->SetShaders(m_iNumTextureLabels, m_textureLabels, pDeviceContext);
 
 	std::list<DrawNode>::iterator it = m_lDrawNodes.begin();
 	std::list<DrawNode>::iterator itEnd = m_lDrawNodes.end();
@@ -221,16 +215,6 @@ DrawNode& ShaderNode::GetDrawNode(const char* name)
 		{
 			return *it;
 		}
-	}
-}
-
-//------------------------------------------------------------------
-void ShaderNode::SetSamplerStates(HALgfx::ISamplerState* pSamplerStates[], int iNumSamplerStates)
-{
-	m_iNumSamplerState = iNumSamplerStates;
-	for (int i = 0; i < iNumSamplerStates; ++i)
-	{
-		m_ppSamplers[i] = pSamplerStates[i];
 	}
 }
 
@@ -301,6 +285,12 @@ void ShaderNode::Create(int iNumElements, HALgfx::InputElementDesc inputElements
 void ShaderNode::LoadShader(HALgfx::ShaderType eType)
 {
 	m_pShaderProgram->LoadShader(eType);
+}
+
+//------------------------------------------------------------------
+void ShaderNode::AddTextureLabel(int iLabel)
+{
+	m_textureLabels[m_iNumTextureLabels++] = iLabel;
 }
 
 //------------------------------------------------------------------

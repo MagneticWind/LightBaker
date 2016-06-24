@@ -56,9 +56,13 @@ public:
 	virtual ICommandBuffer* FinishCommandBuffer();
 	virtual void ExecuteCommandBuffer(ICommandBuffer* pCommandBuffer, bool bRestoreContextState);
 
+	void SetCurrentProgram(GLuint program);
+
 private:
 	HGLRC m_hRC;
 	GLenum m_ePrimitiveMode;
+
+	GLuint m_currentProgram;
 
 };
 

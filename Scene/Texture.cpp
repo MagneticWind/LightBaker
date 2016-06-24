@@ -11,7 +11,20 @@ Texture::Texture(const char* pName)
 {
 	strcpy(m_name, pName);
 
-	m_eSamplerMode = NOMIP_LINEAR_WRAP;
+	m_eSamplerMode = SAMPLER_NOMIP_LINEAR_WRAP;
+
+	m_bLoaded = false;
+	m_pData = NULL;
+}
+
+//------------------------------------------------------------------
+Texture::Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat)
+{
+	strcpy(m_name, pName);
+
+	m_eSamplerMode = eSampler;
+	m_eLabel = eLabel;
+	m_eFormat = eFormat;
 
 	m_bLoaded = false;
 	m_pData = NULL;
@@ -25,7 +38,7 @@ Texture::Texture(const char* pName, int iWidth, int iHeight, TextureFormat eForm
 	m_iHeight = iHeight;
 	m_eFormat = eFormat;
 
-	m_eSamplerMode = NOMIP_LINEAR_WRAP;
+	m_eSamplerMode = SAMPLER_NOMIP_LINEAR_WRAP;
 
 	m_bLoaded = false;
 	m_pData = NULL;

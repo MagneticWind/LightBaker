@@ -44,7 +44,6 @@ public:
 
 	void AddDrawNode(DrawNode& drawNode);
 	void AddConstantBuffer(const HALgfx::BufferDesc& desc, HALgfx::IDevice* pDevice, HALgfx::ShaderType eType);
-	void SetSamplerStates(HALgfx::ISamplerState* pSamplerStates [], int iNumSamplerStates);
 
 	const char* GetName() const;
 	void CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
@@ -53,7 +52,8 @@ public:
 	void LoadShader(HALgfx::ShaderType eType);
 	void Create(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
 	void* CreateBuffer(int iSize, HALgfx::ShaderType eType);
-	bool IsLoaded() const;
+
+	void AddTextureLabel(int iLabel);
 
 	// compute shader
 	void RunCompute(HALgfx::IDeviceContext* pDeviceContext, int iSRVCount, HALgfx::IShaderResourceView** ppSRVs, 
@@ -62,6 +62,8 @@ public:
 	DrawNode& GetDrawNode(const char* name);
 
 private:
+	ShaderNode();
+
 	// shader program
 	HALgfx::IProgram* m_pShaderProgram;
 
@@ -81,9 +83,9 @@ private:
 	int m_iNumberOfPSConstBuffers;
 	int m_iNumberOfCSConstBuffers;
 
-	// samplers
-	HALgfx::ISamplerState* m_ppSamplers[MAX_NUMBER_SAMPLERS];
-	int m_iNumSamplerState;
+	// texture labels
+	int m_iNumTextureLabels;
+	int m_textureLabels[MAX_NUMBER_SRVS];
 
 	// list of draw nodes
 	std::list<DrawNode> m_lDrawNodes;

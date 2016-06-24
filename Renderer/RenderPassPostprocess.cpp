@@ -427,11 +427,12 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		// input layout
 		m_pSSAOShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
 
+		// texture label
+		m_pSSAOShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_DEPTH);
+
 		m_pSSAOShaderNode->Create(2, aInputElementsDesc, pDevice);
 
 		GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
-		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);
-		m_pSSAOShaderNode->SetSamplerStates(&pSampler, 1);
 
 		// draw node
 		DrawNode drawNodeSSAO;
@@ -454,6 +455,8 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		// depth texture
 		drawNodeSSAO.AddSRV(m_pSRVDepth);
+		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+		drawNodeSSAO.AddSampler(pSampler);
 
 		m_pSSAOShaderNode->AddDrawNode(drawNodeSSAO);
 	}
@@ -538,11 +541,12 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		// input layout
 		m_pTonemappingShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
 
+		// texture label
+		m_pTonemappingShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_FRAME);
+
 		m_pTonemappingShaderNode->Create(2, aInputElementsDesc, pDevice);
 
 		GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
-		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::NOMIP_LINEAR_WRAP);
-		m_pTonemappingShaderNode->SetSamplerStates(&pSampler, 1);
 
 		// draw node
 		DrawNode drawNodeTonemapping;
@@ -569,6 +573,9 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		// framebuffer texture
 		drawNodeTonemapping.AddSRV(m_pSRVHDR);
+
+		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+		drawNodeTonemapping.AddSampler(pSampler);
 
 		m_pTonemappingShaderNode->AddDrawNode(drawNodeTonemapping);
 	}

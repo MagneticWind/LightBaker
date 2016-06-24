@@ -22,7 +22,7 @@ class IProgram
 public:
 	virtual void LoadShader(ShaderType eType) = 0;
 	virtual void CreateShaders(int iNumElements, HALgfx::InputElementDesc inputElements[], IDevice* pDevice) = 0;
-	virtual void SetShaders(IDeviceContext* pDeviceContext) = 0;
+	virtual void SetShaders(int iNumTextureLabels, int textureLabels[], IDeviceContext* pDeviceContext) = 0;
 	virtual void ClearShaders(IDeviceContext* pDeviceContext) = 0;
 
 	const char* GetName() const

@@ -34,6 +34,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Renderer", "Renderer\Render
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shader", "shader", "{A420EC2E-496A-4744-8677-87CB0848A22C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "glsl", "glsl", "{536924AA-B036-4413-B8A8-D317DFD7F8D3}"
+	ProjectSection(SolutionItems) = preProject
+		shader\gl\norm.frag = shader\gl\norm.frag
+		shader\gl\norm.vert = shader\gl\norm.vert
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hlsl", "hlsl", "{87699522-0DDC-49A6-87B6-1AB35C4C3E34}"
 	ProjectSection(SolutionItems) = preProject
 		shader\csm_pn.hlsl = shader\csm_pn.hlsl
 		shader\depth_pn.hlsl = shader\depth_pn.hlsl
@@ -106,5 +114,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{536924AA-B036-4413-B8A8-D317DFD7F8D3} = {A420EC2E-496A-4744-8677-87CB0848A22C}
+		{87699522-0DDC-49A6-87B6-1AB35C4C3E34} = {A420EC2E-496A-4744-8677-87CB0848A22C}
 	EndGlobalSection
 EndGlobal

@@ -25,6 +25,7 @@
     <ClInclude Include="CommandBuffer_gl.h" />
     <ClInclude Include="CommandBuffer_plat.h" />
     <ClInclude Include="ComparisonFunc.h" />
+    <ClInclude Include="ComparisonFunc_gl.h" />
     <ClInclude Include="ComparisonFunc_plat.h" />
     <ClInclude Include="ComputeShader_plat.h" />
     <ClInclude Include="DepthStencilState_gl.h" />
@@ -36,6 +37,7 @@
     <ClInclude Include="Device_gl.h" />
     <ClInclude Include="Device_plat.h" />
     <ClInclude Include="FeatureLevel.h" />
+    <ClInclude Include="Format_gl.h" />
     <ClInclude Include="IBlendState.h" />
     <ClInclude Include="IBuffer.h" />
     <ClInclude Include="Buffer_plat.h" />
@@ -91,6 +93,7 @@
     <ClCompile Include="Buffer_gl.cpp" />
     <ClCompile Include="Buffer_plat.cpp" />
     <ClCompile Include="CommandBuffer_plat.cpp" />
+    <ClCompile Include="ComparisonFunc_gl.cpp" />
     <ClCompile Include="ComparisonFunc_plat.cpp" />
     <ClCompile Include="ComputeShader_plat.cpp" />
     <ClCompile Include="DepthStencilState_plat.cpp" />
@@ -99,6 +102,7 @@
     <ClCompile Include="DeviceContext_plat.cpp" />
     <ClCompile Include="Device_gl.cpp" />
     <ClCompile Include="Device_plat.cpp" />
+    <ClCompile Include="Format_gl.cpp" />
     <ClCompile Include="Format_plat.cpp" />
     <ClCompile Include="Inputlayout_gl.cpp" />
     <ClCompile Include="InputLayout_plat.cpp" />
@@ -112,9 +116,12 @@
     <ClCompile Include="RenderTargetView_plat.cpp" />
     <ClCompile Include="Resource_gl.cpp" />
     <ClCompile Include="Resource_plat.cpp" />
+    <ClCompile Include="SamplerState_gl.cpp" />
     <ClCompile Include="SamplerState_plat.cpp" />
+    <ClCompile Include="ShaderResourceView_gl.cpp" />
     <ClCompile Include="ShaderResourceView_plat.cpp" />
     <ClCompile Include="Texture1d_plat.cpp" />
+    <ClCompile Include="Texture2d_gl.cpp" />
     <ClCompile Include="Texture2d_plat.cpp" />
     <ClCompile Include="UnorderedAccessView_plat.cpp" />
     <ClCompile Include="VertexShader_gl.cpp" />

@@ -1,5 +1,5 @@
-#ifndef GLBUFFER_H
-#define GLBUFFER_H
+#ifndef GL_BUFFER_H
+#define GL_BUFFER_H
 
 #include <glew.h>		// has to be included before gl.h
 #include <gl/gl.h>
@@ -20,12 +20,14 @@ public:
 	GLBuffer(const BufferDesc& desc) : mDesc(desc)
 	{
 	}
-	~GLBuffer();
+	~GLBuffer()
+	{}
+
 	virtual void GetDesc(BufferDesc& bufferDesc) const;
 	virtual ResourceType GetType() const;
 	//virtual unsigned int GetElementCount() const;
 	//virtual unsigned int GetElementStride() const;
-	void Create(BufferDesc& bufferDesc, SubResourceData* pSubResourceData);
+	void Create(const BufferDesc& bufferDesc, const SubResourceData& pSubResourceData);
 	GLuint GetGLHandle();
 
 private:

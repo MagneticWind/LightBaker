@@ -206,6 +206,13 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 	GLDeviceContext* pDeviceContext = new GLDeviceContext(hRC);
 	m_pImmediateDeviceContext = static_cast<IDeviceContext*>(pDeviceContext);
 
+	GLint glewInitResult = glewInit();
+	if (GLEW_OK != glewInitResult)
+	{
+		printf("ERROR: %s\n", glewGetErrorString(glewInitResult));
+		exit(EXIT_FAILURE);
+	}
+
 	// final render target
 	//m_pFrameBufferRTV = pDevice->CreateRenderTargetView();
 

@@ -153,7 +153,7 @@ void Program::CreateShaders(int iNumElements, HALgfx::InputElementDesc inputElem
 	}
 }
 
-void Program::SetShaders(IDeviceContext* pDeviceContext)
+void Program::SetShaders(int iNumTextureLabels, int textureLabels[], IDeviceContext* pDeviceContext)
 {
 	for (int i = 0; i < MAX_SHADER_NUM; ++i)
 	{

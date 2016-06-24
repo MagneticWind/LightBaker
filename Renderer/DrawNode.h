@@ -33,6 +33,7 @@ struct DrawNode
 	~DrawNode();
 
 	void AddSRV(HALgfx::IShaderResourceView* pSRV);
+	void AddSampler(HALgfx::ISamplerState* pSampler);
 	void RemoveSRV(HALgfx::IShaderResourceView* pSRV);
 
 	void* CreateCBufferData(int iSize, HALgfx::ShaderType eType);
@@ -48,6 +49,9 @@ struct DrawNode
 
 	// textures
 	HALgfx::IShaderResourceView* m_ppSRVs[MAX_NUMBER_SRVS];
+
+	// 
+	HALgfx::ISamplerState* m_ppSamplers[MAX_NUMBER_SAMPLERS];
 
 	char m_caName[256];
 

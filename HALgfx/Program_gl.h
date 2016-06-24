@@ -21,7 +21,7 @@ public:
 	~GLProgram();
 	virtual void LoadShader(ShaderType eType);
 	virtual void CreateShaders(int iNumElements, HALgfx::InputElementDesc inputElements[], IDevice* pDevice);
-	virtual void SetShaders(IDeviceContext* pDeviceContext);
+	virtual void SetShaders(int iNumTextureLabels, int textureLabels[], IDeviceContext* pDeviceContext);
 	virtual void ClearShaders(IDeviceContext* pDeviceContext);
 
 private:

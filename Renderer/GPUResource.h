@@ -12,6 +12,7 @@ namespace HALgfx
 class IBuffer;
 class ITexture2d;
 class IShaderResourceView;
+class ISamplerState;
 }
 
 namespace Renderer
@@ -85,11 +86,15 @@ namespace Renderer
 
 	struct TextureResource
 	{
-		TextureResource() : m_pTexture2D(NULL), m_pShaderResourceView(NULL)
-		{}
+		TextureResource() : m_pTexture2D(NULL), m_pShaderResourceView(NULL), m_pSampler(NULL)
+		{
+			m_caLabel[0] = '\0';
+		}
 
+		char m_caLabel[256];
 		HALgfx::ITexture2d* m_pTexture2D;
 		HALgfx::IShaderResourceView* m_pShaderResourceView;
+		HALgfx::ISamplerState* m_pSampler;
 	};
 
 } // namespace Magnet
