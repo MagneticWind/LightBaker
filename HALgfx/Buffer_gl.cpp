@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "Buffer_gl.h"
 
 namespace Magnet
@@ -14,21 +15,22 @@ void GLBuffer::Create(const BufferDesc& bufferDesc, const SubResourceData& pSubR
 {
 	glGenBuffers(1, &m_buffer);
 
-	if (pSubResourceData.pMem)
-	{
-		GLenum bufferType = GetGLBindFlags(bufferDesc.bindFlags);
+	GLenum target = GetGLBindFlags(bufferDesc.bindFlags);
 
-		glBindBuffer(bufferType, m_buffer);
-		glBufferData(bufferType, sizeof(bufferDesc.byteSize), pSubResourceData.pMem, GetGLUsage(bufferDesc.usage));
-		glBindBuffer(bufferType, 0);
-	}
-	else
+	glBindBuffer(target, m_buffer);
+	if (glGetError() != GL_NO_ERROR)
 	{
-		GLenum bufferType = GetGLBindFlags(bufferDesc.bindFlags);
-
-		glBindBuffer(bufferType, m_buffer);
-		glBindBuffer(bufferType, 0);
+		assert(0);
 	}
+
+	glBufferData(target, bufferDesc.byteSize, pSubResourceData.pMem, GetGLUsage(bufferDesc.usage));
+
+	if (glGetError() != GL_NO_ERROR)
+	{
+		assert(0);
+	}
+	
+	glBindBuffer(target, 0);
 
 }
 

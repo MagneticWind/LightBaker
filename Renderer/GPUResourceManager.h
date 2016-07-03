@@ -46,7 +46,7 @@ public:
 
 	MeshResource& GetMeshResource(const std::string name);
 	TextureResource& GetTextureResource(const std::string name);
-	HALgfx::ISamplerState* GetSamplerState(int samplerMode);
+	HALgfx::ISamplerState* GetSamplerState(int samplerMode, HALgfx::IDevice* pDevice);
 
 private:
 	std::map<std::string, MeshResource> m_MeshMap;

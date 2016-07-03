@@ -19,7 +19,7 @@ GLenum GetGLBindFlags(unsigned int bindFlags)
 {
 	if (bindFlags & BIND_VERTEX_BUFFER)
 	{
-		return GL_VERTEX_ARRAY;
+		return GL_ARRAY_BUFFER;
 	}
 	else if (bindFlags & BIND_INDEX_BUFFER)
 	{

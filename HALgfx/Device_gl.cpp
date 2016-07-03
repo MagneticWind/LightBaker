@@ -61,9 +61,9 @@ ISamplerState* GLDevice::CreateSamplerState(const SamplerStateDesc& desc)
 }
 
 //------------------------------------------------------------------
-IInputLayout* GLDevice::CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode)
+IInputLayout* GLDevice::CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode)
 {
-	GLInputLayout* pInputLayout = new GLInputLayout(iNumElements, pInputElementDescs);
+	GLInputLayout* pInputLayout = new GLInputLayout(iNumElements, pInputElementDescs, iStride);
 	return pInputLayout;
 }
 
@@ -144,6 +144,17 @@ IUnorderedAccessView* GLDevice::CreateUnorderedAccessView(IResource* pResource, 
 //------------------------------------------------------------------
 void GLDevice::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV)
 {
+
+}
+
+//------------------------------------------------------------------
+void GLDevice::SetupInputLayout(IInputLayout* pInputLayout, IBuffer* pVertexBuffer)
+{
+	GLInputLayout* pGLInputLayout = static_cast<GLInputLayout*>(pInputLayout);
+	
+	GLBuffer* pGLVertexBuffer = static_cast<GLBuffer*>(pVertexBuffer);
+
+	pGLInputLayout->CreateVAO(pGLVertexBuffer->GetGLHandle());
 
 }
 

@@ -94,7 +94,8 @@ void ShaderNode::BindDrawNodeResource(HALgfx::IDeviceContext* pDeviceContext, Dr
 	HALgfx::BufferDesc desc;
 	drawNode.m_pVertexBuffer->GetDesc(desc);
 	int iStride = desc.byteStride;
-	pDeviceContext->SetVertexBuffer(0, iStride, 0, drawNode.m_pVertexBuffer);
+
+ 	pDeviceContext->SetVertexBuffer(0, iStride, 0, drawNode.m_pVertexBuffer);
 	pDeviceContext->SetIndexBuffer(drawNode.m_pIndexBuffer, HALgfx::FORMAT_R32_UINT, 0);
 
 	HALgfx::SubResourceData data;
@@ -148,9 +149,9 @@ void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 {
 	pDeviceContext->BeginEvent(m_pShaderProgram->GetName());
 
-	pDeviceContext->SetInputlayout(m_pInputLayout);
-
 	m_pShaderProgram->SetShaders(m_iNumTextureLabels, m_textureLabels, pDeviceContext);
+
+	pDeviceContext->SetInputlayout(m_pInputLayout);
 
 	std::list<DrawNode>::iterator it = m_lDrawNodes.begin();
 	std::list<DrawNode>::iterator itEnd = m_lDrawNodes.end();
@@ -200,8 +201,15 @@ void ShaderNode::ClearDrawNodes()
 }
 
 //------------------------------------------------------------------
-void ShaderNode::AddDrawNode(DrawNode& drawNode)
+void ShaderNode::AddDrawNode(DrawNode& drawNode, HALgfx::IDevice* pDevice)
 {
+	static bool inputLayoutSetup = false;
+	// first draw node, set up VAO, for OpenGL only
+	if (!inputLayoutSetup)
+	{
+		pDevice->SetupInputLayout(m_pInputLayout, drawNode.m_pVertexBuffer);
+		inputLayoutSetup = true;
+	}
 	m_lDrawNodes.push_back(drawNode);
 }
 
@@ -219,7 +227,7 @@ DrawNode& ShaderNode::GetDrawNode(const char* name)
 }
 
 //------------------------------------------------------------------
-void ShaderNode::CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice)
+void ShaderNode::CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], int iStride, HALgfx::IDevice* pDevice)
 {
 	m_iNumElements = iNumElements;
 	for (int i = 0; i < iNumElements; ++i)
@@ -227,7 +235,7 @@ void ShaderNode::CreateInputLayout(int iNumElements, HALgfx::InputElementDesc in
 		m_inputElements[i] = inputElements[i];
 	}
 
-	m_pInputLayout = pDevice->CreateInputLayout(iNumElements, inputElements, m_pShaderProgram->GetFileSize(HALgfx::VERTEX_SHADER), m_pShaderProgram->GetFileData(HALgfx::VERTEX_SHADER));
+	m_pInputLayout = pDevice->CreateInputLayout(iNumElements, inputElements, iStride, m_pShaderProgram->GetFileSize(HALgfx::VERTEX_SHADER), m_pShaderProgram->GetFileData(HALgfx::VERTEX_SHADER));
 }
 
 //------------------------------------------------------------------

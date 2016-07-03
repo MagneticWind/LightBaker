@@ -125,7 +125,7 @@ void RenderWindow::Initialize(int iWidth, int iHeight, int iLeft, int iTop, cons
 
 	// Setup the window class
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = WindowProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;

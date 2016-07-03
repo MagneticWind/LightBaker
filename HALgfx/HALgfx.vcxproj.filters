@@ -158,6 +158,7 @@
     <ClInclude Include="ComparisonFunc_gl.h">
       <Filter>opengl</Filter>
     </ClInclude>
+    <ClInclude Include="IInputAssembler.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="d3d11">

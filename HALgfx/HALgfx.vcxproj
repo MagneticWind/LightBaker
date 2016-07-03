@@ -48,6 +48,7 @@
     <ClInclude Include="IDeviceContext.h" />
     <ClInclude Include="Format.h" />
     <ClInclude Include="Format_plat.h" />
+    <ClInclude Include="IInputAssembler.h" />
     <ClInclude Include="IInputLayout.h" />
     <ClInclude Include="Inputlayout_gl.h" />
     <ClInclude Include="InputLayout_plat.h" />

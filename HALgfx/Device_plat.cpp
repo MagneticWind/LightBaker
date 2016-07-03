@@ -67,7 +67,7 @@ ISamplerState* Device::CreateSamplerState(const SamplerStateDesc& desc)
 }
 
 //------------------------------------------------------------------
-IInputLayout* Device::CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode)
+IInputLayout* Device::CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode)
 {
 	InputLayout* pInputLayout = new InputLayout(iNumElements, pInputElementDescs, iShaderCodeSize, pShaderCode);
 	pInputLayout->Create(m_pDevice);
@@ -183,6 +183,12 @@ void Device::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, 
 
 	*ppTexture = new Texture2d(pCubeTexture);
 	*ppSRV = new ShaderResourceView(pCubeRV);
+}
+
+//------------------------------------------------------------------
+void Device::SetupInputLayout(IInputLayout* pInputLayout, IBuffer* pVertexBuffer)
+{
+	
 }
 
 } // namespace HALgfx

@@ -23,7 +23,7 @@ public:
 	virtual IRasterizerState* CreateRasterizerState(const RasterizerDesc&);
 	virtual ISamplerState* CreateSamplerState(const SamplerStateDesc&);
 
-	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode);
+	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode);
 	virtual IShader* CreateShader(ShaderType eType, int iShaderCodeSize, const void* pShaderCode);
 	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData&);
 	virtual IBuffer* CreateBuffer(const BufferDesc&, const SubResourceData&);
@@ -35,6 +35,8 @@ public:
 	virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*, const UnorderedAccessViewDesc&);
 
 	void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV);
+
+	virtual void SetupInputLayout(IInputLayout* pInputLayout, IBuffer* pVertexBuffer);
 
 	ID3D11Device* GetD3DPtr();
 

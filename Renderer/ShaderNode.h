@@ -42,11 +42,11 @@ public:
 	void Draw(HALgfx::IDeviceContext* pDeviceContext);
 	void ClearDrawNodes();
 
-	void AddDrawNode(DrawNode& drawNode);
+	void AddDrawNode(DrawNode& drawNode, HALgfx::IDevice* pDevice);
 	void AddConstantBuffer(const HALgfx::BufferDesc& desc, HALgfx::IDevice* pDevice, HALgfx::ShaderType eType);
 
 	const char* GetName() const;
-	void CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], HALgfx::IDevice* pDevice);
+	void CreateInputLayout(int iNumElements, HALgfx::InputElementDesc inputElements[], int iStride, HALgfx::IDevice* pDevice);
 
 	// load compiled shades, create cbuffer, input layout and such
 	void LoadShader(HALgfx::ShaderType eType);

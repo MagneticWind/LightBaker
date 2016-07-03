@@ -154,7 +154,7 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							const char* meshName = pSurface->GetGeometry()->GetName();
 							GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 							MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
-							pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+							pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, meshResource.m_iStride, pDevice);
 
 							pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
@@ -190,11 +190,10 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 							drawNode.AddSRV(texResource.m_pShaderResourceView);
 
-							gpuResourceManager.CreateSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice);
-							HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+							HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice);
 							drawNode.AddSampler(pSampler);
 
-							pShaderNode->AddDrawNode(drawNode);
+							pShaderNode->AddDrawNode(drawNode, pDevice);
 						}
 
 						break;

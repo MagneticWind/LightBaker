@@ -58,7 +58,7 @@ public:
 	virtual IRasterizerState* CreateRasterizerState(const RasterizerDesc&) = 0;
 	virtual ISamplerState* CreateSamplerState(const SamplerStateDesc&) = 0;
 
-	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iShaderCodeSize, const void* pShaderCode) = 0;
+	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode) = 0;
 	virtual IShader* CreateShader(ShaderType eType, int iShaderCodeSize, const void* pShaderCode) = 0;
 	virtual IProgram* CreateProgram(const char* pName) = 0;
 	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData&) = 0;
@@ -70,6 +70,8 @@ public:
 	virtual IUnorderedAccessView* CreateUnorderedAccessView(IResource*, const UnorderedAccessViewDesc&) = 0;
 
 	virtual void LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV) = 0;
+
+	virtual void SetupInputLayout(IInputLayout* pInputLayout, IBuffer* pVertexBuffer) = 0;
 };
 
 } // namespace HALgfx

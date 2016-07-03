@@ -1,4 +1,4 @@
-
+﻿
 #include <assert.h>
 #include <stdio.h>
 
@@ -195,6 +195,7 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 	SetForegroundWindow(hWnd);									// Slightly Higher Priority
 	SetFocus(hWnd);												// Sets Keyboard Focus To The Window
 	
+	glFrontFace(GL_CW);		// set counter clockwise polygon indices so it can use the same index data as DirectX
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -212,6 +213,8 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 		printf("ERROR: %s\n", glewGetErrorString(glewInitResult));
 		exit(EXIT_FAILURE);
 	}
+
+	glEnable(GL_DEBUG_OUTPUT);
 
 	// final render target
 	//m_pFrameBufferRTV = pDevice->CreateRenderTargetView();

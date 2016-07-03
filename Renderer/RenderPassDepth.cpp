@@ -169,7 +169,7 @@ void RenderPassDepth::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							const char* meshName = pSurface->GetGeometry()->GetName();
 							GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 							MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
-							pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+							pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, meshResource.m_iStride, pDevice);
 
 							pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
@@ -199,7 +199,7 @@ void RenderPassDepth::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 							pTransform->mView = mView;
 							pTransform->mProjection = mProjection;
 
-							pShaderNode->AddDrawNode(drawNode);
+							pShaderNode->AddDrawNode(drawNode, pDevice);
 						}
 
 						break;

@@ -1,5 +1,6 @@
 #include <assert.h>
 
+#include "Config.h"
 #include "CBufferDefs.h"
 #include "GPUResourceManager.h"
 
@@ -28,6 +29,7 @@ namespace Renderer
 //------------------------------------------------------------------
 RenderPassOpaque::RenderPassOpaque() : m_fLightIntensityLevel(1.f)
 {
+	m_pShadowSRV = 0;
 }
 
 //------------------------------------------------------------------
@@ -54,7 +56,7 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 	pDeviceContext->SetDepthStencilState(pDSState);
 	pDeviceContext->SetRenderTargetViews(1, &pRTV, pDSV);
 
-//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(1, 0, 0, 0));
+	//pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(1, 0, 0, 0));
 	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -102,8 +104,14 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 
 	// camera
 	const Scene::Camera* pCamera = pScene->GetCurrentCamera();
+
+#ifdef USE_DIRECTX
 	const Math::Matrix4f& mView = pCamera->GetViewMatrix();
 	const Math::Matrix4f& mProjection = pCamera->GetProjectionMatrix();
+#else
+	Math::Matrix4f mView = pCamera->GetViewMatrix().GetTranspos();
+	Math::Matrix4f mProjection = pCamera->GetProjectionMatrix().GetTranspos();
+#endif
 
 	// lights
 	std::list<Scene::Light*>& lightList = pScene->GetLightList();
@@ -180,7 +188,7 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									const char* meshName = pSurface->GetGeometry()->GetName();
 									GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 									MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
-									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, meshResource.m_iStride, pDevice);
 
 									// texture names in shader (needed for OpenGL)
 									pShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_SHADOW);
@@ -210,6 +218,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									CBufferTransform* pTransform = static_cast<CBufferTransform*>(drawNode.CreateCBufferData(sizeof(CBufferTransform), HALgfx::VERTEX_SHADER));
 									Math::Matrix4f mWorld;
 									pRenderObject->GetLocalToWorldTransformation(mWorld);
+#ifndef USE_DIRECTX
+									mWorld = mWorld.GetTranspos();
+#endif
 									pTransform->mWorld = mWorld;
 									pTransform->mView = mView;
 									pTransform->mProjection = mProjection;
@@ -247,9 +258,9 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 
 									// shadowmap
 									drawNode.AddSRV(m_pShadowSRV);
-									drawNode.AddSampler(gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP));
+									drawNode.AddSampler(gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice));
 
-									pShaderNode->AddDrawNode(drawNode);
+									pShaderNode->AddDrawNode(drawNode, pDevice);
 								}
 							}
 							else
@@ -289,7 +300,7 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									const char* meshName = pSurface->GetGeometry()->GetName();
 									GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 									MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
-									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+									pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, meshResource.m_iStride, pDevice);
 
 									pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
@@ -317,6 +328,10 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									CBufferTransform* pTransform = static_cast<CBufferTransform*>(drawNode.CreateCBufferData(sizeof(CBufferTransform), HALgfx::VERTEX_SHADER));
 									Math::Matrix4f mWorld;
 									pRenderObject->GetLocalToWorldTransformation(mWorld);
+
+#ifndef USE_DIRECTX
+									mWorld = mWorld.GetTranspos();
+#endif
 									pTransform->mWorld = mWorld;
 									pTransform->mView = mView;
 									pTransform->mProjection = mProjection;
@@ -347,7 +362,7 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 										drawNode.AddSampler(texResource.m_pSampler);
 									}
 
-									pShaderNode->AddDrawNode(drawNode);
+									pShaderNode->AddDrawNode(drawNode, pDevice);
 
 								}
 							}

@@ -425,7 +425,7 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		m_pSSAOShaderNode->AddConstantBuffer(desc, pDevice, HALgfx::PIXEL_SHADER);
 
 		// input layout
-		m_pSSAOShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
+		m_pSSAOShaderNode->CreateInputLayout(2, aInputElementsDesc, 20,  pDevice);
 
 		// texture label
 		m_pSSAOShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_DEPTH);
@@ -455,10 +455,10 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 
 		// depth texture
 		drawNodeSSAO.AddSRV(m_pSRVDepth);
-		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice);
 		drawNodeSSAO.AddSampler(pSampler);
 
-		m_pSSAOShaderNode->AddDrawNode(drawNodeSSAO);
+		m_pSSAOShaderNode->AddDrawNode(drawNodeSSAO, pDevice);
 	}
 
 	// avg luminance
@@ -539,7 +539,7 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		m_pTonemappingShaderNode->AddConstantBuffer(desc, pDevice, HALgfx::PIXEL_SHADER);
 
 		// input layout
-		m_pTonemappingShaderNode->CreateInputLayout(2, aInputElementsDesc, pDevice);
+		m_pTonemappingShaderNode->CreateInputLayout(2, aInputElementsDesc, 20, pDevice);
 
 		// texture label
 		m_pTonemappingShaderNode->AddTextureLabel(Scene::TEXTURE_LABEL_FRAME);
@@ -574,10 +574,10 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		// framebuffer texture
 		drawNodeTonemapping.AddSRV(m_pSRVHDR);
 
-		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP);
+		HALgfx::ISamplerState* pSampler = gpuResourceManager.GetSamplerState(Scene::SAMPLER_NOMIP_LINEAR_WRAP, pDevice);
 		drawNodeTonemapping.AddSampler(pSampler);
 
-		m_pTonemappingShaderNode->AddDrawNode(drawNodeTonemapping);
+		m_pTonemappingShaderNode->AddDrawNode(drawNodeTonemapping, pDevice);
 	}
 
 }

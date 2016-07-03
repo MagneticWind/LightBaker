@@ -134,6 +134,7 @@ void GLProgram::CreateShaders(int iNumElements, HALgfx::InputElementDesc inputEl
 	}
 
 	glLinkProgram(m_program);
+
 }
 
 void GLProgram::SetShaders(int iNumTextureLabels, int textureLabels[], IDeviceContext* pDeviceContext)
@@ -215,6 +216,7 @@ void GLProgram::ClearShaders(IDeviceContext* pDeviceContext)
 	deviceContext->SetCurrentProgram(0);
 	glUseProgram(0);
 }
+
 void* GLProgram::CreateBuffer(int iSize, HALgfx::ShaderType eType)
 {
 	m_ppFileData[eType] = malloc(iSize);

@@ -235,7 +235,7 @@ void RenderPassShadow::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 								const char* meshName = pSurface->GetGeometry()->GetName();
 								GPUResourceManager& gpuResourceManager = GPUResourceManager::GetInstance();
 								MeshResource& meshResource = gpuResourceManager.GetMeshResource(std::string(meshName));
-								pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
+								pShaderNode->CreateInputLayout(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, meshResource.m_iStride, pDevice);
 
 								pShaderNode->Create(meshResource.m_iNumElements, meshResource.m_aInputElementsDesc, pDevice);
 
@@ -268,7 +268,7 @@ void RenderPassShadow::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 								pTransform->mView = m_mShadowView;
 								pTransform->mProjection = m_mProjection[i];
 
-								pShaderNode->AddDrawNode(drawNode);
+								pShaderNode->AddDrawNode(drawNode, pDevice);
 							}
 
 						}

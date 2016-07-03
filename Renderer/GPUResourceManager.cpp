@@ -227,7 +227,7 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 		}
 
 		CreateSamplerState(pTexture->GetSamplerMode(), pDevice);
-		textureResource.m_pSampler = GetSamplerState(pTexture->GetSamplerMode());
+		textureResource.m_pSampler = GetSamplerState(pTexture->GetSamplerMode(), pDevice);
 
 		m_TextureMap[name] = textureResource;
 	}
@@ -303,9 +303,15 @@ TextureResource& GPUResourceManager::GetTextureResource(const std::string name)
 }
 
 //------------------------------------------------------------------
-HALgfx::ISamplerState* GPUResourceManager::GetSamplerState(int samplerMode)
+HALgfx::ISamplerState* GPUResourceManager::GetSamplerState(int samplerMode, HALgfx::IDevice* pDevice)
 {
+	if (m_SamplerMap[samplerMode] == 0)
+	{
+		CreateSamplerState(static_cast<Scene::SamplerMode>(samplerMode), pDevice);
+	}
+
 	return m_SamplerMap[samplerMode];
+
 }
 
 } // namespace Renderer

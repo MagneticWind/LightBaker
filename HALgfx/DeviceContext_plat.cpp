@@ -265,7 +265,10 @@ void DeviceContext::SetSamplerStates(ShaderType shaderType, int iOffset, int iNu
 	ID3D11SamplerState* pD3DSamplerStates[MAX_NUM_SAMPLERS];
 	for (int i = 0; i < iNumSamplers; ++i)
 	{
-		pD3DSamplerStates[i] = static_cast<SamplerState*>(pState[i])->GetD3DPtr();
+		if (pState[i])
+			pD3DSamplerStates[i] = static_cast<SamplerState*>(pState[i])->GetD3DPtr();
+		else
+			pD3DSamplerStates[i] = 0;
 	}
 	switch(shaderType)
 	{
