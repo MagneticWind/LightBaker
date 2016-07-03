@@ -69,7 +69,7 @@ void GLDeviceContext::SetVertexBuffer(int iSlot, int iStride, int iOffset, IBuff
 	}
 	else
 	{
-		//glBindVertexBuffer(iSlot, 0, iOffset, iStride);
+		glBindVertexBuffer(iSlot, 0, iOffset, iStride);
 	}
 
 }

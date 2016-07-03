@@ -176,8 +176,8 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 		0,								// Shift Bit Ignored
 		0,								// No Accumulation Buffer
 		0, 0, 0, 0,						// Accumulation Bits Ignored
-		16,								// 16Bit Z-Buffer (Depth Buffer)
-		0,								// No Stencil Buffer
+		24,								// 24 Bit Z-Buffer (Depth Buffer)
+		8,								// 8 Bit Stencil Buffer
 		0,								// No Auxiliary Buffer
 		PFD_MAIN_PLANE,					// Main Drawing Layer
 		0,								// Reserved
@@ -195,11 +195,15 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 	SetForegroundWindow(hWnd);									// Slightly Higher Priority
 	SetFocus(hWnd);												// Sets Keyboard Focus To The Window
 	
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	glFrontFace(GL_CW);		// set counter clockwise polygon indices so it can use the same index data as DirectX
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
 
 	GLDevice* pDevice = new GLDevice();
 	m_pDevice = static_cast<IDevice*>(pDevice);
