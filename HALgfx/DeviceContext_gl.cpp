@@ -47,9 +47,16 @@ GLDeviceContext::~GLDeviceContext()
 //------------------------------------------------------------------
 void GLDeviceContext::SetInputlayout(IInputLayout* pInputLayout)
 {
-	GLInputLayout* inputlayout = static_cast<GLInputLayout*>(pInputLayout);
-
-	glBindVertexArray(inputlayout->GetVAO());
+	if (pInputLayout)
+	{
+		GLInputLayout* inputlayout = static_cast<GLInputLayout*>(pInputLayout);
+		glBindVertexArray(inputlayout->GetVAO());
+	}
+	else
+	{
+		glBindVertexArray(0);
+	}
+	
 }
 
 //------------------------------------------------------------------
@@ -245,7 +252,7 @@ void GLDeviceContext::SetSamplerStates(ShaderType shaderType, int iOffset, int i
 {
 	for (int i = 0; i < iNumSamplers; ++i)
 	{
-		if (pState[i = iOffset])
+		if (pState[i])
 		{
 			GLSamplerState* pSampler = static_cast<GLSamplerState*>(pState[i + iOffset]);
 			glBindSampler(i + iOffset, pSampler->GetGLHandle());
@@ -277,10 +284,20 @@ void GLDeviceContext::SetShaderResourceViews(ShaderType shaderType, int iOffset,
 				glActiveTexture(GL_TEXTURE0 + i + iOffset);
 				glBindTexture(GL_TEXTURE_2D, pSRV->GetGLHandle());
 			}
+			else if (pSRV->GetType() == RESOURCE_TEXTURECUBE)
+			{
+				glActiveTexture(GL_TEXTURE0 + i + iOffset);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, pSRV->GetGLHandle());
+			}
 			else
 			{
 				assert(0);
 			}
+		}
+		else
+		{
+			//glActiveTexture(GL_TEXTURE0 + i + iOffset);
+			//glBindTexture(0)
 		}
 	}
 }
@@ -340,12 +357,13 @@ void GLDeviceContext::SetPrimitiveTopology(PrimitiveTopology eType)
 
 void GLDeviceContext::BeginEvent(const char* debugInfo)
 {
+	//glPushGroupMarkerEXT(0, debugInfo);
 
 }
 
 void GLDeviceContext::EndEvent()
 {
-
+	//glPopGroupMarkerEXT();
 }
 
 ICommandBuffer* GLDeviceContext::FinishCommandBuffer()

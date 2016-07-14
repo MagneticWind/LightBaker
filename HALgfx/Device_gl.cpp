@@ -93,7 +93,7 @@ IShader* GLDevice::CreateShader(ShaderType eType, int iShaderCodeSize, const voi
 }
 
 //------------------------------------------------------------------
-ITexture2d* GLDevice::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData& subResourceData)
+ITexture2d* GLDevice::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData* subResourceData)
 {
 	GLTexture2d* pTexture = new GLTexture2d();
 	pTexture->Create(desc, subResourceData);
@@ -144,7 +144,13 @@ IUnorderedAccessView* GLDevice::CreateUnorderedAccessView(IResource* pResource, 
 //------------------------------------------------------------------
 void GLDevice::LoadCubeTextureResource(const char* pPath, ITexture2d** ppTexture, IShaderResourceView** ppSRV)
 {
+//	ID3D11Texture2D* pCubeTexture = NULL;
+//	ID3D11ShaderResourceView* pCubeRV = NULL;
 
+
+
+///	*ppTexture = new GLTexture2d(pCubeTexture);
+//	*ppSRV = new GLShaderResourceView(pCubeRV);
 }
 
 //------------------------------------------------------------------

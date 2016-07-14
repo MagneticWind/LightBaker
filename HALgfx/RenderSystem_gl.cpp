@@ -195,6 +195,7 @@ bool GLRenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight,
 	SetForegroundWindow(hWnd);									// Slightly Higher Priority
 	SetFocus(hWnd);												// Sets Keyboard Focus To The Window
 	
+	// depth buffer setup
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 

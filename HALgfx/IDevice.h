@@ -61,7 +61,7 @@ public:
 	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode) = 0;
 	virtual IShader* CreateShader(ShaderType eType, int iShaderCodeSize, const void* pShaderCode) = 0;
 	virtual IProgram* CreateProgram(const char* pName) = 0;
-	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData&) = 0;
+	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData*) = 0;
 	virtual IBuffer* CreateBuffer(const BufferDesc&, const SubResourceData&) = 0;
 
 	virtual IRenderTargetView* CreateRenderTargetView(IResource*, const RenderTargetViewDesc&) = 0;

@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "glsl", "glsl", "{536924AA-B
 	ProjectSection(SolutionItems) = preProject
 		shader\gl\norm.frag = shader\gl\norm.frag
 		shader\gl\norm.vert = shader\gl\norm.vert
+		shader\gl\sky.frag = shader\gl\sky.frag
+		shader\gl\sky.vert = shader\gl\sky.vert
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hlsl", "hlsl", "{87699522-0DDC-49A6-87B6-1AB35C4C3E34}"

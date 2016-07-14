@@ -170,6 +170,8 @@ void ShaderNode::Draw(HALgfx::IDeviceContext* pDeviceContext)
 		it++;
 	}
 
+	pDeviceContext->SetInputlayout(0);
+
 	pDeviceContext->EndEvent();
 }
 

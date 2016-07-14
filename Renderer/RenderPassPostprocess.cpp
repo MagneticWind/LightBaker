@@ -387,7 +387,7 @@ void RenderPassPostprocess::Initialize(HALgfx::IDevice* pDevice, int iWidth, int
 		texDesc.usage = HALgfx::USAGE_DEFAULT;
 		HALgfx::SubResourceData subResourceData;
 		subResourceData.pMem = 0;
-		m_pSSAOTexture = pDevice->CreateTexture2d(texDesc, subResourceData);
+		m_pSSAOTexture = pDevice->CreateTexture2d(texDesc, &subResourceData);
 
 		HALgfx::RenderTargetViewDesc rtvDesc;
 		rtvDesc.format = texDesc.format;

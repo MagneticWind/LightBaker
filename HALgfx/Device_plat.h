@@ -25,7 +25,7 @@ public:
 
 	virtual IInputLayout* CreateInputLayout(int iNumElements, const InputElementDesc *pInputElementDescs, int iStride, int iShaderCodeSize, const void* pShaderCode);
 	virtual IShader* CreateShader(ShaderType eType, int iShaderCodeSize, const void* pShaderCode);
-	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData&);
+	virtual ITexture2d* CreateTexture2d(const Texture2dDesc&, const SubResourceData*);
 	virtual IBuffer* CreateBuffer(const BufferDesc&, const SubResourceData&);
 	virtual IProgram* CreateProgram(const char* pName);
 

@@ -109,7 +109,7 @@ IProgram* Device::CreateProgram(const char* pName)
 }
 
 //------------------------------------------------------------------
-ITexture2d* Device::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData& subResourceData)
+ITexture2d* Device::CreateTexture2d(const Texture2dDesc& desc, const SubResourceData* subResourceData)
 {
 	Texture2d* pTexture2d = new Texture2d();
 	pTexture2d->Create(desc, subResourceData, m_pDevice);

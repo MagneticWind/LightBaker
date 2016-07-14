@@ -39,6 +39,7 @@ public:
 
 	static void LoadMesh(Mesh* pMesh);
 	static void LoadTexture(Texture* pTexture);
+	//static void LoadCubeTexture(Texture* pTexture);
 
 	Texture* FindTexture(const char* pTextureName);
 	IGeometry* FindGeometry(const char* pGeometryName);

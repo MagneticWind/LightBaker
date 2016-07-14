@@ -290,38 +290,6 @@ void SceneLoader::ParseSurface(tinyxml2::XMLElement* pElement, Surface* pSurface
 		}
 	}
 
-	tinyxml2::XMLElement* pTextureElement = pElement->FirstChildElement("texture");
-
-	while (pTextureElement)
-	{
-		const char* sampler = pTextureElement->FirstChildElement("sampler")->GetText();
-		const char* label = pTextureElement->FirstChildElement("label")->GetText();
-		const char* format = pTextureElement->FirstChildElement("format")->GetText();
-
-		int iSampler;
-		sscanf(sampler, "%d", &iSampler);
-
-		int iLabel;
-		sscanf(label, "%d", &iLabel);
-
-		int iFormat;
-		sscanf(format, "%d", &iFormat);
-
-		const char* pTextureName = pTextureElement->FirstChildElement("name")->GetText();
-
-		Texture* pTexture = ResourceManager::GetInstance().FindTexture(pTextureName);
-		if (pTexture == 0)
-		{
-			Texture* pNewTexture = new Texture(pTextureName, static_cast<SamplerMode>(iSampler), static_cast<TextureLabel>(iLabel), static_cast<TextureFormat>(iFormat));
-			ResourceManager::GetInstance().AddTexture(pNewTexture);
-			pTexture = pNewTexture;
-		}
-		pSurface->AddTexture(pTexture);
-
-		pTextureElement = pTextureElement->NextSiblingElement("texture");
-
-	}
-
 	tinyxml2::XMLElement* pShaderElement = pElement->FirstChildElement("shader");
 }
 
@@ -362,6 +330,20 @@ void SceneLoader::ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pIMat
 				pMaterialElement->QueryFloatText(&fExponent);
 				pMaterial->SetExponent(fExponent);
 			}
+
+			// textures
+			tinyxml2::XMLElement* pTextureElement = pMaterialElement->FirstChildElement("texture");
+			while (pTextureElement)
+			{
+				Texture* pTexture = ParseTexture(pTextureElement);
+
+				if (pTexture != 0)
+					pMaterial->AddTexture(pTexture);
+
+				pTextureElement = pTextureElement->NextSiblingElement("texture");
+
+			}
+
 			pMaterialElement = pMaterialElement->NextSiblingElement();
 		}
 	}
@@ -385,10 +367,12 @@ void SceneLoader::ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pIMat
 					pMaterial->SetSkyType(SKY_PARABLOID);
 				}
 			}
-			else if (strcmp(pProperty, "map") == 0)
+			else if (strcmp(pProperty, "texture") == 0)
 			{
-				const char* pName = pMaterialElement->GetText();
-				pMaterial->SetTextureName(pName);
+				Texture* pTexture = ParseTexture(pMaterialElement);
+
+				if (pTexture != 0)
+					pMaterial->SetTexture(pTexture);
 			}
 			pMaterialElement = pMaterialElement->NextSiblingElement();
 		}
@@ -396,9 +380,36 @@ void SceneLoader::ParseMaterial(tinyxml2::XMLElement* pElement, IMaterial* pIMat
 	
 }
 
-void SceneLoader::ParseTexture(tinyxml2::XMLElement* pElement, Texture* pTexture)
+Texture* SceneLoader::ParseTexture(tinyxml2::XMLElement* pElement)
 {
+	const char* sampler = pElement->FirstChildElement("sampler")->GetText();
+	const char* label = pElement->FirstChildElement("label")->GetText();
+	const char* format = pElement->FirstChildElement("format")->GetText();
+	const char* type = pElement->FirstChildElement("type")->GetText();
 
+	int iSampler;
+	sscanf(sampler, "%d", &iSampler);
+
+	int iLabel;
+	sscanf(label, "%d", &iLabel);
+
+	int iFormat;
+	sscanf(format, "%d", &iFormat);
+
+	int iType;
+	sscanf(type, "%d", &iType);
+
+	const char* pTextureName = pElement->FirstChildElement("name")->GetText();
+
+	Texture* pTexture = ResourceManager::GetInstance().FindTexture(pTextureName);
+	if (pTexture == 0)
+	{
+		Texture* pNewTexture = new Texture(pTextureName, static_cast<SamplerMode>(iSampler), static_cast<TextureLabel>(iLabel), static_cast<TextureFormat>(iFormat), static_cast<TextureType>(iType));
+		ResourceManager::GetInstance().AddTexture(pNewTexture);
+		pTexture = pNewTexture;
+	}
+
+	return pTexture;
 }
 
 } // namespace Scene

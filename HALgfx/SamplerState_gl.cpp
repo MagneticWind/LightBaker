@@ -14,6 +14,7 @@ GLSamplerState::GLSamplerState(const SamplerStateDesc& descSampler)
 
 	glSamplerParameteri(m_sampler, GL_TEXTURE_WRAP_S, GetGLAddressMode(descSampler.addressU));
 	glSamplerParameteri(m_sampler, GL_TEXTURE_WRAP_T, GetGLAddressMode(descSampler.addressV));
+	//glSamplerParameteri(m_sampler, GL_TEXTURE_WRAP_R, GetGLAddressMode(descSampler.addressW));
 
 	glSamplerParameteri(m_sampler, GL_TEXTURE_COMPARE_FUNC, GetGLComparisonFunc(descSampler.comparisonFunc));
 
@@ -26,6 +27,10 @@ GLSamplerState::GLSamplerState(const SamplerStateDesc& descSampler)
 	case FILTER_MIN_MAG_MIP_LINEAR:
 		glSamplerParameteri(m_sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(m_sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		break;
+	case FILTER_MIN_MAG_NOMIP_LINEAR:
+		glSamplerParameteri(m_sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glSamplerParameteri(m_sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		break;
 	case FILTER_ANISOTROPIC:
 		glSamplerParameterf(m_sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, descSampler.maxAnisotropy);

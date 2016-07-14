@@ -135,6 +135,12 @@ void GLProgram::CreateShaders(int iNumElements, HALgfx::InputElementDesc inputEl
 
 	glLinkProgram(m_program);
 
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+	{
+		assert(0);
+	}
+
 }
 
 void GLProgram::SetShaders(int iNumTextureLabels, int textureLabels[], IDeviceContext* pDeviceContext)

@@ -45,8 +45,11 @@ DeviceContext::~DeviceContext()
 //------------------------------------------------------------------
 void DeviceContext::SetInputlayout(IInputLayout* pInputLayout)
 {
-	InputLayout* pInputLayoutPlat = static_cast<InputLayout*>(pInputLayout);
-	m_pDeviceContext->IASetInputLayout(pInputLayoutPlat->GetD3DPtr());
+	if (pInputLayout)
+	{
+		InputLayout* pInputLayoutPlat = static_cast<InputLayout*>(pInputLayout);
+		m_pDeviceContext->IASetInputLayout(pInputLayoutPlat->GetD3DPtr());
+	}
 }
 
 void DeviceContext::SetVertexBuffer(int iSlot, int iStride, int iOffset, IBuffer* pBuffer)

@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "ShaderResourceView_plat.h"
 #include "Texture2d_plat.h"
 #include "Format_plat.h"
@@ -54,6 +55,19 @@ void ShaderResourceView::Create(const ShaderResourceViewDesc& srvDesc, IResource
 			Buffer* pBuffer = static_cast<Buffer*>(pResource);
 			pD3DResource = pBuffer->GetD3DPtr();
 			break;
+		}
+	case SRV_DIMENSION_TEXTURECUBE:
+		{
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+			desc.TextureCube.MipLevels = srvDesc.texSRV.mipLevels;
+			desc.TextureCube.MostDetailedMip = srvDesc.texSRV.mostDetailedMip;
+			Texture2d* pTexture2d = static_cast<Texture2d*>(pResource);
+			pD3DResource = pTexture2d->GetD3DPtr();
+			break;
+		}
+	default:
+		{
+			assert(0);
 		}
 	};
 

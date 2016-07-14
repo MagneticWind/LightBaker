@@ -2,6 +2,7 @@
 #define MATERIAL_SKY_H
 
 #include "IMaterial.h"
+#include "Texture.h"
 
 #include "Math\Vector4f.h"
 
@@ -19,17 +20,21 @@ class MaterialSky : public IMaterial
 {
 public:
 	MaterialSky(unsigned char tech) : IMaterial(tech)
-	{}
+	{
+		m_pSkyTexture = 0;
+	}
 	virtual MaterialType GetType() const;
 
 	SkyType GetSkyType() const;
-	const char* GetMapName() const;
+	const Texture* GetTexture() const;
 	void SetSkyType(SkyType skyType);
-	void SetTextureName(const char* texturePath);
+	void SetTexture(Texture* pTexture);
 
 private:
 	char m_caName[256];
 	SkyType m_eType;
+
+	Texture* m_pSkyTexture;
 };
 
 inline MaterialType MaterialSky::GetType() const
@@ -47,14 +52,14 @@ inline void MaterialSky::SetSkyType(SkyType skyType)
 	m_eType = skyType;
 }
 
-inline void MaterialSky::SetTextureName(const char* texturePath)
+inline void MaterialSky::SetTexture(Texture* pTexture)
 {
-	strcpy(m_caName, texturePath);
+	m_pSkyTexture = pTexture;
 }
 
-inline const char* MaterialSky::GetMapName() const
+inline const Texture* MaterialSky::GetTexture() const
 {
-	return m_caName;
+	return m_pSkyTexture;
 }
 
 } // namespace Scene

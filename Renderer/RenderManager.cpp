@@ -27,6 +27,7 @@
 #include "Scene\Surface.h"
 #include "Scene\Mesh.h"
 #include "Scene\Texture.h"
+#include "Scene\Material.h"
 #include "Scene\MaterialSky.h"
 
 namespace Magnet
@@ -101,6 +102,7 @@ namespace Renderer
 		m_pRenderPasses[m_iPassCount++] = new RenderPassOpaque();
 		m_pRenderPasses[m_iPassCount++] = new RenderPassPostprocess();
 #else
+		m_pRenderPasses[m_iPassCount++] = new RenderPassSky();
 		m_pRenderPasses[m_iPassCount++] = new RenderPassOpaque();
 #endif
 	}
@@ -316,19 +318,22 @@ namespace Renderer
 							GPUResourceManager::GetInstance().CreateMeshResource(pMesh, pDevice);
 						}
 
-						const int iTextureCount = pSurface->GetNumTextures();
-						for (int i = 0; i < iTextureCount; ++i)
-						{
-							const Scene::Texture* pTexture = pSurface->GetTexture(i);
-
-							GPUResourceManager::GetInstance().CreateTextureResource(pTexture, pDevice);
-						}
-
 						const Scene::IMaterial* pMaterial = pSurface->GetMaterial();
 						if (pMaterial->GetType() == Scene::MATERIAL_SKY)
 						{
 							const Scene::MaterialSky* pMaterialSky = static_cast<const Scene::MaterialSky*>(pMaterial);
-							GPUResourceManager::GetInstance().CreateCubeTextureResource(pMaterialSky->GetMapName(), pDevice);
+							GPUResourceManager::GetInstance().CreateTextureResource(pMaterialSky->GetTexture(), pDevice);
+						}
+						else if (pMaterial->GetType() == Scene::MATERIAL_NORMAL)
+						{
+							const Scene::Material* pMaterialNormal = static_cast<const Scene::Material*>(pMaterial);
+							const int iTextureCount = pMaterialNormal->GetNumTextures();
+							for (int i = 0; i < iTextureCount; ++i)
+							{
+								const Scene::Texture* pTexture = pMaterialNormal->GetTexture(i);
+
+								GPUResourceManager::GetInstance().CreateTextureResource(pTexture, pDevice);
+							}
 						}
 
 					}

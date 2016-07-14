@@ -18,7 +18,7 @@ public:
 	Texture2d(ID3D11Texture2D* pTexture2D);
 	~Texture2d();
 
-	void Create(const Texture2dDesc& texture2dDesc, const SubResourceData& subResourceData, ID3D11Device* pDevice);
+	void Create(const Texture2dDesc& texture2dDesc, const SubResourceData* subResourceData, ID3D11Device* pDevice);
 	ID3D11Texture2D* GetD3DPtr();
 	virtual ResourceType GetType() const;
 

@@ -26,7 +26,7 @@ Camera::Camera(const char* pName)
 	m_fAspectRatio = 1.0;
 	m_fFOV = 60.f;
 	m_fZNear = 0.5f;
-	m_fZFar = 50.f;
+	m_fZFar = 2000.f;
 
 	m_fVelocity = 0.1f;
 	m_fRotationScaler = 0.01f;

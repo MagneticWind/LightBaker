@@ -238,7 +238,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	
 	SubResourceData subResourceData;
 	subResourceData.pMem = 0;
-	m_pTexture2dHDR = pDevice->CreateTexture2d(texture2dDesc, subResourceData);
+	m_pTexture2dHDR = pDevice->CreateTexture2d(texture2dDesc, &subResourceData);
 
 	// HDR SRV
 	ShaderResourceViewDesc srvDesc;
@@ -262,7 +262,7 @@ bool RenderSystem::InitializeSystem(unsigned int uWidth, unsigned int uHeight, v
 	texture2dDSTDesc.format = FORMAT_R24G8_TYPELESS;
 	texture2dDSTDesc.usage = USAGE_DEFAULT;
 	texture2dDSTDesc.bindFlags = BIND_SHADER_RESOURCE | BIND_DEPTH_STENCIL;
-	m_pTexture2dDepthStencil = pDevice->CreateTexture2d(texture2dDSTDesc, subResourceData);
+	m_pTexture2dDepthStencil = pDevice->CreateTexture2d(texture2dDSTDesc, &subResourceData);
 
 	// depth stencil target
 	DepthStencilViewDesc dstDesc;

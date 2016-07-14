@@ -25,8 +25,9 @@ Texture2d::~Texture2d()
 	}
 }
 
-void Texture2d::Create(const Texture2dDesc& texture2dDesc, const SubResourceData& subResourceData, ID3D11Device* pDevice)
+void Texture2d::Create(const Texture2dDesc& texture2dDesc, const SubResourceData* subResourceData, ID3D11Device* pDevice)
 {
+
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width = texture2dDesc.width;
 	desc.Height = texture2dDesc.height;
@@ -49,16 +50,31 @@ void Texture2d::Create(const Texture2dDesc& texture2dDesc, const SubResourceData
 		break;
 	};
 
-	D3D11_SUBRESOURCE_DATA initData;
-	initData.pSysMem = subResourceData.pMem;
-	initData.SysMemPitch = subResourceData.uMemPitch;
-	initData.SysMemSlicePitch = subResourceData.uMemSlicePitch;
+	//cubemap
+	if (desc.ArraySize == 6)
+	{
+		D3D11_SUBRESOURCE_DATA initData[6];
+		for (int i = 0; i < 6; ++i)
+		{
+			initData[i].pSysMem = subResourceData[i].pMem;
+			initData[i].SysMemPitch = subResourceData[i].uMemPitch;
+			initData[i].SysMemSlicePitch = subResourceData[i].uMemSlicePitch;
+		}
 
-	if (initData.pSysMem)
-		pDevice->CreateTexture2D(&desc, &initData, &m_pTexture2D);
+		pDevice->CreateTexture2D(&desc, initData, &m_pTexture2D);
+	}
 	else
-		pDevice->CreateTexture2D(&desc, 0, &m_pTexture2D);
-	
+	{
+		D3D11_SUBRESOURCE_DATA initData;
+		initData.pSysMem = subResourceData->pMem;
+		initData.SysMemPitch = subResourceData->uMemPitch;
+		initData.SysMemSlicePitch = subResourceData->uMemSlicePitch;
+
+		if (initData.pSysMem)
+			pDevice->CreateTexture2D(&desc, &initData, &m_pTexture2D);
+		else
+			pDevice->CreateTexture2D(&desc, 0, &m_pTexture2D);
+	}
 }
 
 } // namespace HALgfx

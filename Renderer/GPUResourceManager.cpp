@@ -55,10 +55,10 @@ GPUResourceManager::~GPUResourceManager()
 			delete textureResource.m_pShaderResourceView;
 			textureResource.m_pShaderResourceView = NULL;
 		}
-		if (textureResource.m_pTexture2D)
+		if (textureResource.m_pTexture)
 		{
-			delete textureResource.m_pTexture2D;
-			textureResource.m_pTexture2D = NULL;
+			delete textureResource.m_pTexture;
+			textureResource.m_pTexture = NULL;
 		}
 	}
 
@@ -174,32 +174,84 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 	std::map<std::string, TextureResource>::iterator it = m_TextureMap.find(name);
 	if (it == m_TextureMap.end())
 	{
-		HALgfx::Texture2dDesc texDesc;
-		texDesc.width = pTexture->GetWidth();
-		texDesc.height = pTexture->GetHeight();
-
-		HALgfx::SubResourceData data;
-		data.pMem = const_cast<void*>(pTexture->GetDataBufferPtr());
-		switch (pTexture->GetFormat())
+		if (pTexture->GetType() == Scene::TEXTURE_TYPE_2D)
 		{
-		case Scene::R8G8B8A8_UINT:
-			data.uMemPitch = 4 * pTexture->GetWidth();
-			texDesc.format = HALgfx::FORMAT_R8G8B8A8_UINT;
-			break;
-		case Scene::R8G8B8A8_UNORM:
-			data.uMemPitch = 4 * pTexture->GetWidth();
-			texDesc.format = HALgfx::FORMAT_R8G8B8A8_UNORM;
-			break;
+			HALgfx::Texture2dDesc texDesc;
+			texDesc.width = pTexture->GetWidth();
+			texDesc.height = pTexture->GetHeight();
+
+			texDesc.bindFlags = HALgfx::BIND_SHADER_RESOURCE;
+
+			HALgfx::SubResourceData data;
+			data.pMem = const_cast<void*>(pTexture->GetDataBufferPtr());
+			switch (pTexture->GetFormat())
+			{
+			case Scene::TEXTURE_FORMAT_R8G8B8A8_UINT:
+				data.uMemPitch = 4 * pTexture->GetWidth();
+				texDesc.format = HALgfx::FORMAT_R8G8B8A8_UINT;
+				break;
+			case Scene::TEXTURE_FORMAT_R8G8B8A8_UNORM:
+				data.uMemPitch = 4 * pTexture->GetWidth();
+				texDesc.format = HALgfx::FORMAT_R8G8B8A8_UNORM;
+				break;
+			}
+
+			textureResource.m_pTexture = pDevice->CreateTexture2d(texDesc, &data);
+
+			HALgfx::ShaderResourceViewDesc desc;
+			desc.viewDimension = HALgfx::SRV_DIMENSION_TEXTURE2D;
+			desc.texSRV.mostDetailedMip = 0;
+			desc.texSRV.mipLevels = texDesc.mipLevels;
+			desc.format = texDesc.format;
+			textureResource.m_pShaderResourceView = pDevice->CreateShaderResourceView(textureResource.m_pTexture, desc);
 		}
+		else if (pTexture->GetType() == Scene::TEXTURE_TYPE_CUBE)
+		{
+			HALgfx::Texture2dDesc texDesc;
+			texDesc.width = pTexture->GetWidth();
+			texDesc.height = pTexture->GetHeight();
+			texDesc.arraySize = 6;
+			texDesc.miscFlags = HALgfx::MISC_TEXTURECUBE;
+			texDesc.bindFlags = HALgfx::BIND_SHADER_RESOURCE;
+			texDesc.mipLevels = 1; // this has to be set for cubemap, it can't be 9
 
-		textureResource.m_pTexture2D = pDevice->CreateTexture2d(texDesc, data);
+			HALgfx::SubResourceData data[6];
 
-		HALgfx::ShaderResourceViewDesc desc;
-		desc.viewDimension = HALgfx::SRV_DIMENSION_TEXTURE2D;
-		desc.texSRV.mostDetailedMip = 0;
-		desc.texSRV.mipLevels = texDesc.mipLevels;
-		desc.format = texDesc.format;
-		textureResource.m_pShaderResourceView = pDevice->CreateShaderResourceView(textureResource.m_pTexture2D, desc);
+			void* pDataPtr = const_cast<void*>(pTexture->GetDataBufferPtr());
+			for (int i = 0; i < 6; ++i)
+			{
+				switch (pTexture->GetFormat())
+				{
+				case Scene::TEXTURE_FORMAT_R8G8B8A8_UINT:
+					data[i].uMemPitch = 4 * pTexture->GetWidth();
+					data[i].uMemSlicePitch = 0;
+					texDesc.format = HALgfx::FORMAT_R8G8B8A8_UINT;
+					data[i].pMem = static_cast<unsigned char*>(pDataPtr)+i * 4 * pTexture->GetWidth() * pTexture->GetHeight();
+					break;
+				case Scene::TEXTURE_FORMAT_R8G8B8A8_UNORM:
+					data[i].uMemPitch = 4 * pTexture->GetWidth();
+					data[i].uMemSlicePitch = 0;
+					texDesc.format = HALgfx::FORMAT_R8G8B8A8_UNORM;
+					data[i].pMem = static_cast<unsigned char*>(pDataPtr) + i * 4 * pTexture->GetWidth() * pTexture->GetHeight();
+					break;
+				case Scene::TEXTURE_FORMAT_R32G32B32A32_FLOAT:
+					data[i].uMemPitch = 16 * pTexture->GetWidth();
+					data[i].uMemSlicePitch = 0;
+					texDesc.format = HALgfx::FORMAT_R32G32B32A32_FLOAT;
+					data[i].pMem = static_cast<float*>(pDataPtr) + i * 4 * pTexture->GetWidth() * pTexture->GetHeight();
+					break;
+				}
+			}
+
+			textureResource.m_pTexture = pDevice->CreateTexture2d(texDesc, data);
+
+			HALgfx::ShaderResourceViewDesc desc;
+			desc.viewDimension = HALgfx::SRV_DIMENSION_TEXTURECUBE;
+			desc.texSRV.mostDetailedMip = 0;
+			desc.texSRV.mipLevels = texDesc.mipLevels;
+			desc.format = texDesc.format;
+			textureResource.m_pShaderResourceView = pDevice->CreateShaderResourceView(textureResource.m_pTexture, desc);
+		}
 
 		// set label name
 		switch (pTexture->GetLabel())
@@ -219,6 +271,9 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 		case Scene::TEXTURE_LABEL_EMISSIVE:
 			strcpy(textureResource.m_caLabel, "txEmissive");
 			break;
+		case Scene::TEXTURE_LABEL_SKY:
+			strcpy(textureResource.m_caLabel, "txSky");
+			break;
 		case Scene::TEXTURE_LABEL_SHADOW:
 			strcpy(textureResource.m_caLabel, "txShadow");
 			break;
@@ -233,8 +288,9 @@ void GPUResourceManager::CreateTextureResource(const Scene::Texture* pTexture, H
 	}
 }
 
+/*
 //------------------------------------------------------------------
-void GPUResourceManager::CreateCubeTextureResource(const char* pTextureName, HALgfx::IDevice* pDevice)
+void GPUResourceManager::CreateCubeTextureResource(const Texture* pTexture, HALgfx::IDevice* pDevice)
 {
 	static const char TEXTURE_PATH[256] = "C:\\Projects\\GitHub\\LightBaker\\data\\texture\\";
 	char pPath[256];
@@ -257,6 +313,7 @@ void GPUResourceManager::CreateCubeTextureResource(const char* pTextureName, HAL
 		m_TextureMap[name] = skyTexture;
 	}
 }
+*/
 
 //------------------------------------------------------------------
 void GPUResourceManager::CreateSamplerState(const Scene::SamplerMode mode, HALgfx::IDevice* pDevice)
@@ -266,7 +323,7 @@ void GPUResourceManager::CreateSamplerState(const Scene::SamplerMode mode, HALgf
 	{
 		switch (mode)
 		{
-		case Scene::SAMPLER_NOMIP_LINEAR_WRAP:
+		case Scene::SAMPLER_MIP_LINEAR_WRAP:
 		{
 			// linear sampler state
 			HALgfx::SamplerStateDesc desc;
@@ -275,6 +332,24 @@ void GPUResourceManager::CreateSamplerState(const Scene::SamplerMode mode, HALgf
 			desc.addressW = HALgfx::ADDRESSMODE_WRAP;
 			desc.comparisonFunc = HALgfx::COMPARISON_LESS_EQUAL;
 			desc.filter = HALgfx::FILTER_MIN_MAG_MIP_LINEAR;
+			desc.maxAnisotropy = 1;
+			desc.maxLod = 0;
+			desc.minLod = 0;
+			desc.mipLodBias = 0.f;
+			HALgfx::ISamplerState* pSamplerState = pDevice->CreateSamplerState(desc);
+
+			m_SamplerMap[mode] = pSamplerState;
+			break;
+		}
+		case Scene::SAMPLER_NOMIP_LINEAR_WRAP:
+		{
+			// linear sampler state
+			HALgfx::SamplerStateDesc desc;
+			desc.addressU = HALgfx::ADDRESSMODE_WRAP;
+			desc.addressV = HALgfx::ADDRESSMODE_WRAP;
+			desc.addressW = HALgfx::ADDRESSMODE_WRAP;
+			desc.comparisonFunc = HALgfx::COMPARISON_LESS_EQUAL;
+			desc.filter = HALgfx::FILTER_MIN_MAG_NOMIP_LINEAR;
 			desc.maxAnisotropy = 1;
 			desc.maxLod = 0;
 			desc.minLod = 0;

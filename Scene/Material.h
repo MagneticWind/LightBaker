@@ -2,8 +2,11 @@
 #define MATERIAL_H
 
 #include "IMaterial.h"
+#include "Texture.h"
 
 #include "Math\Vector4f.h"
+
+#define MAX_NUM_TEXTURES 8
 
 namespace Magnet
 {
@@ -14,7 +17,9 @@ class Material : public IMaterial
 {
 public:
 	Material(unsigned char tech) : IMaterial(tech)
-	{}
+	{
+		m_iNumTextures = 0;
+	}
 	virtual MaterialType GetType() const;
 
 	void SetAmbient(const Math::Vector4f& v4Ambient);
@@ -29,8 +34,15 @@ public:
 	void GetEmission(Math::Vector4f& v4Out) const;
 	void GetExponent(float& fOut) const;
 
+	const Texture* GetTexture(int iIndex) const;
+	void AddTexture(Texture* pTexture);
+	int GetNumTextures() const;
+
 private:
 	char m_caName[256];
+
+	Texture* m_ppTextures[MAX_NUM_TEXTURES];
+	int m_iNumTextures;
 
 	Math::Vector4f m_ka;    // ambient
 	Math::Vector4f m_kd;    // diffuse
@@ -68,6 +80,25 @@ inline void Material::GetExponent(float& fOut) const
 {
 	fOut = m_fExponent;
 }
+
+//------------------------------------------------------------------
+inline void Material::AddTexture(Texture* pTexture)
+{
+	m_ppTextures[m_iNumTextures++] = pTexture;
+}
+
+//------------------------------------------------------------------
+inline int Material::GetNumTextures() const
+{
+	return m_iNumTextures;
+}
+
+//------------------------------------------------------------------
+inline const Texture* Material::GetTexture(int iIndex) const
+{
+	return m_ppTextures[iIndex];
+}
+
 } // namespace Scene
 } // namespace Magnet
 

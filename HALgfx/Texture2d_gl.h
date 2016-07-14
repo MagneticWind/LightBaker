@@ -14,7 +14,7 @@ public:
 	GLTexture2d(unsigned int uTexture);
 	~GLTexture2d();
 
-	void Create(const Texture2dDesc& texture2dDesc, const SubResourceData& subResourceData);
+	void Create(const Texture2dDesc& texture2dDesc, const SubResourceData* subResourceData);
 
 	unsigned int GetGLHandle();
 	virtual ResourceType GetType() const;

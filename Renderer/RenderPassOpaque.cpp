@@ -56,7 +56,7 @@ void RenderPassOpaque::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, co
 	pDeviceContext->SetDepthStencilState(pDSState);
 	pDeviceContext->SetRenderTargetViews(1, &pRTV, pDSV);
 
-	//pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(1, 0, 0, 0));
+//	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
 	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -246,10 +246,10 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									pShadowBuffer->v4DepthRange = m_v4Range;
 									
 									// textures, samplers
-									int iNumTextures = pSurface->GetNumTextures();
+									int iNumTextures = pMaterialNormal->GetNumTextures();
 									for (int i = 0; i < iNumTextures; ++i)
 									{
-										const Scene::Texture* pTexture = pSurface->GetTexture(i);
+										const Scene::Texture* pTexture = pMaterialNormal->GetTexture(i);
 										std::string texName(pTexture->GetName());
 										TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 										drawNode.AddSRV(texResource.m_pShaderResourceView);
@@ -352,10 +352,10 @@ void RenderPassOpaque::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 									pCBufferLights->v4DirectionalLightColor = Math::Vector4f(v3LightColor.x, v3LightColor.y, v3LightColor.z, 1.f);
 
 									// textures
-									int iNumTextures = pSurface->GetNumTextures();
+									int iNumTextures = pMaterialNormal->GetNumTextures();
 									for (int i = 0; i < iNumTextures; ++i)
 									{
-										const Scene::Texture* pTexture = pSurface->GetTexture(i);
+										const Scene::Texture* pTexture = pMaterialNormal->GetTexture(i);
 										std::string texName(pTexture->GetName());
 										TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 										drawNode.AddSRV(texResource.m_pShaderResourceView);

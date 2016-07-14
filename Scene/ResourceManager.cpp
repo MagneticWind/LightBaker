@@ -203,6 +203,137 @@ void ResourceManager::AddGeometry(IGeometry* pGeometry)
 //------------------------------------------------------------------
 void ResourceManager::LoadTexture(Texture* pTexture)
 {
+	if (pTexture->GetType() == TEXTURE_TYPE_2D)
+	{
+		char caPath[256];
+		strcpy(caPath, ResourceManagerPrivate::TEXTURE_PATH);
+		strcat(caPath, pTexture->GetName());
+
+		// load images using IL
+		unsigned int uTextureID;
+		ilGenImages(1, &uTextureID);
+		ilBindImage(uTextureID);
+
+		// the formatting setting influences of Texture loading, so must be set up before loading
+		ilEnable(IL_FORMAT_SET);
+		ilSetInteger(IL_FORMAT_MODE, IL_RGBA); // assume all textures are rgba
+
+		if (!ilLoadImage(caPath))
+		{
+			assert(0);
+		}
+
+		int iWidth = ilGetInteger(IL_IMAGE_WIDTH);
+		int iHeight = ilGetInteger(IL_IMAGE_HEIGHT);
+
+		pTexture->SetDimension(iWidth, iHeight);
+
+		void* pData = pTexture->CreateDataBuffer();
+
+		if (pTexture->GetFormat() == TEXTURE_FORMAT_R8G8B8A8_UINT)
+		{
+			assert(ilGetInteger(IL_IMAGE_TYPE) == IL_UNSIGNED_BYTE);
+
+			unsigned char* pDataUINT8 = static_cast<unsigned char*>(pData);
+			unsigned char* pImageData = ilGetData();
+			for (int y = 0; y < iHeight; y++)
+			{
+				for (int x = 0; x < iWidth; x++)
+				{
+					int i = (y * iWidth + x) * 4;
+					pDataUINT8[i] = pImageData[i];
+					pDataUINT8[i + 1] = pImageData[i + 1];
+					pDataUINT8[i + 2] = pImageData[i + 2];
+					pDataUINT8[i + 3] = pImageData[i + 3];
+				}
+			}
+		}
+
+		ilDeleteImage(uTextureID);
+	}
+	// load 6 cube map textures
+	else if (pTexture->GetType() == TEXTURE_TYPE_CUBE)
+	{
+		float* pData = 0;
+
+		char caPath[256];
+		for (int i = 0; i < 6; ++i)
+		{
+			strcpy(caPath, ResourceManagerPrivate::TEXTURE_PATH);
+
+			char caName[256];
+			strcpy(caName, pTexture->GetName());
+			int length = strlen(caName);
+			char caPostfix[3] = {caName[length - 3], caName[length - 2], caName[length - 1]};
+			length -= 4;
+			caName[length++] = '_';
+			caName[length++] = 'c';
+			caName[length++] = '0';
+
+			char cIndex[10];
+			itoa(i, cIndex, 10);
+			caName[length++] = cIndex[0];
+			caName[length++] = '.';
+			caName[length++] = caPostfix[0];
+			caName[length++] = caPostfix[1];
+			caName[length++] = caPostfix[2];
+			caName[length] = '\0';
+
+			strcat(caPath, caName);
+
+			// load images using IL
+			unsigned int uTextureID;
+			ilGenImages(1, &uTextureID);
+			ilBindImage(uTextureID);
+
+			// the formatting setting influences of Texture loading, so must be set up before loading
+			ilEnable(IL_FORMAT_SET);
+			ilSetInteger(IL_FORMAT_MODE, IL_RGBA); // assume all textures are rgba
+
+			if (!ilLoadImage(caPath))
+			{
+				assert(0);
+			}
+
+			int w = ilGetInteger(IL_IMAGE_WIDTH);
+			int h = ilGetInteger(IL_IMAGE_HEIGHT);
+
+			if (i == 0)
+			{
+				pTexture->SetDimension(w, h);
+				pData = static_cast<float*>(pTexture->CreateDataBuffer());
+			}
+
+			if (pTexture->GetFormat() == TEXTURE_FORMAT_R32G32B32A32_FLOAT)
+			{
+				assert(ilGetInteger(IL_IMAGE_TYPE) == IL_FLOAT);
+				
+				float* pDataOffset = pData + i * w * h * 4;
+
+				float* pImageData = reinterpret_cast<float*>(ilGetData());
+				for (int y = 0; y < h; y++)
+				{
+					for (int x = 0; x < w; x++)
+					{
+						int offset = (y * w + x) * 4;
+						pDataOffset[offset] = pImageData[offset];
+						pDataOffset[offset + 1] = pImageData[offset + 1];
+						pDataOffset[offset + 2] = pImageData[offset + 2];
+						pDataOffset[offset + 3] = pImageData[offset + 3];
+					}
+				}
+
+			}
+
+			ilDeleteImage(uTextureID);
+		}
+	}
+}
+
+/*
+//------------------------------------------------------------------
+void ResourceManager::LoadCubeTexture(Texture* pTexture)
+{
 	char caPath[256];
 	strcpy(caPath, ResourceManagerPrivate::TEXTURE_PATH);
 	strcat(caPath, pTexture->GetName());
@@ -234,7 +365,7 @@ void ResourceManager::LoadTexture(Texture* pTexture)
 	int iHeight = ilGetInteger(IL_IMAGE_HEIGHT);
 
 	pTexture->SetDimension(iWidth, iHeight);
-	pTexture->SetFormat(R8G8B8A8_UINT);
+	pTexture->SetFormat(TEXTURE_FORMAT_R8G8B8A8_UINT);
 
 	void* pData = pTexture->CreateDataBuffer();
 
@@ -254,6 +385,7 @@ void ResourceManager::LoadTexture(Texture* pTexture)
 
 	ilDeleteImage(uTextureID);
 }
+*/
 
 //------------------------------------------------------------------
 void ResourceManager::LoadMeshPly(Mesh* pMesh)

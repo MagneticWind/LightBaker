@@ -12,19 +12,21 @@ Texture::Texture(const char* pName)
 	strcpy(m_name, pName);
 
 	m_eSamplerMode = SAMPLER_NOMIP_LINEAR_WRAP;
+	m_eType = TEXTURE_TYPE_2D;
 
 	m_bLoaded = false;
 	m_pData = NULL;
 }
 
 //------------------------------------------------------------------
-Texture::Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat)
+Texture::Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat, TextureType eType)
 {
 	strcpy(m_name, pName);
 
 	m_eSamplerMode = eSampler;
 	m_eLabel = eLabel;
 	m_eFormat = eFormat;
+	m_eType = eType;
 
 	m_bLoaded = false;
 	m_pData = NULL;
@@ -39,6 +41,7 @@ Texture::Texture(const char* pName, int iWidth, int iHeight, TextureFormat eForm
 	m_eFormat = eFormat;
 
 	m_eSamplerMode = SAMPLER_NOMIP_LINEAR_WRAP;
+	m_eType = TEXTURE_TYPE_2D;
 
 	m_bLoaded = false;
 	m_pData = NULL;
@@ -81,15 +84,36 @@ void Texture::SetLoaded(bool bIsLoaded)
 //------------------------------------------------------------------
 void* Texture::CreateDataBuffer()
 {
+	int perFaceByteSize = 0;
+
 	switch (m_eFormat)
 	{
-	case R8G8B8A8_UINT:
-	case R8G8B8A8_UNORM:
-		m_pData = malloc(32 * m_iWidth * m_iHeight);
-		return m_pData;
+	case TEXTURE_FORMAT_R8G8B8A8_UINT:
+	case TEXTURE_FORMAT_R8G8B8A8_UNORM:
+		perFaceByteSize = 4 * m_iWidth * m_iHeight;
+		break;
+	case TEXTURE_FORMAT_R32G32B32A32_FLOAT:
+		perFaceByteSize = 16 * m_iWidth * m_iHeight;
+		break;
 	default:
+		perFaceByteSize = 0;
 		break;
 	}
+
+	switch (m_eType)
+	{
+	case TEXTURE_TYPE_2D:
+		m_pData = malloc(perFaceByteSize);
+		break;
+	case TEXTURE_TYPE_CUBE:
+		m_pData = malloc(perFaceByteSize * 6);
+		break;
+	default:
+		m_pData = 0;
+		break;
+	}
+
+	return m_pData;
 }
 
 void Texture::DestroyDataBuffer()

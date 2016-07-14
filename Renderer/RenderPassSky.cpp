@@ -52,8 +52,8 @@ void RenderPassSky::SetRenderState(HALgfx::IDeviceContext* pDeviceContext, const
 	pDeviceContext->SetRasterizerState(pRState);
 	pDeviceContext->SetDepthStencilState(pDSState);
 
-	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0, 0, 0, 0));
-//	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
+	pDeviceContext->ClearRenderTargetView(pRTV, Math::Vector4f(0.0, 0.0, 0.0, 0));
+	pDeviceContext->ClearDepthStencilView(pDSV, HALgfx::CLEAR_DEPTH, 1.f, 0);
 
 	pDeviceContext->SetPrimitiveTopology(HALgfx::PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -100,8 +100,13 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 
 	// camera
 	const Scene::Camera* pCamera = pScene->GetCurrentCamera();
+#ifdef USE_DIRECTX
 	const Math::Matrix4f& mView = pCamera->GetViewMatrix();
 	const Math::Matrix4f& mProjection = pCamera->GetProjectionMatrix();
+#else
+	Math::Matrix4f mView = pCamera->GetViewMatrix().GetTranspos();
+	Math::Matrix4f mProjection = pCamera->GetProjectionMatrix().GetTranspos();
+#endif
 
 	std::list<Scene::IRenderObject*>::iterator itEnd = renderObjectList.end();
 	for (std::list<Scene::IRenderObject*>::iterator it = renderObjectList.begin(); it != itEnd; ++it)
@@ -180,13 +185,19 @@ void RenderPassSky::Setup(HALgfx::IDevice* pDevice, int iWidth, int iHeight)
 
 							// const buffers
 							CBufferTransform* pTransform = static_cast<CBufferTransform*>(drawNode.CreateCBufferData(sizeof(CBufferTransform), HALgfx::VERTEX_SHADER));
-							pRenderObject->GetLocalToWorldTransformation(pTransform->mWorld);
+							
+							Math::Matrix4f mWorld;
+							pRenderObject->GetLocalToWorldTransformation(mWorld);
+#ifndef USE_DIRECTX
+							mWorld = mWorld.GetTranspos();
+#endif
+							pTransform->mWorld = mWorld;
 							pTransform->mView = mView;
 							pTransform->mProjection = mProjection;
 
 							// cubemap
 							const Scene::MaterialSky* pSkyMaterial = static_cast<const Scene::MaterialSky*>(pMaterial);
-							std::string texName(pSkyMaterial->GetMapName());
+							std::string texName(pSkyMaterial->GetTexture()->GetName());
 							TextureResource& texResource = gpuResourceManager.GetTextureResource(texName);
 							drawNode.AddSRV(texResource.m_pShaderResourceView);
 

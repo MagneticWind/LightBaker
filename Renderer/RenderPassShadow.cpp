@@ -291,7 +291,7 @@ void RenderPassShadow::Initialize(HALgfx::IDevice* pDevice, int iWidth, int iHei
 	texture2dShadowmapDesc.format = HALgfx::FORMAT_R32_TYPELESS;
 	texture2dShadowmapDesc.usage = HALgfx::USAGE_DEFAULT;
 	texture2dShadowmapDesc.bindFlags = HALgfx::BIND_SHADER_RESOURCE | HALgfx::BIND_DEPTH_STENCIL;
-	m_pTexture2dShadowmap = pDevice->CreateTexture2d(texture2dShadowmapDesc, data);
+	m_pTexture2dShadowmap = pDevice->CreateTexture2d(texture2dShadowmapDesc, &data);
 
 	// shadowmap depth stencil target
 	HALgfx::DepthStencilViewDesc shadowmapDstDesc;

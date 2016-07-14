@@ -8,8 +8,15 @@ namespace Scene
 {
 enum TextureFormat
 {
-	R8G8B8A8_UINT,
-	R8G8B8A8_UNORM
+	TEXTURE_FORMAT_R8G8B8A8_UINT,
+	TEXTURE_FORMAT_R8G8B8A8_UNORM,
+	TEXTURE_FORMAT_R32G32B32A32_FLOAT
+};
+
+enum TextureType
+{
+	TEXTURE_TYPE_2D,
+	TEXTURE_TYPE_CUBE
 };
 
 enum SamplerMode
@@ -31,6 +38,7 @@ enum TextureLabel
 	TEXTURE_LABEL_NORMAL,
 	TEXTURE_LABEL_SPECULAR,
 	TEXTURE_LABEL_EMISSIVE,
+	TEXTURE_LABEL_SKY,
 	TEXTURE_LABEL_SHADOW,
 	TEXTURE_LABEL_DEPTH,
 	TEXTURE_LABEL_FRAME,
@@ -41,14 +49,16 @@ class Texture
 {
 public:
 	Texture(const char* pName);
-	Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat);
+	Texture(const char* pName, SamplerMode eSampler, TextureLabel eLabel, TextureFormat eFormat, TextureType eType);
 	Texture(const char* pName, int iWidth, int iHeight, TextureFormat eFormat);
 	~Texture();
 
 	void SetDimension(int iWidth, int iHeight, int iDepth = 0);
 	void SetFormat(TextureFormat eFormat);
+	void SetType(TextureType eType);
 
 	TextureFormat GetFormat() const;
+	TextureType GetType() const;
 	SamplerMode GetSamplerMode() const;
 	TextureLabel GetLabel() const;
 
@@ -69,6 +79,7 @@ private:
 	int m_iWidth;
 	int m_iHeight;
 	TextureFormat m_eFormat;
+	TextureType m_eType;
 	SamplerMode m_eSamplerMode;
 	TextureLabel m_eLabel;
 	void* m_pData;
@@ -86,9 +97,19 @@ inline void Texture::SetFormat(TextureFormat eFormat)
 	m_eFormat = eFormat;
 }
 
+inline void Texture::SetType(TextureType eType)
+{
+	m_eType = eType;
+}
+
 inline TextureFormat Texture::GetFormat() const
 {
 	return m_eFormat;
+}
+
+inline TextureType Texture::GetType() const
+{
+	return m_eType;
 }
 
 inline SamplerMode Texture::GetSamplerMode() const
